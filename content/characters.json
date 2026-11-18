@@ -11,7 +11,7 @@
     "age": "22",
     "height": "184 cm",
     "species": "人間",
-    "personality": "無邪気に甘えてみせる享楽家であり、頭の回転が速い合理主義者。笑顔のまま冷徹な決断を下すこともある。幼馴染にはどこまでも贔屓がち。",
+    "personality": "芝居がかった言動が多く、茶目っ気の強いエンターテイナー。頭の回転が速く大胆で合理的。笑顔のまま冷徹な決断を下すこともある。幼馴染にはどこまでも贔屓がち。",
     "artwork": "assets/orphe.png",
     "icon": "assets/creator-upload-0001-orphe-icon.webp",
     "iconPosition": 30,
@@ -35,6 +35,10 @@
       {
         "title": "希少種の君に、保護のご案内。",
         "url": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=s8gc2g2o6k"
+      },
+      {
+        "title": "幼馴染の愛が重すぎる♡",
+        "url": "https://zeta-ai.io/ja/plots/30296bda-c3bf-453c-8b12-bbcd4503a80d/profile?share_id=qq0if3of"
       }
     ],
     "links": [],
@@ -49,14 +53,6 @@
       },
       {
         "image": "assets/creator-upload-0004-orphe-gallery-3.webp",
-        "caption": ""
-      },
-      {
-        "image": "assets/creator-upload-0005-orphe-gallery-4.webp",
-        "caption": ""
-      },
-      {
-        "image": "assets/creator-upload-0006-orphe-gallery-5.webp",
         "caption": ""
       }
     ],
@@ -78,18 +74,18 @@
   {
     "id": "char-mwl0i9og-qmme",
     "name": "ノクス・モロー",
-    "roman": "NEW CAST",
-    "surname": "ORIGINAL",
-    "type": "ORIGINAL CHARACTER",
-    "roleJa": "オリジナルキャラクター",
-    "hook": "ここに一文紹介を入力します。",
-    "intro": "",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "",
-    "artwork": "assets/creator-upload-0007-char-mwl0i9og-qmme-artwork.webp",
-    "icon": "assets/creator-upload-0008-char-mwl0i9og-qmme-icon.webp",
+    "roman": "NOX",
+    "surname": "MOREAU",
+    "type": "PRIVATE BUTLER",
+    "roleJa": "ロジエ家執事",
+    "hook": "面倒くさがりな執事の、いちばん面倒な恋。",
+    "intro": "幼い頃から、ロジエ邸へ仕えている。気だるく無愛想で、口数控え目。仕事はできるが、できるだけ働きたくない有能執事。",
+    "age": "26",
+    "height": "180cm",
+    "species": "人間",
+    "personality": "退屈と面倒を嫌う、気だるい合理主義者。無愛想だが極めて有能で、義理堅く責任感が強い。甘やかすより厳しく促すことが多い一方、情は深い。長年そばにいた相手への恋心を自覚しているが、今の関係を失うことを恐れ、その欲を封じている。",
+    "artwork": "assets/creator-upload-0005-char-mwl0i9og-qmme-artwork.webp",
+    "icon": "assets/creator-upload-0006-char-mwl0i9og-qmme-icon.webp",
     "iconPosition": 25,
     "colors": {
       "accent": "#335ec1",
@@ -100,12 +96,31 @@
     "worldIds": [
       "rosier"
     ],
-    "tagIds": [],
+    "tagIds": [
+      "tag-mwly15iv-0qwh",
+      "tag-mwly1tdq-r6sb",
+      "tag-mwly0yvh-qlp6",
+      "tag-mwly3cns-bfod"
+    ],
     "playable": true,
-    "works": [],
+    "works": [
+      {
+        "title": "希少種の君に、保護のご案内",
+        "url": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=yavaxte2a"
+      },
+      {
+        "title": "執事を押し倒してしまった。",
+        "url": "https://zeta-ai.io/ja/plots/68b6706a-7691-4a5d-b7e5-2cddc27aa0f7/profile?share_id=kapbva3io"
+      }
+    ],
     "links": [],
     "gallery": [],
-    "fields": [],
+    "fields": [
+      {
+        "label": "職業",
+        "value": "執事"
+      }
+    ],
     "published": true,
     "iconCrop": {
       "x": 100,
@@ -118,23 +133,23 @@
   {
     "id": "char-mwl7ju3q-bbgr",
     "name": "ロク",
-    "reading": "",
+    "reading": "ろく",
     "aliases": "",
     "roman": "ROKU",
     "surname": "",
-    "type": "ORIGINAL CHARACTER",
-    "roleJa": "オリジナルキャラクター",
-    "hook": "ここに一文紹介を入力します。",
-    "intro": "",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "",
-    "artwork": "assets/creator-upload-0009-char-mwl7ju3q-bbgr-artwork.webp",
-    "icon": "assets/creator-upload-0010-char-mwl7ju3q-bbgr-icon.webp",
+    "type": "LOCKSMITH APPRENTICE",
+    "roleJa": "鍵職人見習い",
+    "hook": "盗みに入った屋敷へ、今夜も通い続ける元泥棒。",
+    "intro": "かつてロジエ邸へ忍び込んだ、元コソ泥のジェネット獣人。今は鍵職人の弟子として暮らしている。ロジエ邸の庭の大木を伝って窓から、ただ一人に会いに来る。",
+    "age": "20",
+    "height": "188 cm",
+    "species": "ジェネット獣人",
+    "personality": "ぶっきらぼうで飾り気がなく、思ったことを率直に口にする。根は情が深く、相手の意思を尊重する。かつては荒れた生活を送っていたが、ロジエ邸との交流を通じて穏やかになった。大切な相手を無意識に最優先するが、恋にはとことん鈍い。",
+    "artwork": "assets/creator-upload-0007-char-mwl7ju3q-bbgr-artwork.webp",
+    "icon": "assets/creator-upload-0008-char-mwl7ju3q-bbgr-icon.webp",
     "iconPosition": 25,
     "iconCrop": {
-      "x": 69.93531744716579,
+      "x": 69.34290038555442,
       "y": 0,
       "zoom": 1.2
     },
@@ -142,12 +157,28 @@
       "accent": "#84b365",
       "deep": "#272725",
       "soft": "#feee9f",
-      "bright": "#c2c2c2"
+      "bright": "#febf67"
     },
-    "worldIds": [],
-    "tagIds": [],
+    "worldIds": [
+      "rosier"
+    ],
+    "tagIds": [
+      "tag-mwly2n25-4twl",
+      "tag-mwly2x69-ldl5",
+      "tag-mwly2idz-vfjt",
+      "tag-mwly3526-tw7z"
+    ],
     "playable": true,
-    "works": [],
+    "works": [
+      {
+        "title": "希少種の君に、保護のご案内",
+        "url": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=o4c4dmwc8"
+      },
+      {
+        "title": "鈍すぎる泥棒猫は、初恋に気づけない。",
+        "url": "https://zeta-ai.io/ja/plots/b7f77570-ff71-43a6-91df-3dae3e65a3e3/profile?share_id=m60wdksq"
+      }
+    ],
     "links": [],
     "gallery": [],
     "fields": [],
@@ -158,20 +189,20 @@
   {
     "id": "char-mwl7surn-h05s",
     "name": "ルッカ・ヴィエリ",
-    "reading": "",
+    "reading": "るっか・ゔぃえり",
     "aliases": "",
-    "roman": "NEW CAST",
-    "surname": "",
-    "type": "ORIGINAL CHARACTER",
-    "roleJa": "オリジナルキャラクター",
-    "hook": "ここに一文紹介を入力します。",
-    "intro": "",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "",
-    "artwork": "assets/creator-upload-0011-char-mwl7surn-h05s-artwork.webp",
-    "icon": "assets/creator-upload-0012-char-mwl7surn-h05s-icon.webp",
+    "roman": "LUCCA",
+    "surname": "VIERI",
+    "type": "GOVERNMENT NEGOTIATOR",
+    "roleJa": "獣人保護専門の国家交渉官",
+    "hook": "獣人保護のプロにとって、君との恋だけが想定外。",
+    "intro": "国家の獣人保護交渉を担う、フェネック獣人の交渉官。明るく人懐っこいが、少々常識外れ。希少獣人の保護交渉に訪れたはずが、仕事だけでは収まらない特別な恋に落ちてしまった。",
+    "age": "24",
+    "height": "174 cm",
+    "species": "フェネック獣人",
+    "personality": "朗らかで自由奔放、好奇心と獣人への愛情にあふれた行動派。独特の距離感や大胆な言動で周囲を振り回すが、交渉の腕は超一流。恋愛経験は豊富だが、本気で誰かに執着した事はない。自分の欲望に素直で、簡単には卑屈にならない。",
+    "artwork": "assets/creator-upload-0009-char-mwl7surn-h05s-artwork.webp",
+    "icon": "assets/creator-upload-0010-char-mwl7surn-h05s-icon.webp",
     "iconPosition": 25,
     "iconCrop": {
       "x": 19.326941944888294,
@@ -184,56 +215,37 @@
       "soft": "#fffcdb",
       "bright": "#fb7941"
     },
-    "worldIds": [],
-    "tagIds": [],
+    "worldIds": [
+      "rosier"
+    ],
+    "tagIds": [
+      "tag-mwly3otu-9zn9",
+      "tag-mwly3tfw-3p0s",
+      "tag-mwly3x0c-7a7z",
+      "tag-mwly3zqe-sd7h"
+    ],
     "playable": true,
-    "works": [],
+    "works": [
+      {
+        "title": " 希少種の君に、保護のご案内",
+        "url": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=59c00s42"
+      },
+      {
+        "title": "単体プロット制作中",
+        "url": ""
+      }
+    ],
     "links": [],
     "gallery": [],
-    "fields": [],
+    "fields": [
+      {
+        "label": "職業",
+        "value": "国家交渉官"
+      }
+    ],
     "published": true,
     "createdAt": "2026-11-17T21:39:02.247Z",
     "firstPublishedAt": "2026-11-17T21:53:52.796Z"
-  },
-  {
-    "id": "char-mwl3wakn-jmzx",
-    "name": "硯",
-    "roman": "SUZURI",
-    "surname": "",
-    "type": "",
-    "roleJa": "烏の人化個体",
-    "hook": "ここに一文紹介を入力します。",
-    "intro": "",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "",
-    "artwork": "assets/creator-upload-0013-char-mwl3wakn-jmzx-artwork.webp",
-    "icon": "assets/creator-upload-0014-char-mwl3wakn-jmzx-icon.webp",
-    "iconPosition": 95,
-    "colors": {
-      "accent": "#a83dff",
-      "deep": "#180b23",
-      "soft": "#cddcfe",
-      "bright": "#6041fb"
-    },
-    "worldIds": [],
-    "tagIds": [],
-    "playable": true,
-    "works": [],
-    "links": [],
-    "gallery": [],
-    "fields": [],
-    "published": true,
-    "createdAt": "2026-11-17T19:49:42.611Z",
-    "firstPublishedAt": "2026-11-17T19:54:34.888Z",
-    "iconCrop": {
-      "x": 37.137330754352035,
-      "y": 0,
-      "zoom": 1
-    },
-    "reading": "",
-    "aliases": ""
   },
   {
     "id": "rov",
@@ -249,7 +261,7 @@
     "species": "人外 / 狼耳・角",
     "personality": "自然体でマイペース。欲求と興味に素直で、理不尽な強制を嫌う。怒鳴るより静かに決断し、束縛そのものではなく自分を閉じ込める施設を敵視する。",
     "artwork": "assets/rov.png",
-    "icon": "assets/creator-upload-0015-rov-icon.webp",
+    "icon": "assets/creator-upload-0011-rov-icon.webp",
     "iconPosition": 25,
     "colors": {
       "accent": "#378af6",
@@ -304,7 +316,7 @@
     "species": "",
     "personality": "設定準備中。",
     "artwork": "assets/unnamed.png",
-    "icon": "assets/creator-upload-0016-unnamed-icon.webp",
+    "icon": "assets/creator-upload-0012-unnamed-icon.webp",
     "iconPosition": 23,
     "colors": {
       "accent": "#8e65fb",
