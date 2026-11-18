@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rosier",
+    "title": "ロジエ邸",
+    "subtitle": "希少種の君に、保護のご案内。",
+    "summary": "世界的デザイナーの屋敷で育った希少獣人と、彼らを取り巻く人々の物語。",
+    "category": "FANTASY / ROMANCE",
+    "accent": "#f85861",
+    "image": "assets/orphe.png",
+    "link": "",
+    "stories": [
+      {
+        "title": "希少種の君に、保護のご案内。",
+        "label": "MAIN STORY",
+        "description": "国家保護通知から始まる、希少獣人とロジエ邸の物語。",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "zero",
+    "title": "零号施設",
+    "subtitle": "第零収容研究所",
+    "summary": "国家研究資源とされた人外を収容する、最高危険度の研究施設。",
+    "category": "DARK SCI-FI",
+    "accent": "#269ffb",
+    "image": "assets/rov.png",
+    "link": "https://zeta-ai.io/ja/plots/72938678-04eb-4093-9dbd-3cb7dea91d7e/profile",
+    "stories": []
+  },
+  {
+    "id": "original",
+    "title": "ORIGINAL PROJECT",
+    "subtitle": "オリジナルキャラクター",
+    "summary": "まだ名前のないキャラクターたちのためのアーカイブ。",
+    "category": "PERSONAL / OC",
+    "accent": "#9967fa",
+    "image": "assets/unnamed.png",
+    "link": "",
+    "stories": []
+  }
+]
