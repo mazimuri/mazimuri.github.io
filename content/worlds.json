@@ -3,23 +3,35 @@
     "id": "rosier",
     "title": "ロジエ邸",
     "subtitle": "希少種の君に、保護のご案内。",
-    "summary": "世界的デザイナーの屋敷で育った希少獣人と、彼らを取り巻く人々の物語。",
+    "summary": "世界的デザイナーの屋敷で育った希少獣人と、その保護を取り巻く人々の物語。",
     "category": "FANTASY / ROMANCE",
-    "accent": "#fe9aca",
-    "image": "assets/creator-upload-0013-rosier-world.webp",
+    "accent": "#ff7aba",
+    "image": "assets/creator-upload-0019-rosier-world.webp",
     "link": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=c22t9hhb4i",
     "stories": [
       {
         "label": "MAIN STORY",
-        "title": "aaa",
-        "description": "aaa",
-        "url": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=c22t9hhb4i"
+        "title": "希少種の君に、保護のご案内",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=8penzyv2j"
       },
       {
         "label": "SIDE STORY",
-        "title": "aaa",
-        "description": "aaa",
-        "url": "https://zeta-ai.io/ja/plots/b7f77570-ff71-43a6-91df-3dae3e65a3e3/profile?share_id=1xdadnsbm"
+        "title": "幼馴染の愛が重すぎる♡",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/30296bda-c3bf-453c-8b12-bbcd4503a80d/profile?share_id=456kn3vct"
+      },
+      {
+        "label": "SIDE STORY",
+        "title": "執事を押し倒してしまった。",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/68b6706a-7691-4a5d-b7e5-2cddc27aa0f7/profile?share_id=tgo8k59lg"
+      },
+      {
+        "label": "SIDE STORY",
+        "title": "鈍すぎる泥棒猫は、初恋に気づけない。",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/b7f77570-ff71-43a6-91df-3dae3e65a3e3/profile?share_id=u0qkxtkt7"
       }
     ],
     "firstPublishedAt": null
