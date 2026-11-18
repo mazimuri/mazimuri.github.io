@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#141517">
+  <meta name="description" content="CAST / SIGNAL — 創作キャラクターを巡る、ゲームUI風アーカイブ。">
+  <title>CAST / SIGNAL — Character Archive</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="scanline" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="#char/orphe" id="brandHome" aria-label="キャラクター選択画面に戻る">
+      <span class="brand-symbol"><span></span><span></span><span></span><span></span></span>
+      <span class="brand-main">CAST<span class="brand-slash">//</span>SIGNAL</span>
+      <span class="brand-mini">YOUR ORIGINAL UNIVERSE</span>
+    </a>
+    <nav class="topnav" aria-label="ページナビゲーション">
+      <button class="nav-button active" id="nav-select" data-nav="select"><span class="nav-number">01</span> SELECT</button>
+      <button class="nav-button" id="nav-index" data-nav="index"><span class="nav-number">02</span> ALL CAST</button>
+      <button class="nav-button" id="nav-worlds" data-nav="worlds"><span class="nav-number">03</span> WORLDS</button>
+      <button class="nav-button" id="nav-about" data-nav="about"><span class="nav-number">04</span> ABOUT</button>
+    </nav>
+    <div class="head-right">
+      <span class="signal-led"><i></i><span>PUBLIC</span></span>
+      <button id="motionToggle" class="motion-control" aria-pressed="true" title="アニメーションのON/OFF">MOTION <b>ON</b></button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero theme-orphe is-entering" id="hero" aria-label="キャラクター選択画面">
+      <div class="hero-surface" aria-hidden="true"></div>
+      <div class="hero-dark-panel" aria-hidden="true"></div>
+      <div class="hero-accent-slab" aria-hidden="true"></div>
+      <div class="hero-pattern" aria-hidden="true"></div>
+      <div class="hero-outline" aria-hidden="true">S</div>
+      <div class="hero-angle" aria-hidden="true"></div>
+      <div class="hero-circles" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="hero-crosshair" aria-hidden="true">＋</div>
+      <div class="hero-accent-rail" aria-hidden="true"></div><div class="hero-palette-stripe" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="hero-topline mono" aria-hidden="true"><span>/// CAST DATABASE — SELECTION SYSTEM</span><span>PUBLIC ARCHIVE &nbsp; / &nbsp; CAST NAVIGATION</span></div>
+      <div class="hero-ghostname" id="ghostName" aria-hidden="true">ORPHE</div>
+      <div class="hero-no" id="heroNumber" aria-hidden="true">01</div>
+      <div class="hero-copy" id="heroCopy" aria-live="polite">
+        <div class="intro-kicker"><span class="kicker-stroke"></span><span id="heroKicker">CHARACTER FILE &nbsp; 001 / 003</span><b id="heroNew" class="hero-new" hidden>NEW</b><span class="kicker-tick">◆</span></div>
+        <div class="title-stack"><h1 id="heroRoman">ORPHE</h1><div class="title-outline" id="heroRoman2">ROSIER</div></div>
+        <p class="hero-jp" id="heroJapanese">オルフェ・ロジエ</p>
+        <div class="hero-role"><span class="role-index">TYPE /</span><span id="heroRole">世界的ファッションデザイナー</span></div>
+        <p class="hero-hook" id="heroHook">その才能は、たった一人を美しく飾るために。</p>
+        <button class="hero-cta" type="button" id="openDetail"><span><small>ACCESS FILE</small><strong>CHARACTER PROFILE</strong></span><span class="cta-arrow" aria-hidden="true">↗</span></button>
+        <div class="mini-meta mono" id="heroMeta">ZETA / ロジエ邸 <span>●</span> 001</div>
+      </div>
+      <div class="hero-art-wrap" id="artWrap"><img class="hero-art" src="assets/orphe.png" id="heroArt" alt="オルフェ・ロジエのイラスト" draggable="false"></div>
+      <div class="hero-art-stamp" id="artStamp" aria-hidden="true"><span>FILE<br><b>001</b></span></div>
+      <div class="side-dash mono" id="sideDash" aria-hidden="true">IDENTITY VERIFIED / SIGNAL ACTIVE</div>
+      <div class="hero-bottomline mono" aria-hidden="true"><span><i></i><i></i><i></i> SELECT YOUR CHARACTER</span><span>← / → KEY TO SWITCH</span></div>
+    </section>
+    <section class="picker" aria-label="キャラクター切り替え">
+      <div class="picker-title"><span class="picker-label mono"><i></i> NOW BROWSING</span><strong>CHOOSE<br><em>YOUR</em> CAST<span class="period">.</span></strong><span class="picker-count mono" id="pickerCount">03 SIGNALS DETECTED</span></div>
+      <div class="picker-carousel" id="pickerCarousel">
+        <button type="button" class="picker-edge picker-edge-left" id="pickerEdgePrev" aria-label="前のキャラクターのアイコンを見る" hidden><span>‹</span></button>
+        <div class="picker-strip" id="pickerStrip" role="tablist" aria-label="登場キャラクター"></div>
+        <button type="button" class="picker-edge picker-edge-right" id="pickerEdgeNext" aria-label="次のキャラクターのアイコンを見る" hidden><span>›</span></button>
+      </div>
+      <div class="picker-nav"><button type="button" id="prev" aria-label="前のキャラ">← <small>PREV</small></button><button type="button" id="next" aria-label="次のキャラ"><small>NEXT</small> →</button><button type="button" class="picker-index" id="openIndex" aria-label="全キャラ一覧を開く">☷ <small>ALL CAST</small></button></div>
+    </section>
+    <div id="draftIndicator" class="preview-banner" hidden><span>◉ DRAFT PREVIEW — このブラウザ内だけの下書き表示</span><button id="backToAdmin" type="button">EDIT MODE に戻る ↗</button></div>
+    <div class="footer-bar mono"><span>CAST / SIGNAL — ORIGINAL CHARACTER ARCHIVE</span><div class="footer-social" id="footerSocial"></div><span>© mazimuri / CAST SIGNAL</span></div>
+  </main>
+
+  <div class="overlay-scrim" id="scrim" hidden></div>
+  <aside class="dossier" id="dossier" role="dialog" aria-modal="true" aria-label="キャラクター詳細" aria-hidden="true">
+    <div class="dossier-head"><span class="mono">/ / / &nbsp; CHARACTER INTELLIGENCE &nbsp; <b id="dossierNo">#001</b></span><button type="button" class="panel-close" data-close aria-label="プロフィールを閉じる">BACK TO SELECT &nbsp; ×</button></div>
+    <div class="dossier-scroll">
+      <div class="dossier-feature"><img class="dossier-mobile-art" id="dossierMobileArt" src="assets/orphe.png" alt="" aria-hidden="true"><span class="mono dossier-eyebrow" id="dossierEyebrow">PERSONNEL RECORD / ZETA</span><div class="dossier-super" id="dossierSuper">ORPHE</div><div class="dossier-name" id="dossierName">オルフェ・ロジエ</div><p class="dossier-lead" id="dossierLead">その才能は、たった一人を美しく飾るために。</p></div>
+      <div class="dossier-tabs" role="tablist" aria-label="プロフィール項目">
+        <button data-tab="profile" role="tab" aria-selected="true">01 <span>PROFILE</span></button>
+        <button data-tab="story" role="tab" aria-selected="false">02 <span>STORY</span></button>
+        <button data-tab="gallery" role="tab" aria-selected="false">03 <span>GALLERY</span></button>
+        <button data-tab="links" role="tab" aria-selected="false">04 <span>LINKS</span></button>
+      </div>
+      <div class="dossier-tab-content" id="dossierContent" aria-live="polite"></div>
+    </div>
+    <div class="dossier-foot mono"><span id="dossierFooter">ARCHIVE / 001</span><span>© CAST / SIGNAL</span></div>
+  </aside>
+
+  <aside class="directory" id="directory" role="dialog" aria-modal="true" aria-label="キャラクター一覧" aria-hidden="true">
+    <div class="directory-head"><span class="mono">// COMPLETE DATABASE</span><button type="button" data-close class="panel-close">CLOSE INDEX ×</button></div>
+    <div class="directory-content"><span class="directory-kicker mono">LOOK UP A SIGNAL</span><h2>ALL <i>CHARACTERS</i><span>.</span></h2><div class="directory-control"><label class="directory-search-label"><span class="mono">SEARCH /</span><input id="search" placeholder="キャラ名・作品・タグで検索" type="search" autocomplete="off"></label><div class="directory-filters"><button type="button" data-filter="all" aria-pressed="true">ALL</button><button type="button" data-filter="playable" aria-pressed="false">PLAYABLE</button><button type="button" data-filter="showcase" aria-pressed="false">SHOWCASE</button></div></div><div class="directory-count mono" id="directoryCount">03 FILES MATCH</div><div class="directory-items" id="directoryItems"></div></div>
+  </aside>
+
+  <aside class="directory worlds-panel" id="worldsPanel" role="dialog" aria-modal="true" aria-label="世界観から探す" aria-hidden="true">
+    <div class="directory-head"><span class="mono">// WORLD DATABASE</span><button type="button" data-close class="panel-close">CLOSE ×</button></div>
+    <div class="directory-content"><span class="directory-kicker mono">INTERCONNECTED STORIES</span><h2>WORLD <i>SELECT</i><span>.</span></h2><p class="worlds-intro">同じ世界に暮らすキャラクターを、作品から探す。</p><div id="worldCards" class="world-cards"></div></div>
+  </aside>
+
+
+  <aside class="directory world-detail-panel" id="worldDetailPanel" role="dialog" aria-modal="true" aria-label="WORLD詳細" aria-hidden="true">
+    <div class="directory-head"><span class="mono">// WORLD INTELLIGENCE / STORY NETWORK</span><button type="button" class="panel-close" id="worldDetailBack">BACK TO WORLDS ×</button></div>
+    <div id="worldDetailContent" class="world-detail-content"></div>
+  </aside>
+
+  <aside class="directory about-panel" id="aboutPanel" role="dialog" aria-modal="true" aria-label="このサイトについて" aria-hidden="true">
+    <div class="directory-head"><span class="mono">// ABOUT THE ARCHIVE</span><button type="button" data-close class="panel-close">CLOSE ×</button></div>
+    <div class="directory-content about-content">
+      <div class="about-topline mono"><span>INFORMATION FILE / 004</span><span>EST. YOUR UNIVERSE</span></div>
+      <div class="about-heading"><div><span class="directory-kicker mono">THE WORLD BEHIND THE CHARACTERS</span><h2>ABOUT<span class="about-dot">.</span></h2><p class="about-subtitle">WELCOME TO THE SIGNAL.</p></div><div class="about-deco" aria-hidden="true"><b>CS</b><span>/// ARCHIVE INFORMATION</span></div></div>
+      <div class="about-introduction"><span class="about-index mono">01 / THE ARCHIVE</span><h3 id="aboutTitle">キャラクターと、物語の保管庫。</h3><p id="aboutIntro"></p></div>
+      <div class="about-guides"><article class="about-guide"><span class="mono">02 / IMAGE POLICY</span><h3>画像について<span> ↗</span></h3><p id="aboutImages"></p></article><article class="about-guide"><span class="mono">03 / FAN WORKS</span><h3>二次創作・ファンアート<span> ↗</span></h3><p id="aboutFans"></p><div class="about-fa" id="aboutFa" hidden><span class="mono">FAN ART TAG /</span><strong id="aboutFaValue"></strong><button type="button" id="copyFa">COPY ⧉</button></div></article><article class="about-guide"><span class="mono">04 / TALK SCREENSHOTS</span><h3>zetaのトークスクショ<span> ↗</span></h3><p id="aboutScreens"></p><a class="about-terms" href="https://zeta-ai.io/ja/policy/terms" target="_blank" rel="noopener noreferrer">zetaの利用規約を確認する ↗</a></article></div>
+      <div class="about-connect"><div><span class="mono">05 / CREATOR CONNECTION</span><h3>FIND ME <i>ONLINE.</i></h3><p>作品の感想やファンアートも大歓迎。気軽に見せてね！</p></div><div class="about-connect-links" id="aboutLinks"></div></div>
+      <div class="about-end mono">THANK YOU FOR VISITING / CAST SIGNAL <span>◆ ◆ ◆</span></div>
+    </div>
+  </aside>
+
+  <!-- Fullscreen image viewer. Keeps original image proportions, supports arrows and Esc. -->
+  <div class="gallery-lightbox" id="galleryLightbox" role="dialog" aria-modal="true" aria-label="ギャラリー画像を拡大表示" aria-hidden="true" hidden>
+    <div class="lightbox-top"><div class="lightbox-brand mono"><span>◉</span> VISUAL ARCHIVE <small>/ IMAGE VIEWER</small></div><button type="button" class="lightbox-close" id="lightboxClose" aria-label="画像ビューアを閉じる">CLOSE <span>×</span></button></div>
+    <div class="lightbox-stage"><button class="lightbox-prev" type="button" id="lightboxPrev" aria-label="前の画像">‹</button><img id="lightboxImage" alt="" src="" draggable="false"><button class="lightbox-next" type="button" id="lightboxNext" aria-label="次の画像">›</button></div>
+    <div class="lightbox-foot mono"><span id="lightboxCaption">ARTWORK</span><span id="lightboxCount">01 / 01</span></div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
