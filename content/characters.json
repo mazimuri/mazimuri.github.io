@@ -7,19 +7,17 @@
     "surname": "ROSIER",
     "type": "WORLD-CLASS DESIGNER",
     "roleJa": "世界的ファッションデザイナー",
-    "hook": "その才能は、たった一人を美しく飾るために。",
+    "hook": "その才能は、たった一人を美しく飾るために！",
     "intro": "華やかで、自由奔放で、気まぐれ。世界を魅了する天才デザイナーには、どうしても特別扱いしたい幼馴染がいる。",
     "age": "22",
     "height": "184 cm",
     "species": "人間",
     "personality": "無邪気に甘えてみせる享楽家であり、頭の回転が速い合理主義者。笑顔のまま冷徹な決断を下すこともある。幼馴染にはどこまでも贔屓がち。",
-    "artwork": "assets/orphe.png",
-    "icon": "",
-    "iconPosition": 30,
+    "artwork": "/assets/orphe.png",
     "colors": {
       "accent": "#fa555d",
-      "soft": "#ffb5a6",
       "deep": "#4e141b",
+      "soft": "#ffb5a6",
       "bright": "#ff7073"
     },
     "worldIds": [
@@ -32,21 +30,18 @@
       "t-04"
     ],
     "playable": true,
+    "published": true,
     "works": [
       {
-        "title": "希少種の君に、保護のご案内。",
-        "url": ""
+        "title": "希少種の君に、保護のご案内。"
       }
     ],
-    "links": [],
-    "gallery": [],
     "fields": [
       {
         "label": "職業",
         "value": "世界的ファッションデザイナー"
       }
-    ],
-    "published": true
+    ]
   },
   {
     "id": "rov",
@@ -62,13 +57,11 @@
     "height": "178 cm",
     "species": "人外 / 狼耳・角",
     "personality": "自然体でマイペース。欲求と興味に素直で、理不尽な強制を嫌う。怒鳴るより静かに決断し、束縛そのものではなく自分を閉じ込める施設を敵視する。",
-    "artwork": "assets/rov.png",
-    "icon": "",
-    "iconPosition": 25,
+    "artwork": "/assets/rov.png",
     "colors": {
       "accent": "#199ef9",
-      "soft": "#a3e4ff",
       "deep": "#092346",
+      "soft": "#a3e4ff",
       "bright": "#20b7ff"
     },
     "worldIds": [
@@ -81,21 +74,19 @@
       "t-08"
     ],
     "playable": true,
+    "published": true,
     "works": [
       {
         "title": "第零収容研究所／零号施設",
         "url": "https://zeta-ai.io/ja/plots/72938678-04eb-4093-9dbd-3cb7dea91d7e/profile"
       }
     ],
-    "links": [],
-    "gallery": [],
     "fields": [
       {
         "label": "危険度",
         "value": "GRADE-X"
       }
-    ],
-    "published": true
+    ]
   },
   {
     "id": "unnamed",
@@ -106,17 +97,12 @@
     "roleJa": "オリジナルキャラクター",
     "hook": "名前も物語も、これから。",
     "intro": "紫のジャケットに身を包んだオリジナルキャラクター。詳しいプロフィールは制作中。",
-    "age": "",
-    "height": "",
-    "species": "",
     "personality": "設定準備中。",
-    "artwork": "assets/unnamed.png",
-    "icon": "",
-    "iconPosition": 23,
+    "artwork": "/assets/unnamed.png",
     "colors": {
       "accent": "#8e65fb",
-      "soft": "#c6bdff",
       "deep": "#231742",
+      "soft": "#c6bdff",
       "bright": "#af7aff"
     },
     "worldIds": [
@@ -126,10 +112,6 @@
       "t-09"
     ],
     "playable": false,
-    "works": [],
-    "links": [],
-    "gallery": [],
-    "fields": [],
     "published": true
   }
 ]
