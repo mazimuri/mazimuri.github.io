@@ -1,0 +1,262 @@
+# CAST / SIGNAL / GitHub-backed hosted Pages CMS configuration
+media:
+  input: assets
+  output: /assets
+  rename: safe
+  categories:
+  - image
+content:
+- name: characters
+  label: 01 / CHARACTERS — キャラクター
+  type: file
+  path: content/characters.json
+  format: json
+  list: true
+  fields:
+  - name: id
+    label: 固定ID（英数字・変更注意）
+    type: string
+    description: '例: orphe。URLの一部になるので作成後は変更しない'
+  - name: name
+    label: 名前（日本語）
+    type: string
+    required: true
+  - name: reading
+    label: 読み仮名（検索用）
+    type: string
+  - name: roman
+    label: 英字メイン
+    type: string
+  - name: surname
+    label: 英字サブ（省略可）
+    type: string
+  - name: type
+    label: TYPE英字
+    type: string
+  - name: roleJa
+    label: TYPE日本語
+    type: string
+  - name: hook
+    label: 一文キャッチコピー
+    type: string
+  - name: intro
+    label: 導入文
+    type: text
+  - name: age
+    label: 年齢
+    type: string
+  - name: height
+    label: 身長
+    type: string
+  - name: species
+    label: 種族
+    type: string
+  - name: personality
+    label: PERSONALITY
+    type: text
+  - name: artwork
+    label: 透過立ち絵
+    type: image
+  - name: icon
+    label: 顔アイコン
+    type: image
+  - name: iconCrop
+    label: アイコン位置・ズーム
+    type: object
+    fields:
+    - name: x
+      label: 左右位置（%）
+      type: number
+      description: 50が中央。既存データは入力値が異なることがあります
+    - name: y
+      label: 上下位置（%）
+      type: number
+    - name: zoom
+      label: 拡大倍率
+      type: number
+  - name: colors
+    label: テーマの4色（#から始まるHEX）
+    type: object
+    fields:
+    - name: accent
+      label: ① メインカラー HEX
+      type: string
+    - name: deep
+      label: ② 暗色 HEX
+      type: string
+    - name: soft
+      label: ③ 淡色 HEX
+      type: string
+    - name: bright
+      label: ④ 明色 HEX
+      type: string
+  - name: worldIds
+    label: '所属WORLD ID（例: rosier）'
+    type: string
+    list: true
+  - name: tagIds
+    label: 共通タグID（TAGS欄のidを参照）
+    type: string
+    list: true
+  - name: playable
+    label: zetaで遊べる
+    type: boolean
+  - name: published
+    label: 公開する
+    type: boolean
+    description: '重要: Publicリポジトリでは非表示設定でも元JSONは誰でも読めます。秘密の下書きは入力しないでください。'
+  - name: firstPublishedAt
+    label: 初回公開日（NEW表示用）
+    type: string
+    description: '例: 2026-11-18T09:00:00+09:00'
+  - name: works
+    label: キャラ出演作品
+    type: object
+    fields:
+    - name: title
+      label: 作品名
+      type: string
+    - name: url
+      label: 作品URL
+      type: string
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{title}'
+  - name: links
+    label: 追加リンク
+    type: object
+    fields:
+    - name: label
+      label: 表示名
+      type: string
+    - name: url
+      label: URL
+      type: string
+    list:
+      collapsible: true
+  - name: gallery
+    label: ギャラリー
+    type: object
+    fields:
+    - name: image
+      label: 画像
+      type: image
+    - name: caption
+      label: 説明文
+      type: string
+    list:
+      collapsible: true
+  - name: fields
+    label: 自由追加プロフィール
+    type: object
+    fields:
+    - name: label
+      label: 項目名
+      type: string
+    - name: value
+      label: 内容
+      type: string
+    list:
+      collapsible: true
+- name: worlds
+  label: 02 / WORLDS — 世界観
+  type: file
+  path: content/worlds.json
+  format: json
+  list: true
+  fields:
+  - name: id
+    label: 固定WORLD ID
+    type: string
+  - name: title
+    label: WORLD名
+    type: string
+    required: true
+  - name: subtitle
+    label: 作品名・サブタイトル
+    type: string
+  - name: summary
+    label: 世界観紹介
+    type: text
+  - name: category
+    label: ジャンル
+    type: string
+  - name: accent
+    label: テーマカラー HEX
+    type: string
+  - name: image
+    label: メイン画像
+    type: image
+  - name: link
+    label: 代表作品URL
+    type: string
+  - name: firstPublishedAt
+    label: 初回公開日（NEW表示用）
+    type: string
+  - name: stories
+    label: 関連zeta作品
+    type: object
+    fields:
+    - name: title
+      label: 作品タイトル
+      type: string
+    - name: label
+      label: MAIN STORY / SIDE STORY
+      type: string
+    - name: description
+      label: 説明
+      type: text
+    - name: url
+      label: zeta作品URL
+      type: string
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{title}'
+- name: tags
+  label: 03 / TAGS — 共通タグ
+  type: file
+  path: content/tags.json
+  format: json
+  list: true
+  fields:
+  - name: id
+    label: タグID
+    type: string
+  - name: label
+    label: タグ名
+    type: string
+- name: site
+  label: 04 / ABOUT — サイト設定
+  type: file
+  path: content/site.json
+  format: json
+  fields:
+  - name: title
+    label: サイト紹介タイトル
+    type: string
+  - name: intro
+    label: サイト紹介文
+    type: text
+  - name: imagePolicy
+    label: 画像について
+    type: text
+  - name: fanPolicy
+    label: FA・二次創作について
+    type: text
+  - name: screenshotPolicy
+    label: トークスクショについて
+    type: text
+  - name: faTag
+    label: FAタグ
+    type: string
+  - name: xUrl
+    label: XのURL
+    type: string
+  - name: zetaUrl
+    label: zetaプロフィールURL
+    type: string
+  - name: newDays
+    label: NEW表示の日数
+    type: number
