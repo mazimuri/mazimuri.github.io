@@ -1,30 +1,17 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" data-cast-version="5.9.7">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#141517">
   <meta name="description" content="CAST / SIGNAL — 創作キャラクターを巡る、ゲームUI風アーカイブ。">
   <title>CAST / SIGNAL — Character Archive</title>
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="CAST / SIGNAL">
-  <meta property="og:locale" content="ja_JP">
-  <meta property="og:title" content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ">
-  <meta property="og:description" content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。">
-  <meta property="og:url" content="https://mazimuri.github.io/">
-  <meta property="og:image" content="https://mazimuri.github.io/assets/ogp-main.jpg">
-  <meta property="og:image:secure_url" content="https://mazimuri.github.io/assets/ogp-main.jpg">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="CAST / SIGNAL — 4人のキャラクターが並ぶオリジナルキャラクターアーカイブのバナー">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ">
-  <meta name="twitter:description" content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。">
-  <meta name="twitter:image" content="https://mazimuri.github.io/assets/ogp-main.jpg">
   <link rel="stylesheet" href="style.css">
   <script src="data.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="publisher.js" defer></script>
+  <script src="admin.js" defer></script>
+  <script src="visual-engine.js" defer></script>
 </head>
 <body>
   <div class="scanline" aria-hidden="true"></div>
@@ -35,13 +22,14 @@
       <span class="brand-mini">YOUR ORIGINAL UNIVERSE</span>
     </a>
     <nav class="topnav" aria-label="ページナビゲーション">
-      <button class="nav-button active" id="nav-select" data-nav="select"><span class="nav-number">01</span> SELECT</button>
-      <button class="nav-button" id="nav-index" data-nav="index"><span class="nav-number">02</span> ALL CAST</button>
-      <button class="nav-button" id="nav-worlds" data-nav="worlds"><span class="nav-number">03</span> WORLDS</button>
-      <button class="nav-button" id="nav-about" data-nav="about"><span class="nav-number">04</span> ABOUT</button>
+      <button class="nav-button active" id="nav-select" data-nav="select"><span class="nav-number">01</span><span class="nav-text"><span class="nav-ja">キャラ選択</span><span class="nav-en">SELECT</span></span></button>
+      <button class="nav-button" id="nav-index" data-nav="index"><span class="nav-number">02</span><span class="nav-text"><span class="nav-ja">キャラ一覧</span><span class="nav-en">ALL CAST</span></span></button>
+      <button class="nav-button" id="nav-worlds" data-nav="worlds"><span class="nav-number">03</span><span class="nav-text"><span class="nav-ja">世界観</span><span class="nav-en">WORLDS</span></span></button>
+      <button class="nav-button" id="nav-about" data-nav="about"><span class="nav-number">04</span><span class="nav-text"><span class="nav-ja">サイト案内</span><span class="nav-en">ABOUT</span></span></button>
     </nav>
     <div class="head-right">
-      <span class="signal-led"><i></i><span>PUBLIC</span></span>
+      <button type="button" class="admin-launch" id="openAdmin"><span>✦</span> EDIT MODE</button>
+      <span class="signal-led"><i></i><span>DEMO</span></span>
       <button id="motionToggle" class="motion-control" aria-pressed="true" title="アニメーションのON/OFF">MOTION <b>ON</b></button>
     </div>
   </header>
@@ -57,15 +45,20 @@
       <div class="hero-circles" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="hero-crosshair" aria-hidden="true">＋</div>
       <div class="hero-accent-rail" aria-hidden="true"></div><div class="hero-palette-stripe" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <div class="hero-topline mono" aria-hidden="true"><span>/// CAST DATABASE — SELECTION SYSTEM</span><span>PUBLIC ARCHIVE &nbsp; / &nbsp; CAST NAVIGATION</span></div>
+      <div class="hero-topline mono" aria-hidden="true"><span>/// CAST DATABASE — SELECTION SYSTEM</span><span>VOL. 05.9 &nbsp; / &nbsp; CAST NAVIGATION</span></div>
       <div class="hero-ghostname" id="ghostName" aria-hidden="true">ORPHE</div>
       <div class="hero-no" id="heroNumber" aria-hidden="true">01</div>
       <div class="hero-copy" id="heroCopy" aria-live="polite">
         <div class="intro-kicker"><span class="kicker-stroke"></span><span id="heroKicker">CHARACTER FILE &nbsp; 001 / 003</span><b id="heroNew" class="hero-new" hidden>NEW</b><span class="kicker-tick">◆</span></div>
         <div class="title-stack"><h1 id="heroRoman">ORPHE</h1><div class="title-outline" id="heroRoman2">ROSIER</div></div>
         <p class="hero-jp" id="heroJapanese">オルフェ・ロジエ</p>
-        <div class="hero-role"><span class="role-index">TYPE /</span><span id="heroRole">世界的ファッションデザイナー</span></div>
-        <p class="hero-hook" id="heroHook">その才能は、たった一人を美しく飾るために。</p>
+        <div class="hero-role" hidden><span class="role-index">TYPE /</span><span id="heroRole">世界的ファッションデザイナー</span></div>
+        <div class="hero-core-data" id="heroCoreData" hidden><span id="heroSpeciesWrap" hidden><small>SPECIES</small><b id="heroSpecies"></b></span><span id="heroGenderWrap" hidden><small>GENDER</small><b id="heroGender"></b></span></div>
+        <p class="hero-hook" id="heroHook" hidden>その才能は、たった一人を美しく飾るために。</p>
+        <section class="hero-intel" id="heroIntel" aria-label="キャラクター紹介" hidden>
+          <div class="hero-voice" id="heroVoiceBlock" hidden><p id="heroVoice"></p></div>
+          <div class="hero-bio" id="heroBioBlock" hidden><p id="heroBio"></p></div>
+        </section>
         <button class="hero-cta" type="button" id="openDetail"><span><small>ACCESS FILE</small><strong>CHARACTER PROFILE</strong></span><span class="cta-arrow" aria-hidden="true">↗</span></button>
         <div class="mini-meta mono" id="heroMeta">ZETA / ロジエ邸 <span>●</span> 001</div>
       </div>
@@ -81,10 +74,10 @@
         <div class="picker-strip" id="pickerStrip" role="tablist" aria-label="登場キャラクター"></div>
         <button type="button" class="picker-edge picker-edge-right" id="pickerEdgeNext" aria-label="次のキャラクターのアイコンを見る" hidden><span>›</span></button>
       </div>
-      <div class="picker-nav"><button type="button" id="prev" aria-label="前のキャラ">← <small>PREV</small></button><button type="button" id="next" aria-label="次のキャラ"><small>NEXT</small> →</button><button type="button" class="picker-index" id="openIndex" aria-label="全キャラ一覧を開く">☷ <small>ALL CAST</small></button></div>
+      <div class="picker-nav"><button type="button" id="prev" aria-label="前のキャラ">← <small>PREV</small></button><button type="button" id="next" aria-label="次のキャラ"><small>NEXT</small> →</button><button type="button" class="picker-index" id="openIndex" aria-label="キャラ一覧を開く">☷ <small>キャラ一覧</small></button></div>
     </section>
     <div id="draftIndicator" class="preview-banner" hidden><span>◉ DRAFT PREVIEW — このブラウザ内だけの下書き表示</span><button id="backToAdmin" type="button">EDIT MODE に戻る ↗</button></div>
-    <div class="footer-bar mono"><span>CAST / SIGNAL — ORIGINAL CHARACTER ARCHIVE</span><div class="footer-social" id="footerSocial"></div><span>© mazimuri / CAST SIGNAL</span></div>
+    <div class="footer-bar mono"><span>CAST / SIGNAL — ORIGINAL CHARACTER ARCHIVE</span><div class="footer-social" id="footerSocial"></div><span>© PERSONAL PROJECT / CONCEPT BUILD 05.4</span></div>
   </main>
 
   <div class="overlay-scrim" id="scrim" hidden></div>
@@ -105,7 +98,13 @@
 
   <aside class="directory" id="directory" role="dialog" aria-modal="true" aria-label="キャラクター一覧" aria-hidden="true">
     <div class="directory-head"><span class="mono">// COMPLETE DATABASE</span><button type="button" data-close class="panel-close">CLOSE INDEX ×</button></div>
-    <div class="directory-content"><span class="directory-kicker mono">LOOK UP A SIGNAL</span><h2>ALL <i>CHARACTERS</i><span>.</span></h2><div class="directory-control"><label class="directory-search-label"><span class="mono">SEARCH /</span><input id="search" placeholder="キャラ名・作品・タグで検索" type="search" autocomplete="off"></label><div class="directory-filters"><button type="button" data-filter="all" aria-pressed="true">ALL</button><button type="button" data-filter="playable" aria-pressed="false">PLAYABLE</button><button type="button" data-filter="showcase" aria-pressed="false">SHOWCASE</button></div></div><div class="directory-count mono" id="directoryCount">03 FILES MATCH</div><div class="directory-items" id="directoryItems"></div></div>
+    <div class="directory-content cast-directory-content">
+      <div class="directory-fixed" id="directoryFixed">
+        <div class="directory-heading-row"><div><span class="directory-kicker mono">LOOK UP A SIGNAL / CAST DATABASE</span><h2>ALL <i>CHARACTERS</i><span>.</span></h2></div><span class="directory-fixed-note mono">SCROLL THE CAST / KEEP YOUR FILTERS</span></div>
+        <div class="directory-control"><label class="directory-search-label"><span class="mono">SEARCH /</span><input id="search" placeholder="キャラ名・作品・タグで検索" type="search" autocomplete="off"></label><div class="directory-filters" role="group" aria-label="キャラクター表示範囲"><button type="button" data-filter="all" aria-pressed="true">すべて</button><button type="button" data-filter="playable" aria-pressed="false">zetaで遊べる</button><button type="button" data-filter="showcase" aria-pressed="false" title="zetaで遊ぶリンクがないキャラクター">紹介のみ</button></div></div>
+        <div class="directory-subtools"><div class="directory-count mono" id="directoryCount" role="status" aria-live="polite">03 FILES MATCH</div><div class="directory-view" role="group" aria-label="一覧の表示切り替え"><span class="mono">VIEW MODE /</span><button type="button" data-directory-view="gallery" aria-pressed="true">▦ GALLERY</button><button type="button" data-directory-view="detail" aria-pressed="false">≡ DETAIL</button></div></div>
+      </div><div class="directory-items directory-gallery" id="directoryItems" tabindex="0" role="region" aria-label="検索結果・キャラクター一覧"></div>
+    </div>
   </aside>
 
   <aside class="directory worlds-panel" id="worldsPanel" role="dialog" aria-modal="true" aria-label="世界観から探す" aria-hidden="true">
@@ -131,12 +130,47 @@
     </div>
   </aside>
 
+  <div id="connectionTooltip" class="connection-tooltip" role="tooltip" aria-hidden="true" hidden>
+    <span class="connection-tooltip-kicker">CHARACTER CONNECTION ↗</span>
+    <strong id="connectionTooltipName"></strong>
+    <span id="connectionTooltipRelation"></span>
+    <small id="connectionTooltipDetail" hidden></small>
+  </div>
+
   <!-- Fullscreen image viewer. Keeps original image proportions, supports arrows and Esc. -->
   <div class="gallery-lightbox" id="galleryLightbox" role="dialog" aria-modal="true" aria-label="ギャラリー画像を拡大表示" aria-hidden="true" hidden>
     <div class="lightbox-top"><div class="lightbox-brand mono"><span>◉</span> VISUAL ARCHIVE <small>/ IMAGE VIEWER</small></div><button type="button" class="lightbox-close" id="lightboxClose" aria-label="画像ビューアを閉じる">CLOSE <span>×</span></button></div>
     <div class="lightbox-stage"><button class="lightbox-prev" type="button" id="lightboxPrev" aria-label="前の画像">‹</button><img id="lightboxImage" alt="" src="" draggable="false"><button class="lightbox-next" type="button" id="lightboxNext" aria-label="次の画像">›</button></div>
     <div class="lightbox-foot mono"><span id="lightboxCaption">ARTWORK</span><span id="lightboxCount">01 / 01</span></div>
   </div>
+
+  <!-- Editable offline proof of concept. No administrator authentication or real online publishing. -->
+  <div id="admin" class="admin-root" hidden aria-label="CAST SIGNAL 管理画面">
+    <header class="admin-top">
+      <div class="admin-brand"><span class="admin-brand-icon">✳</span><div><strong>CAST<span>//</span>SIGNAL</strong><small>CONTROL ROOM / V5.9.6 OFFLINE</small></div></div>
+      <span class="admin-draft-tag" id="adminStatus">● LOCAL DRAFT</span>
+      <div class="admin-top-actions">
+        <button type="button" class="admin-action ghost" id="adminPreview">◉ 下書きを見る</button>
+        <button type="button" class="admin-action primary" id="adminPublish">↗ 公開ビューに反映</button>
+        <button type="button" class="admin-action close" id="adminExit">× 終了</button>
+      </div>
+    </header>
+    <div class="admin-frame">
+      <aside class="admin-sidebar">
+        <div class="admin-side-label">MANAGEMENT MODULES</div>
+        <button class="admin-menu active" data-admin-section="dashboard">▦ <span>OVERVIEW</span><small>00</small></button>
+        <button class="admin-menu" data-admin-section="characters">♙ <span>CHARACTERS</span><small>01</small></button>
+        <button class="admin-menu" data-admin-section="worlds">◎ <span>WORLDS</span><small>02</small></button>
+        <button class="admin-menu" data-admin-section="tags">⌗ <span>TAGS</span><small>03</small></button>
+        <button class="admin-menu" data-admin-section="about">✦ <span>ABOUT</span><small>04</small></button>
+        <button class="admin-menu" data-admin-section="backup">⇅ <span>BACKUP</span><small>05</small></button>
+        <button class="admin-menu" data-admin-section="publish">⇧ <span>GITHUB EXPORT</span><small>06</small></button>
+        <div class="admin-side-bottom"><span class="pulse-dot"></span><b>LOCAL WORKSPACE</b><p>ここでの「公開」はこのブラウザ内のデモだけ。Xで共有できる公開サイトは、サーバーへの公開と認証設定が必要です。</p></div>
+      </aside>
+      <div class="admin-workspace"><div class="admin-screen-top"><span class="admin-path" id="adminPath">/ CONTROL / OVERVIEW</span><span class="admin-save-status" id="saveStatus">保存済み</span></div><div id="adminContent" class="admin-content"></div></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
