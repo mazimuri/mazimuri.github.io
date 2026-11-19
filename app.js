@@ -110,11 +110,11 @@ function followSelected(animate=true){
  // ScrollIntoView would also scroll the whole page; keep movement inside this rail only.
 }
 function updatePickerEdges(){
- const strip=$('pickerStrip'),overflow=strip.scrollWidth>strip.clientWidth+5;
- const left=$('pickerEdgePrev'),right=$('pickerEdgeNext');
- if(!overflow){left.hidden=true;right.hidden=true;return}
- left.hidden=strip.scrollLeft<=3;
- right.hidden=strip.scrollLeft>=strip.scrollWidth-strip.clientWidth-4;
+ // The selector loops from the last character to the first, and vice versa.
+ // Keep both rail arrows visible even when the thumbnail strip is at either end.
+ const canCycle=state.people.length>1;
+ $('pickerEdgePrev').hidden=!canCycle;
+ $('pickerEdgeNext').hidden=!canCycle;
 }
 function route(path){const h='#'+path;if(location.hash!==h)history.pushState(null,'',h)}
 function choose(id,{routing=true,detail=false}={}){const i=state.people.findIndex(p=>p.id===id);if(i<0)return;state.index=i;close(false);load();if(detail){state.tab='profile';open('dossier',false)}if(routing)route('char/'+id+(detail?'/profile':''))}
