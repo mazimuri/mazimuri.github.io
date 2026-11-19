@@ -69,7 +69,8 @@
       "zoom": 1.05
     },
     "reading": "",
-    "aliases": ""
+    "aliases": "",
+    "relationships": []
   },
   {
     "id": "char-mwl0i9og-qmme",
@@ -128,7 +129,8 @@
       "zoom": 1.25
     },
     "reading": "",
-    "aliases": ""
+    "aliases": "",
+    "relationships": []
   },
   {
     "id": "char-mwl7ju3q-bbgr",
@@ -184,7 +186,8 @@
     "fields": [],
     "published": true,
     "createdAt": "2026-11-17T21:32:03.329Z",
-    "firstPublishedAt": "2026-11-17T21:33:52.437Z"
+    "firstPublishedAt": "2026-11-17T21:33:52.437Z",
+    "relationships": []
   },
   {
     "id": "char-mwl7surn-h05s",
@@ -245,229 +248,7 @@
     ],
     "published": true,
     "createdAt": "2026-11-17T21:39:02.247Z",
-    "firstPublishedAt": "2026-11-17T21:53:52.796Z"
-  },
-  {
-    "id": "rov",
-    "name": "ロヴ",
-    "roman": "ROV",
-    "surname": "GRADE–X",
-    "type": "CONTAINMENT / GRADE–X",
-    "roleJa": "最危険収容個体",
-    "hook": "噛みちぎれないのは、拘束具じゃない。",
-    "intro": "危険度最高等級の人外。強靭な牙と身体能力を持ちながら、施設での自由は奪われたまま。自分の意志だけは、誰にも渡さない。",
-    "age": "20",
-    "height": "178 cm",
-    "species": "人外 / 狼耳・角",
-    "personality": "自然体でマイペース。欲求と興味に素直で、理不尽な強制を嫌う。怒鳴るより静かに決断し、束縛そのものではなく自分を閉じ込める施設を敵視する。",
-    "artwork": "assets/rov.png",
-    "icon": "assets/creator-upload-0011-rov-icon.webp",
-    "iconPosition": 25,
-    "colors": {
-      "accent": "#378af6",
-      "soft": "#ffd9a3",
-      "deep": "#181b2f",
-      "bright": "#0033ff"
-    },
-    "worldIds": [
-      "zero"
-    ],
-    "tagIds": [
-      "t-05",
-      "t-06",
-      "t-07",
-      "t-08"
-    ],
-    "playable": true,
-    "works": [
-      {
-        "title": "第零収容研究所／零号施設",
-        "url": "https://zeta-ai.io/ja/plots/72938678-04eb-4093-9dbd-3cb7dea91d7e/profile"
-      }
-    ],
-    "links": [],
-    "gallery": [],
-    "fields": [
-      {
-        "label": "危険度",
-        "value": "GRADE-X"
-      }
-    ],
-    "published": true,
-    "iconCrop": {
-      "x": 79.24779251663617,
-      "y": 100,
-      "zoom": 1.2
-    },
-    "reading": "",
-    "aliases": ""
-  },
-  {
-    "id": "char-mwlz5upf-pkm8",
-    "name": "ゼイン",
-    "reading": "",
-    "aliases": "",
-    "roman": "ZAYN",
-    "surname": "",
-    "type": "ORIGINAL CHARACTER",
-    "roleJa": "オリジナルキャラクター",
-    "hook": "ここに一文紹介を入力します。",
-    "intro": "",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "",
-    "artwork": "assets/creator-upload-0012-char-mwlz5upf-pkm8-artwork.webp",
-    "icon": "assets/creator-upload-0013-char-mwlz5upf-pkm8-icon.webp",
-    "iconPosition": 25,
-    "iconCrop": {
-      "x": 59.623485630894066,
-      "y": 0,
-      "zoom": 1.1
-    },
-    "colors": {
-      "accent": "#68080d",
-      "deep": "#0b0404",
-      "soft": "#5e2b2b",
-      "bright": "#a02727"
-    },
-    "worldIds": [
-      "zero"
-    ],
-    "tagIds": [],
-    "playable": true,
-    "works": [],
-    "links": [],
-    "gallery": [],
-    "fields": [],
-    "published": true,
-    "createdAt": "2026-11-18T10:25:00.690Z",
-    "firstPublishedAt": "2026-11-18T11:39:58.296Z"
-  },
-  {
-    "id": "char-mwm2gdu5-ms9z",
-    "name": "ルキ",
-    "reading": "",
-    "aliases": "",
-    "roman": "LUKI",
-    "surname": "",
-    "type": "ORIGINAL CHARACTER",
-    "roleJa": "オリジナルキャラクター",
-    "hook": "ここに一文紹介を入力します。",
-    "intro": "",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "",
-    "artwork": "assets/creator-upload-0014-char-mwm2gdu5-ms9z-artwork.webp",
-    "icon": "assets/creator-upload-0015-char-mwm2gdu5-ms9z-icon.webp",
-    "iconPosition": 25,
-    "iconCrop": {
-      "x": 33.29978379184374,
-      "y": 0,
-      "zoom": 1
-    },
-    "colors": {
-      "accent": "#ff8093",
-      "deep": "#df2046",
-      "soft": "#553535",
-      "bright": "#eeafaf"
-    },
-    "worldIds": [
-      "zero"
-    ],
-    "tagIds": [],
-    "playable": true,
-    "works": [],
-    "links": [],
-    "gallery": [],
-    "fields": [],
-    "published": true,
-    "createdAt": "2026-11-18T11:57:08.458Z",
-    "firstPublishedAt": "2026-11-18T12:04:13.315Z"
-  },
-  {
-    "id": "char-mwm2jrl8-adlo",
-    "name": "セルガ",
-    "reading": "",
-    "aliases": "",
-    "roman": "NEW CAST",
-    "surname": "",
-    "type": "ORIGINAL CHARACTER",
-    "roleJa": "オリジナルキャラクター",
-    "hook": "ここに一文紹介を入力します。",
-    "intro": "",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "",
-    "artwork": "assets/creator-upload-0016-char-mwm2jrl8-adlo-artwork.webp",
-    "icon": "assets/creator-upload-0017-char-mwm2jrl8-adlo-icon.webp",
-    "iconPosition": 25,
-    "iconCrop": {
-      "x": 72.17409631299141,
-      "y": 0,
-      "zoom": 1
-    },
-    "colors": {
-      "accent": "#95469b",
-      "deep": "#181920",
-      "soft": "#f1efef",
-      "bright": "#c680ff"
-    },
-    "worldIds": [
-      "zero"
-    ],
-    "tagIds": [],
-    "playable": true,
-    "works": [],
-    "links": [],
-    "gallery": [],
-    "fields": [],
-    "published": true,
-    "createdAt": "2026-11-18T11:59:44.925Z",
-    "firstPublishedAt": "2026-11-18T12:04:13.315Z"
-  },
-  {
-    "id": "unnamed",
-    "name": "名前未定",
-    "roman": "UNNAMED",
-    "surname": "O.C. / 03",
-    "type": "ORIGINAL / UNREGISTERED",
-    "roleJa": "オリジナルキャラクター",
-    "hook": "名前も物語も、これから。",
-    "intro": "紫のジャケットに身を包んだオリジナルキャラクター。詳しいプロフィールは制作中。",
-    "age": "",
-    "height": "",
-    "species": "",
-    "personality": "設定準備中。",
-    "artwork": "assets/unnamed.png",
-    "icon": "assets/creator-upload-0018-unnamed-icon.webp",
-    "iconPosition": 23,
-    "colors": {
-      "accent": "#8e65fb",
-      "soft": "#c6bdff",
-      "deep": "#231742",
-      "bright": "#af7aff"
-    },
-    "worldIds": [
-      "original"
-    ],
-    "tagIds": [
-      "t-09"
-    ],
-    "playable": false,
-    "works": [],
-    "links": [],
-    "gallery": [],
-    "fields": [],
-    "published": true,
-    "iconCrop": {
-      "x": 91.67498971972248,
-      "y": 0,
-      "zoom": 1.15
-    },
-    "reading": "",
-    "aliases": ""
+    "firstPublishedAt": "2026-11-17T21:53:52.796Z",
+    "relationships": []
   }
 ]
