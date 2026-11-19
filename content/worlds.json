@@ -35,41 +35,5 @@
       }
     ],
     "firstPublishedAt": null
-  },
-  {
-    "id": "zero",
-    "title": "零号施設",
-    "subtitle": "第零収容研究所",
-    "summary": "国家研究資源とされた人外を収容する、最高危険度の研究施設。",
-    "category": "DARK SCI-FI",
-    "accent": "#269ffb",
-    "image": "assets/rov.png",
-    "link": "https://zeta-ai.io/ja/plots/72938678-04eb-4093-9dbd-3cb7dea91d7e/profile",
-    "stories": [],
-    "firstPublishedAt": null
-  },
-  {
-    "id": "original",
-    "title": "ORIGINAL PROJECT",
-    "subtitle": "オリジナルキャラクター",
-    "summary": "まだ名前のないキャラクターたちのためのアーカイブ。",
-    "category": "PERSONAL / OC",
-    "accent": "#9967fa",
-    "image": "assets/unnamed.png",
-    "link": "",
-    "stories": [],
-    "firstPublishedAt": null
-  },
-  {
-    "id": "world-mwl0gdn2-fhb6",
-    "title": "新しいWORLD",
-    "subtitle": "",
-    "summary": "",
-    "category": "",
-    "accent": "#e8fa42",
-    "image": "",
-    "link": "",
-    "stories": [],
-    "firstPublishedAt": null
   }
 ]
