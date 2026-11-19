@@ -42,6 +42,38 @@ function setTheme(c){
  $('dossier').style.setProperty('--deep',colors.deep);
 }
 function setText(id,value){$(id).textContent=String(value??'')}
+// Persistent visual scroll progress for the fixed-size INTRODUCTION window.
+// The scrolling remains native, so wheel, touch and keyboard continue to work.
+function updateIntroScrollIndicator(){
+ const text=$('heroBio'),track=$('introScrollRail');if(!text||!track)return;
+ const overflow=text.scrollHeight-text.clientHeight;
+ track.hidden=overflow<3||$('heroBioBlock').hidden;
+ if(track.hidden)return;
+ const height=track.clientHeight;
+ const thumb=Math.max(14,Math.min(height,height*text.clientHeight/text.scrollHeight));
+ const top=overflow?text.scrollTop/overflow*(height-thumb):0;
+ const knob=track.firstElementChild;
+ knob.style.height=thumb+'px';knob.style.transform='translateY('+top+'px)';
+}
+function updateMobileIntroProgress(){
+ const reading=$('mobileIntroText'), track=$('mobileIntroTrack'), thumb=$('mobileIntroThumb');
+ if(!reading||!track||!thumb)return;
+ const diff=reading.scrollHeight-reading.clientHeight,trackHeight=track.clientHeight;
+ track.hidden=diff<2;
+ if(track.hidden)return;
+ const th=Math.max(15,Math.min(trackHeight,reading.clientHeight/reading.scrollHeight*trackHeight));
+ thumb.style.height=th+'px';thumb.style.transform='translateY('+reading.scrollTop/diff*(trackHeight-th)+'px)';
+}
+function renderMobileSelection(){
+ const c=cur(),track=$('mobilePortraitTrack'), viewport=$('mobilePortraitViewport');
+ if(!c||!track)return;
+ track.innerHTML=state.people.map(p=>`<button type="button" class="mobile-portrait" role="tab" data-mobile-person="${esc(p.id)}" aria-selected="${p.id===c.id}" style="--portrait-accent:${esc(p.colors.accent)}" aria-label="${esc(p.name)}を選ぶ" title="${esc(p.name)}"><span><img src="${esc(icon(p))}" alt="" style="${cropStyle(p,'choose')}" class="cast-icon ${p.icon?'has-face':''}" data-crop-render></span></button>`).join('');
+ setText('mobilePickerCount',String(state.index+1).padStart(2,'0')+' / '+String(state.people.length).padStart(2,'0'));
+ requestAnimationFrame(()=>{const chosen=track.querySelector('[aria-selected="true"]');if(!chosen)return;
+ const destination=chosen.offsetLeft+chosen.offsetWidth/2-viewport.clientWidth/2;
+ viewport.scrollTo({left:Math.max(0,destination),behavior:'instant'});
+ });
+}
 function showEmpty(){stage.style.display='none';$('pickerStrip').innerHTML='<p class="empty">公開中のキャラクターはまだいません。</p>'}
 function load({animate=true}={}){
  if(!state.people.length){showEmpty();return} stage.style.display='';const c=cur();setTheme(c);
@@ -49,10 +81,14 @@ function load({animate=true}={}){
  setText('heroKicker',`CHARACTER FILE ${c.no} / ${String(state.people.length).padStart(3,'0')}`);setText('heroRole',c.roleJa||c.type||'ORIGINAL CHARACTER');
  const species=String(c.species||'').trim(),gender=String(c.gender||'').trim();$('heroCoreData').hidden=!(species||gender);$('heroSpeciesWrap').hidden=!species;$('heroGenderWrap').hidden=!gender;setText('heroSpecies',species);setText('heroGender',gender);
  setText('heroHook',c.hook||'');const voice=String(c.quote||'').trim(),bio=String(c.intro||'').trim();
- $('heroVoiceBlock').hidden=!voice;$('heroBioBlock').hidden=!bio;$('heroIntel').hidden=!(voice||bio);setText('heroVoice',voice);setText('heroBio',bio);$('heroCopy').classList.toggle('has-voice',!!voice);$('heroCopy').classList.toggle('has-bio',!!bio);$('heroNew').hidden=!isNew(c);setText('heroNumber',String(state.index+1).padStart(2,'0'));setText('ghostName',c.roman||'SIGNAL');
+ $('heroVoiceBlock').hidden=!voice;$('heroBioBlock').hidden=!bio;$('heroIntel').hidden=!(voice||bio);setText('heroVoice',voice);setText('heroBio',bio);$('heroBio').scrollTop=0;requestAnimationFrame(updateIntroScrollIndicator);$('heroCopy').classList.toggle('has-voice',!!voice);$('heroCopy').classList.toggle('has-bio',!!bio);$('heroNew').hidden=!isNew(c);setText('heroNumber',String(state.index+1).padStart(2,'0'));setText('ghostName',c.roman||'SIGNAL');
+ setText('mobileQuoteName',c.name||'名前未定');setText('mobileQuoteText',voice);
+ $('mobileQuote').classList.toggle('no-quote',!voice);
+ setText('mobileIntroText',bio||'紹介文は準備中です。');setText('mobileIntroNumber',c.no+' / CHARACTER FILE');
+ $('mobileIntroText').scrollTop=0;requestAnimationFrame(updateMobileIntroProgress);
  setText('heroMeta',`${c.playable?'PLAYABLE / zeta':'SHOWCASE'} / ${c.world}  ●  ${c.no}`);setText('sideDash',c.deco+' / SYSTEM READY');
  $('heroArt').src=c.artwork||'';const pos={x:0,y:0,zoom:1,...(c.artPosition||{})};$('heroArt').style.setProperty('--art-x',`${Number(pos.x)||0}%`);$('heroArt').style.setProperty('--art-y',`${Number(pos.y)||0}%`);$('heroArt').style.setProperty('--art-zoom',Number(pos.zoom)||1);$('heroArt').alt=c.name+'の立ち絵';const badge={right:17,top:10,...(c.fileBadgePosition||{})},mobileBadge={right:8,top:66,...(c.fileBadgePositionMobile||{})};$('artStamp').style.setProperty('--badge-right',Number(badge.right)+'%');$('artStamp').style.setProperty('--badge-top',Number(badge.top)+'%');$('artStamp').style.setProperty('--badge-mobile-right',Number(mobileBadge.right)+'%');$('artStamp').style.setProperty('--badge-mobile-top',Number(mobileBadge.top)+'%');$('artStamp').innerHTML=`<span>FILE<br><b>${esc(c.no)}</b></span>`;
- renderPicker();if(state.panel==='dossier')renderDossier();
+ renderPicker();renderMobileSelection();if(state.panel==='dossier')renderDossier();
  clearTimeout(state.enterTimer);const nonce=++state.enterNonce;stage.classList.remove('is-entering');
  if(animate&&state.animations){stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px');void stage.offsetWidth;stage.classList.add('is-entering');state.enterTimer=setTimeout(()=>{if(state.enterNonce===nonce)stage.classList.remove('is-entering')},1220)}
 }
@@ -102,7 +138,7 @@ function relationPanel(c){
  }).join('');
  const worldLinks=worlds.map(w=>`<button type="button" class="connection-world-link" data-related-world="${esc(w.id)}"><span class="connection-world-label">WORLD <b>${esc(w.title)}</b></span><span aria-hidden="true">↗</span></button>`).join('');
  return `<section class="file-profile-section file-connections" aria-label="関連キャラと所属WORLD">
-   <div class="file-section-label mono"><b>04</b><span>CONNECTIONS <small>関連キャラ</small></span></div>
+   <div class="file-section-label mono"><b>03</b><span>CONNECTIONS <small>関連キャラ</small></span></div>
    ${relationships.length?`<div class="connection-avatars" role="group" aria-label="関連キャラのプロフィール">${faces}</div>`:''}
    ${worldLinks?`<div class="connection-worlds-compact">${worldLinks}</div>`:''}
  </section>`;
@@ -122,9 +158,8 @@ function renderDossier(){const c=cur();if(!c)return;
      <div class="file-section-label mono"><b>01</b><span>PERSONALITY <small>人物像</small></span></div>
      <p class="file-reading">${esc(c.personality||'設定準備中')}</p>
    </section>
-   ${(c.intro||c.hook)?`<section class="file-profile-section file-background"><div class="file-section-label mono"><b>02</b><span>OVERVIEW <small>人物概要</small></span></div>${c.hook?`<p class="file-hook-note">${esc(c.hook)}</p>`:''}${c.intro?`<p class="file-reading">${esc(c.intro)}</p>`:''}</section>`:''}
    <section class="file-profile-section file-identity">
-     <div class="file-section-label mono"><b>03</b><span>PROFILE DATA <small>基本データ</small></span></div>
+     <div class="file-section-label mono"><b>02</b><span>PROFILE DATA <small>基本データ</small></span></div>
      <div class="file-data-layout">
        ${basic.filter(([k])=>k==='TYPE').map(([k,v])=>`<div class="file-data-role"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}
        <div class="file-data-facts">
@@ -133,7 +168,7 @@ function renderDossier(){const c=cur();if(!c)return;
      </div>
    </section>
    ${relationPanel(c)}
-   ${tags.length?`<section class="file-profile-section file-keywords"><div class="file-section-label mono"><b>05</b><span>KEYWORDS <small>タグ</small></span></div><div class="file-tags">${tags.map(t=>`<span># ${esc(t)}</span>`).join('')}</div></section>`:''}
+   ${tags.length?`<section class="file-profile-section file-keywords"><div class="file-section-label mono"><b>04</b><span>KEYWORDS <small>タグ</small></span></div><div class="file-tags">${tags.map(t=>`<span># ${esc(t)}</span>`).join('')}</div></section>`:''}
  </div>`;
  } else if(state.tab==='story'){
  const works=c.workRecords.length?c.workRecords.map((t,i)=>{const tag=validUrl(t.url)?'a':'div',attrs=tag==='a'?`href="${esc(validUrl(t.url))}" target="_blank" rel="noopener noreferrer"`:'';return `<${tag} ${attrs} class="work-row ${tag==='a'?'work-clickable':''}"><div><small>STORY / ${String(i+1).padStart(2,'0')}</small><strong>${esc(t.title||'')}</strong></div><span class="work-arrow">${tag==='a'?'↗':'—'}</span></${tag}>`}).join(''):'<p class="tab-paragraph">作品はまだ登録されていません。</p>';
@@ -200,6 +235,7 @@ function renderAbout(){
  const links=[{label:'X / TWITTER',url:t.xUrl,icon:'X'},{label:'ZETA / CREATOR',url:t.zetaUrl,icon:'zeta'}].filter(l=>validUrl(l.url));
  $('aboutLinks').innerHTML=links.length?links.map(l=>`<a href="${esc(l.url)}" rel="noopener noreferrer" target="_blank"><b>${esc(l.icon)}</b><span>${esc(l.label)}</span><em>↗</em></a>`).join(''):'<span class="about-link-pending">CREATOR LINKS / 準備中</span>';
  $('footerSocial').innerHTML=links.map(l=>`<a href="${esc(l.url)}" rel="noopener noreferrer" target="_blank" aria-label="${esc(l.label)}を開く">${esc(l.icon)} ↗</a>`).join('');
+ $('mobileSocialLinks').innerHTML=links.length?links.map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(l.label)}を開く"><b>${esc(l.icon)}</b></a>`).join(''):'<small>LINKS / 準備中</small>';
 }
 function setNav(){$$('[data-nav]').forEach(b=>b.classList.toggle('active',state.panel==='directory'?b.dataset.nav==='index':(state.panel==='worldsPanel'||state.panel==='worldDetailPanel')?b.dataset.nav==='worlds':state.panel==='aboutPanel'?b.dataset.nav==='about':b.dataset.nav==='select'))}
 function open(which,routing=true){close(false);state.panel=which;const el=$(which);el.setAttribute('aria-hidden','false');el.classList.add('open');$('scrim').hidden=false;requestAnimationFrame(()=>$('scrim').classList.add('visible'));document.body.style.overflow='hidden';document.body.classList.toggle('detail-open',which==='dossier');if(which==='dossier'){renderDossier();$('dossierContent').scrollTop=0}if(which==='directory')renderDirectory();if(which==='worldsPanel')renderWorlds();if(which==='worldDetailPanel')renderWorldDetail();if(which==='aboutPanel')renderAbout();setNav();if(routing)route(which==='dossier'?'char/'+cur().id+'/'+state.tab:which==='directory'?'index':which==='aboutPanel'?'about':which==='worldDetailPanel'?'world/'+state.world:'worlds');el.querySelector('[data-close]')?.focus({preventScroll:true})}
@@ -239,7 +275,8 @@ window.addEventListener('resize',hideConnectionTooltip);
 $('dossierContent').addEventListener('click',e=>{const rel=e.target.closest('[data-related-id]');if(rel){hideConnectionTooltip();choose(rel.dataset.relatedId,{detail:true});return}const w=e.target.closest('[data-related-world]');if(w){hideConnectionTooltip();openWorld(w.dataset.relatedWorld)}});
 $('pickerStrip').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)choose(b.dataset.person)});
 $('prev').onclick=()=>shift(-1);$('next').onclick=()=>shift(1);
-$('pickerStrip').addEventListener('scroll',updatePickerEdges,{passive:true});window.addEventListener('resize',()=>{followSelected(false);updatePickerEdges()});
+$('pickerStrip').addEventListener('scroll',updatePickerEdges,{passive:true});$('heroBio').addEventListener('scroll',updateIntroScrollIndicator,{passive:true});
+window.addEventListener('resize',()=>{followSelected(false);updatePickerEdges();updateIntroScrollIndicator()});
 $('pickerEdgePrev').onclick=()=>shift(-1);$('pickerEdgeNext').onclick=()=>shift(1);
 $('openDetail').onclick=()=>{state.tab='profile';open('dossier')};
 $('openIndex').onclick=()=>{state.world='';state.filter='all';$('search').value='';open('directory')};
@@ -255,8 +292,65 @@ $('worldCards').addEventListener('click',e=>{const b=e.target.closest('[data-wor
 $('worldDetailBack').onclick=()=>open('worldsPanel');
 $('worldDetailContent').addEventListener('click',e=>{const b=e.target.closest('[data-world-character]');if(b)choose(b.dataset.worldCharacter,{detail:true})});
 $('dossierContent').addEventListener('click',e=>{const mode=e.target.closest('[data-gallery-mode]'),pick=e.target.closest('[data-gallery-select]');if(mode){galleryState.view=mode.dataset.galleryMode;renderDossier()}else if(pick){galleryState.focus=Number(pick.dataset.gallerySelect);renderDossier()}});
-$('motionToggle').onclick=()=>{state.animations=!state.animations;document.body.classList.toggle('no-motion',!state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;$('motionToggle').setAttribute('aria-pressed',String(state.animations))};
+$('motionToggle').onclick=()=>{state.animations=!state.animations;document.body.classList.toggle('no-motion',!state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
+$('motionToggle').setAttribute('aria-pressed',String(state.animations))};
 $('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
+// V5.9.8: compact mobile navigation, no impact on desktop navigation.
+$('mobileIntroText').addEventListener('scroll',updateMobileIntroProgress,{passive:true});
+window.addEventListener('resize',updateMobileIntroProgress);
+$('mobileOpenDetail').addEventListener('click',()=>$('openDetail').click());
+$('mobilePrev').addEventListener('click',()=>shift(-1));
+$('mobileNext').addEventListener('click',()=>shift(1));
+$('mobileAllCast').addEventListener('click',()=>$('openIndex').click());
+$('mobilePortraitTrack').addEventListener('click',e=>{const b=e.target.closest('[data-mobile-person]');if(b)choose(b.dataset.mobilePerson)});
+const mobileMenuToggle=$('mobileMenuToggle'), mobileNav=$('mobileNav');
+const mobileBackdrop=$('mobileNavBackdrop'), mobileMenuClose=$('mobileMenuClose');
+const mobileMotionToggle=$('mobileMotionToggle');
+function setMobileMenu(opened){
+ const openNow=Boolean(opened&&matchMedia('(max-width:620px)').matches);
+ mobileMenuToggle.setAttribute('aria-expanded',String(openNow));
+ mobileMenuToggle.setAttribute('aria-label',openNow?'メニューを閉じる':'メニューを開く');
+ mobileNav.setAttribute('aria-hidden',String(!openNow));
+ mobileNav.inert=!openNow;
+ mobileNav.classList.toggle('open',openNow);
+ mobileBackdrop.hidden=!openNow;
+ document.body.classList.toggle('mobile-menu-open',openNow);
+ if(openNow)mobileMenuClose.focus({preventScroll:true});
+}
+mobileMenuToggle.addEventListener('click',()=>setMobileMenu(mobileMenuToggle.getAttribute('aria-expanded')!=='true'));
+mobileMenuClose.addEventListener('click',()=>{setMobileMenu(false);mobileMenuToggle.focus({preventScroll:true})});
+mobileBackdrop.addEventListener('click',()=>setMobileMenu(false));
+$$('#mobileNav [data-nav]').forEach(b=>b.addEventListener('click',()=>setMobileMenu(false)));
+mobileMotionToggle.innerHTML=$('motionToggle').innerHTML;
+mobileMotionToggle.addEventListener('click',()=>{$('motionToggle').click(); mobileMotionToggle.innerHTML=$('motionToggle').innerHTML});
+window.addEventListener('resize',()=>{if(!matchMedia('(max-width:620px)').matches)setMobileMenu(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('mobile-menu-open')){e.stopImmediatePropagation();setMobileMenu(false);mobileMenuToggle.focus({preventScroll:true})}},true);
+
+// Mobile ALL CAST: keep search/filter available without stealing screen height.
+const filterToggle=$('mobileFilterToggle'),filterPanel=$('mobileFilters');
+filterToggle.addEventListener('click',()=>{
+ const open=filterToggle.getAttribute('aria-expanded')!=='true';
+ filterToggle.setAttribute('aria-expanded',String(open));
+ filterToggle.querySelector('span').textContent=open?'−':'＋';
+ filterPanel.classList.toggle('mobile-filters-open',open);
+ if(open)$('search').focus({preventScroll:true});
+});
+
+// Swipe horizontally over the character stage to switch cast members.
+// Vertical movement is left to native page/intro scrolling; taps and controls are untouched.
+let mobileSwipe=null;
+function skipSwipeTarget(e){return Boolean(e.target.closest('button,a,input,textarea,select,.hero-bio,.hero-voice,.hero-cta,.mobile-intro,.mobile-quote,.mobile-profile'))}
+stage.addEventListener('touchstart',e=>{
+ if(!matchMedia('(max-width:620px)').matches||state.panel||document.body.classList.contains('mobile-menu-open')||e.touches.length!==1||skipSwipeTarget(e)){mobileSwipe=null;return}
+ mobileSwipe={x:e.touches[0].clientX,y:e.touches[0].clientY,time:Date.now()};
+},{passive:true});
+stage.addEventListener('touchend',e=>{
+ if(!mobileSwipe||e.changedTouches.length!==1||state.panel||document.body.classList.contains('mobile-menu-open')){mobileSwipe=null;return}
+ const dx=e.changedTouches[0].clientX-mobileSwipe.x,dy=e.changedTouches[0].clientY-mobileSwipe.y;
+ if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.45&&Date.now()-mobileSwipe.time<950)shift(dx<0?1:-1);
+ mobileSwipe=null;
+},{passive:true});
+stage.addEventListener('touchcancel',()=>{mobileSwipe=null},{passive:true});
 document.addEventListener('keydown',e=>{if(document.body.classList.contains('admin-open'))return;if(e.key==='Escape'&&state.panel){close();return}if(['ArrowLeft','ArrowRight'].includes(e.key)&&!state.panel&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();shift(e.key==='ArrowRight'?1:-1)}});
 let frame=0;stage.addEventListener('pointermove',e=>{if(!state.animations||state.panel||e.pointerType==='touch')return;if(frame)return;const r=stage.getBoundingClientRect(),x=((e.clientX-r.left)/r.width-.5)*14,y=((e.clientY-r.top)/r.height-.5)*10;frame=requestAnimationFrame(()=>{stage.style.setProperty('--par-x',x.toFixed(1)+'px');stage.style.setProperty('--par-y',y.toFixed(1)+'px');frame=0})});stage.addEventListener('pointerleave',()=>{stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px')});
 window.addEventListener('hashchange',onRoute);window.addEventListener('popstate',onRoute);

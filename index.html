@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-cast-version="5.9.7" lang="ja">
+<html data-cast-version="5.9.9" lang="ja">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -8,9 +8,10 @@
 <meta content="CAST / SIGNAL — 創作キャラクターを巡る、ゲームUI風アーカイブ。" name="description"/>
 <title>CAST / SIGNAL — Character Archive</title>
 <link href="style.css" rel="stylesheet"/>
+<link href="mobile.css?v=5.9.9" rel="stylesheet"/>
 <script defer="" src="cloud-config.js"></script>
 <script defer="" src="data.js"></script>
-<script defer="" src="app.js"></script>
+<script defer="" src="app.js?v=5.9.9"></script>
 
 
 
@@ -35,6 +36,17 @@
 <button aria-pressed="true" class="motion-control" id="motionToggle" title="アニメーションのON/OFF">MOTION <b>ON</b></button>
 </div>
 </header>
+<button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-label="メニューを開く" aria-controls="mobileNav" aria-expanded="false"><span></span><span></span><span></span></button>
+<div id="mobileNavBackdrop" class="mobile-nav-backdrop" hidden></div>
+<nav id="mobileNav" class="mobile-nav-drawer" aria-label="スマホ用ナビゲーション" aria-hidden="true" inert>
+  <div class="mobile-nav-head"><span>CAST // SIGNAL <small>MENU / NAVIGATION</small></span><button type="button" id="mobileMenuClose" aria-label="メニューを閉じる">×</button></div>
+  <button type="button" class="mobile-nav-link" data-nav="select"><small>01 / SELECT</small><strong>キャラ選択</strong><b>↗</b></button>
+  <button type="button" class="mobile-nav-link" data-nav="index"><small>02 / ALL CAST</small><strong>キャラ一覧</strong><b>↗</b></button>
+  <button type="button" class="mobile-nav-link" data-nav="worlds"><small>03 / WORLDS</small><strong>世界観</strong><b>↗</b></button>
+  <button type="button" class="mobile-nav-link" data-nav="about"><small>04 / ABOUT</small><strong>サイト案内</strong><b>↗</b></button>
+  <button type="button" class="mobile-motion" id="mobileMotionToggle">MOTION <b>ON</b></button>
+  <div class="mobile-social" aria-label="作者のSNSリンク"><small>CREATOR / CONNECT</small><div class="mobile-social-links" id="mobileSocialLinks"></div></div>
+</nav>
 <main id="main">
 <section aria-label="キャラクター選択画面" class="hero theme-orphe is-entering" id="hero">
 <div aria-hidden="true" class="hero-surface"></div>
@@ -58,15 +70,34 @@
 <p class="hero-hook" hidden="" id="heroHook">その才能は、たった一人を美しく飾るために。</p>
 <section aria-label="キャラクター紹介" class="hero-intel" hidden="" id="heroIntel">
 <div class="hero-voice" hidden="" id="heroVoiceBlock"><p id="heroVoice"></p></div>
-<div class="hero-bio" hidden="" id="heroBioBlock"><p id="heroBio"></p></div>
+<div class="hero-bio" hidden="" id="heroBioBlock"><p id="heroBio"></p><span class="intro-scroll-rail" id="introScrollRail" aria-hidden="true" hidden><i></i></span></div>
 </section>
-<button class="hero-cta" id="openDetail" type="button"><span><small>ACCESS FILE</small><strong>CHARACTER PROFILE</strong></span><span aria-hidden="true" class="cta-arrow">↗</span></button>
+<button class="hero-cta" id="openDetail" type="button" aria-label="キャラクタープロフィールを開く"><span><small>ACCESS FILE</small><strong>CHARACTER PROFILE</strong></span><span aria-hidden="true" class="cta-arrow">↗</span></button>
 <div class="mini-meta mono" id="heroMeta">ZETA / ロジエ邸 <span>●</span> 001</div>
 </div>
 <div class="hero-art-wrap" id="artWrap"><img alt="オルフェ・ロジエのイラスト" class="hero-art" draggable="false" id="heroArt" src="assets/orphe.png"/></div>
+<section class="mobile-quote" id="mobileQuote" aria-label="キャラクターの名前と台詞">
+  <div class="mobile-quote-name" id="mobileQuoteName">オルフェ・ロジエ</div>
+  <p id="mobileQuoteText"></p>
+</section>
+<button type="button" class="mobile-profile" id="mobileOpenDetail" aria-label="キャラクタープロフィールを開く">
+  <span class="mobile-profile-label"><small>FILE / ACCESS</small><strong>PROFILE</strong></span><span class="mobile-profile-arrow" aria-hidden="true">↗</span>
+</button>
+<section class="mobile-intro" id="mobileIntroduction" aria-label="キャラクター人物紹介">
+  <div class="mobile-intro-head"><strong>INTRODUCTION</strong><small id="mobileIntroNumber">001 / CHARACTER FILE</small></div>
+  <div class="mobile-intro-reading"><p class="mobile-intro-text" id="mobileIntroText"></p><span class="mobile-intro-track" id="mobileIntroTrack" aria-hidden="true"><i id="mobileIntroThumb"></i></span></div>
+</section>
 <div aria-hidden="true" class="hero-art-stamp" id="artStamp"><span>FILE<br/><b>001</b></span></div>
 <div aria-hidden="true" class="side-dash mono" id="sideDash">IDENTITY VERIFIED / SIGNAL ACTIVE</div>
 <div aria-hidden="true" class="hero-bottomline mono"><span><i></i><i></i><i></i> SELECT YOUR CHARACTER</span><span>← / → KEY TO SWITCH</span></div>
+</section>
+<section class="mobile-picker" aria-label="スマホ用キャラクター切り替え">
+  <div class="mobile-picker-row">
+    <button type="button" id="mobilePrev" class="mobile-picker-arrow" aria-label="前のキャラクター">←</button>
+    <div class="mobile-portrait-viewport" id="mobilePortraitViewport" role="tablist" aria-label="登場キャラクター"><div class="mobile-portrait-track" id="mobilePortraitTrack"></div></div>
+    <button type="button" id="mobileNext" class="mobile-picker-arrow" aria-label="次のキャラクター">→</button>
+  </div>
+  <div class="mobile-picker-foot"><span id="mobilePickerCount">01 / 04</span><button type="button" id="mobileAllCast">▦ <span>ALL CAST</span> ↗</button></div>
 </section>
 <section aria-label="キャラクター切り替え" class="picker">
 <div class="picker-title"><span class="picker-label mono"><i></i> NOW BROWSING</span><strong>CHOOSE<br/><em>YOUR</em> CAST<span class="period">.</span></strong><span class="picker-count mono" id="pickerCount">03 SIGNALS DETECTED</span></div>
@@ -98,9 +129,9 @@
 <aside aria-hidden="true" aria-label="キャラクター一覧" aria-modal="true" class="directory" id="directory" role="dialog">
 <div class="directory-head"><span class="mono">// COMPLETE DATABASE</span><button class="panel-close" data-close="" type="button">CLOSE INDEX ×</button></div>
 <div class="directory-content cast-directory-content">
-<div class="directory-fixed" id="directoryFixed">
+<div class="directory-fixed" id="directoryFixed"><button class="mobile-filter-toggle" type="button" id="mobileFilterToggle" aria-expanded="false" aria-controls="mobileFilters">⌕ SEARCH / FILTER <span>＋</span></button>
 <div class="directory-heading-row"><div><span class="directory-kicker mono">LOOK UP A SIGNAL / CAST DATABASE</span><h2>ALL <i>CHARACTERS</i><span>.</span></h2></div><span class="directory-fixed-note mono">SCROLL THE CAST / KEEP YOUR FILTERS</span></div>
-<div class="directory-control"><label class="directory-search-label"><span class="mono">SEARCH /</span><input autocomplete="off" id="search" placeholder="キャラ名・作品・タグで検索" type="search"/></label><div aria-label="キャラクター表示範囲" class="directory-filters" role="group"><button aria-pressed="true" data-filter="all" type="button">すべて</button><button aria-pressed="false" data-filter="playable" type="button">zetaで遊べる</button><button aria-pressed="false" data-filter="showcase" title="zetaで遊ぶリンクがないキャラクター" type="button">紹介のみ</button></div></div>
+<div class="directory-control" id="mobileFilters"><label class="directory-search-label"><span class="mono">SEARCH /</span><input autocomplete="off" id="search" placeholder="キャラ名・作品・タグで検索" type="search"/></label><div aria-label="キャラクター表示範囲" class="directory-filters" role="group"><button aria-pressed="true" data-filter="all" type="button">すべて</button><button aria-pressed="false" data-filter="playable" type="button">zetaで遊べる</button><button aria-pressed="false" data-filter="showcase" title="zetaで遊ぶリンクがないキャラクター" type="button">紹介のみ</button></div></div>
 <div class="directory-subtools"><div aria-live="polite" class="directory-count mono" id="directoryCount" role="status">03 FILES MATCH</div><div aria-label="一覧の表示切り替え" class="directory-view" role="group"><span class="mono">VIEW MODE /</span><button aria-pressed="true" data-directory-view="gallery" type="button">▦ GALLERY</button><button aria-pressed="false" data-directory-view="detail" type="button">≡ DETAIL</button></div></div>
 </div><div aria-label="検索結果・キャラクター一覧" class="directory-items directory-gallery" id="directoryItems" role="region" tabindex="0"></div>
 </div>
