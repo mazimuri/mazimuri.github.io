@@ -1,0 +1,15 @@
+/* Only the admin.html login gate, not the public website */
+.cloud-locked > :not(#cloudLogin) { visibility: hidden!important }
+.cloud-auth { position: fixed; inset: 0; z-index: 999999; background: #111416; display: grid; place-items: center; padding: 20px; overflow: auto; color: #edf0e9; font: 15px/1.65 system-ui, sans-serif }
+.cloud-auth[hidden] { display: none!important }
+.cloud-auth-card { box-sizing: border-box; width: min(100%, 490px); border: 1px solid #55605e; padding: clamp(24px,5vw,44px); background: linear-gradient(138deg,#202627,#13191b); box-shadow: 9px 9px 0 #bdeb50 }
+.cloud-eyebrow { color: #bdeb50; font-size: 11px; letter-spacing: .16em; font-weight: 800 }
+.cloud-auth h1 { margin: 3px 0 10px; font-size: clamp(29px,5vw,40px); line-height: 1.1; letter-spacing: -.04em; color: white }
+.cloud-auth p { font-size: 13px; line-height: 1.75 }
+.cloud-auth label { display: block; font-size: 11px; margin: 18px 0 5px; font-weight: 800; color: #bdeb50; letter-spacing: .14em }
+.cloud-auth input { display: block; box-sizing: border-box; width: 100%; background: #101718; border: 1px solid #68716e; color: white; font-size: 16px; padding: 12px; border-radius: 0 }
+.cloud-auth input:focus { outline: 2px solid #bdeb50; outline-offset: 1px }
+.cloud-auth button { cursor:pointer; width:100%; font-size: 14px; font-weight: 850; letter-spacing: .12em; border: 0; background:#bdeb50; color:#101516; margin-top: 22px; padding: 13px }
+.cloud-auth button:disabled { opacity: .6; cursor: wait }
+.cloud-auth #cloudLoginStatus { min-height: 22px; color: #d8c6ba; margin-top: 14px }
+.cloud-auth a { color: #bdeb50; text-decoration: underline; font-size: 12px }
