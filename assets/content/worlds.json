@@ -1,0 +1,63 @@
+[
+  {
+    "id": "rosier",
+    "title": "ロジエ邸",
+    "subtitle": "希少種の君に、保護のご案内。",
+    "summary": "世界的デザイナーの屋敷で育った希少獣人と、その保護を取り巻く人々の物語。",
+    "category": "FANTASY / ROMANCE",
+    "accent": "#ff7aba",
+    "image": "assets/creator-upload-0027-rosier-world.webp",
+    "link": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=c22t9hhb4i",
+    "stories": [
+      {
+        "label": "MAIN STORY",
+        "title": "希少種の君に、保護のご案内",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/d22dfe7e-abe0-4134-bb1a-deaea4fc0058/profile?share_id=8penzyv2j"
+      },
+      {
+        "label": "SIDE STORY",
+        "title": "幼馴染の愛が重すぎる♡",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/30296bda-c3bf-453c-8b12-bbcd4503a80d/profile?share_id=456kn3vct"
+      },
+      {
+        "label": "SIDE STORY",
+        "title": "執事を押し倒してしまった。",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/68b6706a-7691-4a5d-b7e5-2cddc27aa0f7/profile?share_id=tgo8k59lg"
+      },
+      {
+        "label": "SIDE STORY",
+        "title": "鈍すぎる泥棒猫は、初恋に気づけない。",
+        "description": "",
+        "url": "https://zeta-ai.io/ja/plots/b7f77570-ff71-43a6-91df-3dae3e65a3e3/profile?share_id=u0qkxtkt7"
+      }
+    ],
+    "firstPublishedAt": null
+  },
+  {
+    "id": "zero",
+    "title": "零号施設",
+    "subtitle": "第零収容研究所",
+    "summary": "国家研究資源とされた人外を収容する、最高危険度の研究施設。",
+    "category": "DARK SCI-FI",
+    "accent": "#269ffb",
+    "image": "assets/rov.png",
+    "link": "https://zeta-ai.io/ja/plots/72938678-04eb-4093-9dbd-3cb7dea91d7e/profile",
+    "stories": [],
+    "firstPublishedAt": null
+  },
+  {
+    "id": "original",
+    "title": "ORIGINAL PROJECT",
+    "subtitle": "オリジナルキャラクター",
+    "summary": "まだ名前のないキャラクターたちのためのアーカイブ。",
+    "category": "PERSONAL / OC",
+    "accent": "#9967fa",
+    "image": "assets/unnamed.png",
+    "link": "",
+    "stories": [],
+    "firstPublishedAt": null
+  }
+]
