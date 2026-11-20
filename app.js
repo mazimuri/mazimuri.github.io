@@ -87,7 +87,7 @@ function load({animate=true}={}){
  setText('mobileIntroText',bio||'紹介文は準備中です。');setText('mobileIntroNumber',c.no+' / CHARACTER FILE');
  $('mobileIntroText').scrollTop=0;requestAnimationFrame(updateMobileIntroProgress);
  setText('heroMeta',`${c.playable?'PLAYABLE / zeta':'SHOWCASE'} / ${c.world}  ●  ${c.no}`);setText('sideDash',c.deco+' / SYSTEM READY');
- $('heroArt').src=c.artwork||'';const pos={x:0,y:0,zoom:1,...(c.artPosition||{})};$('heroArt').style.setProperty('--art-x',`${Number(pos.x)||0}%`);$('heroArt').style.setProperty('--art-y',`${Number(pos.y)||0}%`);$('heroArt').style.setProperty('--art-zoom',Number(pos.zoom)||1);$('heroArt').alt=c.name+'の立ち絵';const badge={right:17,top:10,...(c.fileBadgePosition||{})},mobileBadge={right:8,top:66,...(c.fileBadgePositionMobile||{})};$('artStamp').style.setProperty('--badge-right',Number(badge.right)+'%');$('artStamp').style.setProperty('--badge-top',Number(badge.top)+'%');$('artStamp').style.setProperty('--badge-mobile-right',Number(mobileBadge.right)+'%');$('artStamp').style.setProperty('--badge-mobile-top',Number(mobileBadge.top)+'%');$('artStamp').innerHTML=`<span>FILE<br><b>${esc(c.no)}</b></span>`;
+ $('heroArt').src=c.artwork||'';const pos={x:0,y:0,zoom:1,...(c.artPosition||{})};$('heroArt').style.setProperty('--art-x',`${Number(pos.x)||0}%`);$('heroArt').style.setProperty('--art-y',`${Number(pos.y)||0}%`);$('heroArt').style.setProperty('--art-zoom',Number(pos.zoom)||1);$('heroArt').alt=c.name+'の立ち絵';const badge={right:17,top:10,...(c.fileBadgePosition||{})},mobileBadge={right:8,top:66,...(c.fileBadgePositionMobile||{})};$('artStamp').style.setProperty('--badge-right',Number(badge.right)+'%');$('artStamp').style.setProperty('--badge-top',Number(badge.top)+'%');$('artStamp').style.setProperty('--badge-mobile-right',Number(mobileBadge.right)+'%');$('artStamp').style.setProperty('--badge-mobile-top',Number(mobileBadge.top)+'%');$('artStamp').innerHTML=`<span class="v7-stamp-original">FILE<br><b>${esc(c.no)}</b></span><span class="v7-stamp-detail" aria-hidden="true"><span class="v7-stamp-corner tl"></span><span class="v7-stamp-corner tr"></span><span class="v7-stamp-corner bl"></span><span class="v7-stamp-corner br"></span><svg class="v10-stamp-arc" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><defs><path id="v10-stamp-arc-path" d="M 32 56 A 59 59 0 0 1 128 56"/></defs><text><textPath href="#v10-stamp-arc-path" startOffset="50%" text-anchor="middle">CAST SIGNAL</textPath></text></svg><span class="v7-stamp-inner"><small>FILE</small><strong>${esc(c.no)}</strong><i></i></span></span>`;
  renderPicker();renderMobileSelection();if(state.panel==='dossier')renderDossier();
  clearTimeout(state.enterTimer);const nonce=++state.enterNonce;stage.classList.remove('is-entering');
  if(animate&&state.animations){stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px');void stage.offsetWidth;stage.classList.add('is-entering');state.enterTimer=setTimeout(()=>{if(state.enterNonce===nonce)stage.classList.remove('is-entering')},1220)}
@@ -202,6 +202,27 @@ function renderWorlds(){const worlds=state.doc.worlds||[];
 }
 
 function worldById(id){return state.doc?.worlds.find(w=>w.id===id)}
+/* Study 14: Story cast is derived from the published character work records.
+   Never infer participation just because two characters share a world. */
+function storyPlotId(url){
+ const m=String(url||'').match(/\/plots\/([a-z0-9-]+)/i);return m?m[1].toLowerCase():'';
+}
+function storyTitleKey(title){
+ return String(title||'').trim().replace(/[\s\u3000。、．.!！?？♡♥]+$/g,'').replace(/[\s\u3000]+/g,'').toLocaleLowerCase();
+}
+function storyParticipants(t, group){
+ const storyId=storyPlotId(t.url),key=storyTitleKey(t.title);
+ return group.filter(c=>(c.workRecords||[]).some(work=>{
+   const workId=storyPlotId(work.url);
+   if(storyId&&workId)return storyId===workId;
+   return (!storyId||!workId)&&Boolean(key)&&storyTitleKey(work.title)===key;
+ }));
+}
+function storyCastMarkup(t,group){
+ const participants=storyParticipants(t,group);
+ if(!participants.length)return '<span class="world-story-cast-unlinked mono">CAST / 登場キャラ未登録</span>';
+ return `<span class="world-story-cast-caption mono">APPEARING CAST <b>/ ${String(participants.length).padStart(2,'0')}</b><small>登場キャラ</small></span><span class="world-story-cast-faces">${participants.map(c=>`<button class="world-story-avatar" type="button" data-world-character="${esc(c.id)}" aria-label="${esc(c.name)}のプロフィールを見る" title="${esc(c.name)}" style="--avatar-accent:${esc(c.colors?.accent||'#eaff58')}"><span class="world-story-avatar-portrait"><img src="${esc(icon(c))}" style="${cropStyle(c,'all')}" alt="" loading="lazy" data-crop-render></span><span class="world-story-avatar-name">${esc(c.name)}</span></button>`).join('')}</span>`;
+}
 function renderWorldDetail(){
  const w=worldById(state.world);if(!w){$('worldDetailContent').innerHTML='<p class="empty">WORLDが見つかりません</p>';return}
  const idx=state.doc.worlds.indexOf(w)+1;
@@ -220,7 +241,7 @@ function renderWorldDetail(){
     <div class="world-detail-stats mono"><span>${String(stories.length).padStart(2,'0')} STORIES</span><span>${String(group.length).padStart(2,'0')} CHARACTERS</span></div></div>
   </section>
   <div class="world-detail-main"><div class="world-detail-section-title"><span class="mono">01 / PLAYABLE STORIES</span><h3>STORY <i>FILES.</i></h3><p>気になる物語を選んで、作品ページへ。</p></div>
-   <div class="world-story-list">${stories.length?stories.map((t,i)=>{const href=validUrl(t.url);const tag=href?'a':'div';return `<${tag} class="world-story-item ${href?'clickable':'pending'}" ${href?`href="${esc(href)}" target="_blank" rel="noopener noreferrer"`:''}><span class="world-story-num mono">${String(i+1).padStart(2,'0')}</span><div class="world-story-info"><small class="mono">${esc(t.label||'STORY')}</small><b>${esc(t.title)}</b>${t.description?`<p>${esc(t.description)}</p>`:''}</div><span class="world-story-arrow">${href?'↗':'—'}</span></${tag}>`}).join(''):'<p class="world-detail-empty">作品の登録はまだありません。</p>'}</div>
+   <div class="world-story-list">${stories.length?stories.map((t,i)=>{const href=validUrl(t.url);const tag=href?'a':'div';return `<div class="world-story-entry"><div class="world-story-cast">${storyCastMarkup(t,group)}</div><${tag} class="world-story-item ${href?'clickable':'pending'}" ${href?`href="${esc(href)}" target="_blank" rel="noopener noreferrer"`:''}><span class="world-story-num mono">${String(i+1).padStart(2,'0')}</span><div class="world-story-info"><small class="mono">${esc(t.label||'STORY')}</small><b>${esc(t.title)}</b>${t.description?`<p>${esc(t.description)}</p>`:''}</div><span class="world-story-arrow">${href?'↗':'—'}</span></${tag}></div>`}).join(''):'<p class="world-detail-empty">作品の登録はまだありません。</p>'}</div>
    ${linkBlock}
    <div class="world-detail-section-title cast-section"><span class="mono">02 / CHARACTER NETWORK</span><h3>CONNECTED <i>CAST.</i></h3><p>この世界に登場するキャラクター</p></div>
    <div class="world-cast-grid">${group.length?group.map(c=>`<button type="button" class="world-cast-card" data-world-character="${esc(c.id)}" style="--cast-accent:${esc(c.colors.accent)}"><span class="world-cast-visual"><img data-crop-render src="${esc(icon(c))}" alt="" style="${cropStyle(c,'all')}"></span><span class="world-cast-info"><small class="mono">FILE #${esc(c.no)} ${c.playable?' / zeta':''}</small><strong>${esc(c.name)}</strong><em>VIEW PROFILE ↗</em></span></button>`).join(''):'<p class="world-detail-empty">キャラクターはまだ登録されていません。</p>'}</div>

@@ -9,9 +9,11 @@
 <title>CAST / SIGNAL — Character Archive</title>
 <link href="style.css?v=5.9.10" rel="stylesheet"/>
 <link href="mobile.css?v=5.9.9.4" rel="stylesheet"/>
+<link rel="stylesheet" href="cast-side-rail.css?v=15.0.1">
 <script defer="" src="cloud-config.js"></script>
 <script defer="" src="data.js"></script>
 <script defer="" src="app.js?v=5.9.9.2"></script>
+<script defer src="cast-side-rail.js?v=15.0.1"></script>
 
 
 
@@ -56,6 +58,23 @@
 <div aria-hidden="true" class="hero-outline">S</div>
 <div aria-hidden="true" class="hero-angle"></div>
 <div aria-hidden="true" class="hero-circles"><span></span><span></span><span></span></div>
+<div class="v4-deep-insignia" aria-hidden="true"><span class="v4-engraved-title">S / SIGNAL</span><div class="v4-engraved-meta"><span>◀ 001 / CHARACTER DATABASE</span><span>VISUAL SYSTEM — PERSONAL ARCHIVE</span></div><b>///</b></div>
+<div class="v4-paper-insignia" aria-hidden="true"><span>ORIGINAL CAST INDEX</span><i></i><strong>CS / 01</strong><small>EST. 2026 —— INDEXED FILES</small></div>
+<div class="v4-color-ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><span>CHROMA SYSTEM / 04</span></div>
+<div class="v6-graphics" aria-hidden="true">
+<div class="v6-hatch"><span></span><span></span><span></span></div>
+<div class="v8-hatch v8-hatch-lower"><span></span><span></span><span></span></div>
+<div class="v8-hatch v8-hatch-accent"><span></span><span></span><span></span></div>
+<div class="v8-hatch v8-hatch-paper"><span></span><span></span><span></span></div>
+<div class="v6-trace v6-trace-one"></div><div class="v6-trace v6-trace-two"></div>
+<div class="v6-bracket"><span>01 / VISUAL SYSTEM</span><b>CAST SIGNAL — ARCHIVE</b></div>
+<div class="v6-brand-stamp"><span>SELECT / FILES</span><strong>CS—<em id="v6Total">04</em></strong><small>CHARACTER CHROMA INDEX</small></div>
+<div class="v6-paper-number" id="v6PaperNumber">04</div>
+<div class="v6-pictograms"><i></i><i></i><i></i><i></i><b>PERSONAL ARCHIVE</b></div>
+<div class="v6-side-index">CAST SELECTION SYSTEM · ORIGINAL FILES</div>
+<div class="v6-signal-mark">/// ACCESS / READY &nbsp; ◇ &nbsp; SIGNAL 06</div>
+</div>
+
 <div aria-hidden="true" class="hero-crosshair">＋</div>
 <div aria-hidden="true" class="hero-accent-rail"></div><div aria-hidden="true" class="hero-palette-stripe"><i></i><i></i><i></i><i></i></div>
 <div aria-hidden="true" class="hero-topline mono"><span>/// CAST DATABASE — SELECTION SYSTEM</span><span>VOL. 05.9   /   CAST NAVIGATION</span></div>
@@ -99,6 +118,12 @@
   </div>
   <div class="mobile-picker-foot"><span id="mobilePickerCount">01 / 04</span><button type="button" id="mobileAllCast">▦ <span>ALL CAST</span> ↗</button></div>
 </section>
+
+<aside class="v5-rail" id="v5Rail" aria-label="キャラクター選択。奥から手前へ大きくなるセレクター">
+<div class="v5-control-head"><button type="button" class="v5-batch" id="v5Batch" aria-label="次の4人のグループへ" title="次の4人のグループへ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 17 L16 4 L28 17" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button><span class="v5-batch-label">JUMP +04</span></div>
+<div class="v5-stack" id="v5Stack" role="tablist" aria-label="キャラクター切り替え。選択中のキャラクターは最下段に表示されます"></div>
+<div class="v5-readout" aria-live="polite"><span id="v5Count">01 / 04</span><span>SCROLL / SELECT</span></div>
+</aside>
 <section aria-label="キャラクター切り替え" class="picker">
 <div class="picker-title"><span class="picker-label mono"><i></i> NOW BROWSING</span><strong>CHOOSE<br/><em>YOUR</em> CAST<span class="period">.</span></strong><span class="picker-count mono" id="pickerCount">03 SIGNALS DETECTED</span></div>
 <div class="picker-carousel" id="pickerCarousel">
