@@ -66,26 +66,26 @@ function cropStudio(c){
  const mode=cropMode(),p=cropVals(c,mode),src=esc(c.icon||c.artwork||'');
  const option=(value,title,desc)=>`<button type="button" data-action="crop-mode" data-view="${value}" class="crop-mode-btn ${mode===value?'active':''}" aria-pressed="${mode===value}"><b>${title}</b><small>${desc}</small></button>`;
  const sliders=['x','y'].map(k=>`<div class="crop-control-row"><label>${k==='x'?'HORIZONTAL / X':'VERTICAL / Y'} <b id="crop${k.toUpperCase()}Label">${Math.round(p[k])}%</b></label><input type="range" min="0" max="100" step="1" value="${p[k]}" data-crop-axis="${k}"></div>`).join('');
- return `<div class="form-field wide icon-studio"><div class="crop-edit-head"><b>ICON CROP STUDIO / アイコン表示範囲</b><span class="mono">INDEPENDENT CROPS</span></div>
- <p class="crop-hint">CHOOSE YOUR CASTとALL CASTは別々に保存。選択した枠をドラッグして上下左右へ移動できます。画像自体は変更しません。</p>
- <div class="crop-mode-tabs" role="group" aria-label="アイコン表示の編集先">${option('choose','CHOOSE YOUR CAST','横のキャラ選択バー')}${option('all','ALL CAST','キャラ一覧・関連キャラ')}</div>
- <div class="crop-editor"><div class="crop-main"><span class="crop-mark mono">DRAG TO ADJUST / ${mode==='all'?'ALL CAST':'CHOOSE YOUR CAST'}</span>
- <div class="crop-canvas ${mode==='all'?'crop-gallery-mode':'crop-picker-mode'}" id="cropCanvas" role="img" aria-label="ドラッグしてアイコンの表示位置を調整"><img data-crop-render id="cropMainImg" src="${src}" style="${cropAttrs(c,mode)}" alt=""></div>
+ return `<div class="form-field wide icon-studio v15-icon-studio"><div class="crop-edit-head"><b>ICON CROP STUDIO / アイコン表示範囲</b><span class="mono">INDEPENDENT CROPS</span></div>
+ <p class="crop-hint">右側の斜めキャラ選択カード（SELECT）とALL CAST一覧は別々に保存。黄色い枠の画像をドラッグすると表示位置を調整できます。横方向に余白がない画像はズームを上げると動かせます。</p>
+ <div class="crop-mode-tabs" role="group" aria-label="アイコン表示の編集先">${option('choose','SELECT / 右キャラバー','斜めの横長アイコン')}${option('all','ALL CAST','キャラ一覧・関連キャラ')}</div>
+ <div class="crop-editor"><div class="crop-main"><span class="crop-mark mono">DRAG TO ADJUST / ${mode==='all'?'ALL CAST':'RIGHT CHARACTER SELECTOR'}</span>
+ <div class="crop-canvas ${mode==='all'?'crop-gallery-mode':'crop-picker-mode'}" id="cropCanvas" role="img" aria-label="ドラッグして画像の表示範囲を調整"><img data-crop-render id="cropMainImg" src="${src}" style="${cropAttrs(c,mode)}" alt=""><span class="v15-crop-label">${esc(c.name)}</span></div>
  <div class="crop-control-row"><label>ZOOM / <b id="cropZoomLabel">${Number(p.zoom).toFixed(2)}×</b></label><input id="cropZoom" type="range" min="1" max="4" step="0.05" value="${p.zoom}" data-crop-zoom></div>${sliders}
- <div class="crop-small-actions">${btn('crop-enable-y','↕ 上下の移動幅を増やす','small')}${btn('crop-reset','↺ この枠の位置をリセット','small')}<small>画像が枠にぴったり合う方向は、ズームを上げると動かせます</small></div></div>
- <div class="crop-live-col"><span class="mono">CHOOSE YOUR CAST / LIVE</span><div class="crop-rail-visual"><span class="crop-rail-frame"><img data-crop-render class="crop-shared" src="${src}" style="${cropAttrs(c,'choose')}" alt=""></span><div><small>NO.${String(doc().characters.indexOf(c)+1).padStart(3,'0')}</small><b>${esc(c.name)}</b></div></div>
+ <div class="crop-small-actions">${btn('crop-enable-y','↕ 上下の移動幅を増やす','small')}${btn('crop-reset','↺ この枠の位置をリセット','small')}<small>キャラクターを変更しても設定は個別に保持。公開にはPUBLISH操作が必要です。</small></div></div>
+ <div class="crop-live-col"><span class="mono">RIGHT SELECTOR / LIVE</span><div class="crop-rail-visual v15-crop-rail-visual"><span class="crop-rail-frame"><img data-crop-render class="crop-shared" src="${src}" style="${cropAttrs(c,'choose')}" alt=""><span class="v15-mini-name">${esc(c.name)}</span></span><div><small>SELECTED / NO.${String(doc().characters.indexOf(c)+1).padStart(3,'0')}</small><b>RIGHT CAST RAIL</b></div></div>
  <span class="mono">ALL CAST / LIVE</span><div class="crop-gallery-preview"><span class="crop-gallery-frame"><img data-crop-render class="crop-shared" src="${src}" style="${cropAttrs(c,'all')}" alt=""></span><strong>${esc(c.name)}</strong></div></div></div></div>`;
 }
-const badgeIsMobile=()=>matchMedia('(max-width:620px)').matches;
+const badgeIsMobile=()=>matchMedia('(max-width:800px)').matches;
 const badgeField=()=>badgeIsMobile()?'fileBadgePositionMobile':'fileBadgePosition';
 const badgeVals=c=>({... (badgeIsMobile()?{right:8,top:66}:{right:17,top:10}),...(c[badgeField()]||{})});
 function artStudio(c){const p=artVals(c),b=badgeVals(c),number=String(doc().characters.indexOf(c)+1).padStart(3,'0');return `<section class="form-section"><h3>MAIN VISUAL STUDIO / 立ち絵とFILE番号の表示調整</h3>
- <p class="crop-hint">SELECT本体と同じCSS構造を、現在のウィンドウ比率で縮小表示。画像位置・倍率・FILE番号を調節します。公開プレビューからも最終確認できます。</p>
+ <p class="crop-hint">新しい右サイドバー版SELECTの構図を縮小表示します。背景をドラッグすると立ち絵が移動、FILEバッジをドラッグするとバッジ位置が変わります。位置はキャラ別に保存されます。</p>
  <div class="art-editor v594-art-editor"><div class="art-stage" id="artStage" role="group" aria-label="立ち絵のライブプレビュー。画像ドラッグで立ち絵、丸い番号ドラッグでバッジを動かせます">
  <div class="art-preview-scene hero theme-${['orphe','rov','unnamed'].includes(c.id)?c.id:'generic'}" id="artPreviewScene" style="--accent:${cleanColor(c.colors?.accent)};--deep:${cleanColor(c.colors?.deep)};--soft:${cleanColor(c.colors?.soft)};--bright:${cleanColor(c.colors?.bright)}">
  <div class="hero-surface"></div><div class="hero-dark-panel"></div><div class="hero-accent-slab"></div><div class="hero-pattern"></div><div class="hero-art-wrap" id="artPreviewWrap"><img class="hero-art" id="artStageImg" src="${esc(c.artwork||'')}" style="${artAttrs(c)}" alt=""></div>
- <div class="hero-art-stamp" id="artPreviewBadge" style="--badge-right:${(c.fileBadgePosition||{}).right??17}%;--badge-top:${(c.fileBadgePosition||{}).top??10}%;--badge-mobile-right:${(c.fileBadgePositionMobile||{}).right??8}%;--badge-mobile-top:${(c.fileBadgePositionMobile||{}).top??66}%"><span>FILE<br><b>${number}</b></span></div></div>
- <span class="art-stage-top mono">ACTUAL SELECT LAYOUT / DRAG TO ADJUST</span></div>
+ <div class="hero-art-stamp" id="artPreviewBadge" style="--badge-right:${(c.fileBadgePosition||{}).right??17}%;--badge-top:${(c.fileBadgePosition||{}).top??10}%;--badge-mobile-right:${(c.fileBadgePositionMobile||{}).right??8}%;--badge-mobile-top:${(c.fileBadgePositionMobile||{}).top??66}%"><span class="v7-stamp-original">FILE<br><b>${number}</b></span><span class="v7-stamp-detail" aria-hidden="true"><span class="v7-stamp-corner tl"></span><span class="v7-stamp-corner tr"></span><span class="v7-stamp-corner bl"></span><span class="v7-stamp-corner br"></span><span class="v7-stamp-inner"><small>FILE</small><strong>${number}</strong><i></i></span></span></div></div>
+ <span class="art-stage-top mono">V15 SELECT / DRAG ART OR FILE BADGE</span></div>
  <div class="art-controls"><div class="form-field"><label>SIZE / 倍率 <b id="artZoomLabel">${Number(p.zoom).toFixed(2)}×</b></label><input type="range" data-art-control="zoom" min="0.5" max="2.5" step="0.05" value="${p.zoom}"></div>
  <div class="form-field"><label>HORIZONTAL / 左右 <b id="artXLabel">${Math.round(p.x)}%</b></label><input type="range" data-art-control="x" min="-65" max="65" step="1" value="${p.x}"></div>
  <div class="form-field"><label>VERTICAL / 上下 <b id="artYLabel">${Math.round(p.y)}%</b></label><input type="range" data-art-control="y" min="-65" max="65" step="1" value="${p.y}"></div>
@@ -149,7 +149,7 @@ function showCrop(){const c=selected();if(!c)return;const p=cropVals(c,cropMode(
  if($('cropZoom'))$('cropZoom').value=p.zoom;if($('cropZoomLabel'))$('cropZoomLabel').textContent=Number(p.zoom).toFixed(2)+'×';window.CAST_CROP?.renderAll();}
 function resetCrop(){const c=selected();if(!c)return;setCrop(c,{x:50,y:50,zoom:1});showCrop();persist('現在のアイコン枠をリセットしたよ')}
 let cropDrag=null;
-function startCrop(e){const frame=e.target.closest('#cropCanvas');if(!frame||!selected())return;e.preventDefault();const c=selected(),p=cropVals(c,cropMode());setCrop(c,{...p});const img=$('cropMainImg');const fw=frame.clientWidth,fh=frame.clientHeight,ratio=img?.naturalWidth/img?.naturalHeight||1,zoom=p.zoom||1;const w=Math.max(fw,fh*ratio)*zoom,h=Math.max(fh,fw/ratio)*zoom;
+function startCrop(e){const frame=e.target.closest('#cropCanvas');if(!frame||!selected())return;e.preventDefault();const c=selected(),p=cropVals(c,cropMode());setCrop(c,{...p});const img=$('cropMainImg');const fw=frame.clientWidth,fh=frame.clientHeight,ratio=img?.naturalWidth/img?.naturalHeight||1,zoom=p.zoom||1;const effectiveZoom=zoom*(cropMode()==='choose'?1.15:1),w=Math.max(fw,fh*ratio)*effectiveZoom,h=Math.max(fh,fw/ratio)*effectiveZoom;
  cropDrag={id:e.pointerId,x:e.clientX,y:e.clientY,cx:p.x,cy:p.y,overflowX:Math.max(0,w-fw),overflowY:Math.max(0,h-fh)};frame.setPointerCapture(e.pointerId);frame.classList.add('dragging')}
 function dragCrop(e){if(!cropDrag||e.pointerId!==cropDrag.id||!selected())return;const c=selected(),p=cropVals(c,cropMode());const x=cropDrag.overflowX>1?limit(cropDrag.cx-(e.clientX-cropDrag.x)*100/cropDrag.overflowX,0,100):p.x;const y=cropDrag.overflowY>1?limit(cropDrag.cy-(e.clientY-cropDrag.y)*100/cropDrag.overflowY,0,100):p.y;setCrop(c,{...p,x,y});showCrop()}
 function endCrop(e){if(!cropDrag||e.pointerId!==cropDrag.id)return;cropDrag=null;$('cropCanvas')?.classList.remove('dragging');persist('アイコン位置を保存したよ')}

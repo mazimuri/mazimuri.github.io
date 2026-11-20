@@ -1,0 +1,137 @@
+/* CAST // SIGNAL / ADMIN STUDIO V15.1 — editing matches the new right-side rail.
+   Only the admin overlay is affected; published character data is unchanged. */
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode{
+  width:min(100%,470px)!important;aspect-ratio:2.78!important;min-height:120px!important;
+  max-height:none!important;border:3px solid #eaff54!important;
+  border-radius:15px 3px 21px 4px!important;
+  clip-path:polygon(11% 0,100% 0,92% 100%,0 100%);
+  background:#18191c!important;
+  box-shadow:4px 5px 0 #121417!important;
+}
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode::before{display:none!important}
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode::after{
+  content:''!important;position:absolute;z-index:2;left:0;right:0;top:auto;bottom:0;
+  height:23%!important;background:#06080b!important;opacity:1!important;border:0!important;pointer-events:none;
+}
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode img[data-crop-render],
+#admin .v15-icon-studio .crop-rail-frame img[data-crop-render]{
+  object-fit:cover!important;
+  object-position:var(--crop-x,50%) var(--crop-y,50%)!important;
+  transform:skewX(11deg) scale(1.15) scale(var(--crop-zoom,1))!important;
+  transform-origin:var(--crop-x,50%) var(--crop-y,50%)!important;
+  pointer-events:none!important;
+}
+#admin .v15-icon-studio .v15-crop-label{
+  position:absolute;left:50%;bottom:2%;z-index:3;
+  transform:translateX(-50%);border-radius:999px;background:#050609;
+  padding:3px 13px;color:white;font:950 clamp(12px,1.25vw,17px)/1.15 var(--jpn);
+  white-space:nowrap;pointer-events:none;
+}
+#admin .v15-icon-studio .crop-canvas.crop-gallery-mode .v15-crop-label{display:none}
+#admin .v15-crop-rail-visual{
+  display:flex;align-items:center;gap:12px;min-height:135px!important;padding:13px 12px!important;
+  background:#23262a!important;border:1px solid #515c60!important;overflow:visible!important;
+}
+#admin .v15-icon-studio .crop-rail-frame{
+  width:clamp(142px,17vw,220px)!important;height:auto!important;
+  aspect-ratio:2.68!important;flex:0 0 auto!important;max-height:none!important;
+  clip-path:polygon(12% 0,100% 0,92% 100%,0 100%);
+  border-radius:10px 2px 14px 3px;background:#0e1013!important;
+  box-shadow:4px 5px 0 #080a0c!important;
+}
+#admin .v15-icon-studio .crop-rail-frame::after{
+  content:''!important;position:absolute;inset:auto 0 0;height:22%!important;
+  background:#050608!important;opacity:1!important;z-index:2;pointer-events:none;
+}
+#admin .v15-mini-name{
+  position:absolute;z-index:3;bottom:0;left:50%;transform:translateX(-50%);
+  border-radius:999px 999px 0 0;background:#050608;
+  padding:2px 7px 0;color:white;font:900 10px/1.2 var(--jpn);
+  white-space:nowrap;max-width:95%;pointer-events:none;
+}
+#admin .v15-crop-rail-visual>div{
+  color:#f7f8f5!important;padding:0!important;min-width:0!important;display:grid!important;gap:6px!important;
+}
+#admin .v15-crop-rail-visual>div small{color:#eaff54!important}
+#admin .v15-icon-studio .crop-canvas.dragging{cursor:grabbing}
+#admin #artStage{border:2px solid #eaff54;overflow:hidden;background:#121316!important}
+#admin #artPreviewScene .hero-surface{background:var(--soft,#f4f2ee)!important}
+#admin #artPreviewScene .hero-dark-panel{
+  position:absolute!important;inset:0!important;
+  clip-path:polygon(0 0,56% 0,27% 100%,0 100%)!important;background:var(--deep,#111216)!important;
+}
+#admin #artPreviewScene .hero-accent-slab{
+  position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;
+  transform:none!important;background:var(--accent,#f22)!important;
+  clip-path:polygon(69% 0,90% 0,61% 100%,40% 100%)!important;
+}
+#admin #artPreviewScene .hero-art-wrap{
+  position:absolute!important;left:18%!important;right:auto!important;bottom:-1.7%!important;
+  top:auto!important;width:72%!important;height:94%!important;z-index:6!important;
+  max-width:none!important;filter:none!important;pointer-events:none!important;
+}
+#admin #artPreviewScene.theme-orphe .hero-art-wrap{height:106%!important;left:17.3%!important}
+#admin #artPreviewScene .hero-art{
+  display:block;width:100%!important;height:100%!important;object-fit:contain!important;
+  object-position:center bottom!important;
+  transform:translate(var(--art-x,0%),var(--art-y,0%)) scale(var(--art-zoom,1))!important;
+  transform-origin:center bottom!important;
+}
+#admin #artStage #artPreviewBadge{
+  display:block!important;position:absolute!important;z-index:20!important;
+  width:clamp(83px,7.8vw,151px)!important;height:clamp(83px,7.8vw,151px)!important;
+  left:auto!important;right:calc(var(--badge-right,17%) + 14%)!important;
+  top:calc(var(--badge-top,10%) - 2%)!important;
+  background:transparent!important;border:0!important;border-radius:0!important;
+  color:white!important;box-shadow:none!important;transform:none!important;
+  cursor:grab!important;touch-action:none!important;pointer-events:auto!important;
+}
+#admin #artPreviewBadge:active{cursor:grabbing!important}
+#admin #artPreviewBadge .v7-stamp-original{display:none!important}
+#admin #artPreviewBadge .v7-stamp-detail{
+  position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;
+}
+#admin #artPreviewBadge .v7-stamp-detail:before{
+  content:'';position:absolute;inset:10%;border:2px solid white;border-radius:50%;
+  background:color-mix(in srgb,var(--accent) 65%,transparent);backdrop-filter:blur(2px);
+}
+#admin #artPreviewBadge .v7-stamp-inner{
+  position:absolute;z-index:2;left:50%;top:51%;width:80%;
+  transform:translate(-50%,-50%);display:flex;align-items:center;flex-direction:column;
+  gap:2px;color:white;text-align:center;
+}
+#admin #artPreviewBadge .v7-stamp-inner small{font:900 clamp(8px,.82vw,14px)/1.1 var(--mono);letter-spacing:.12em;color:white}
+#admin #artPreviewBadge .v7-stamp-inner strong{
+  display:block;width:100%;font:1000 italic clamp(28px,2.48vw,51px)/.98 var(--sans);
+  letter-spacing:-.035em;transform:translateX(-.10em);font-variant-numeric:tabular-nums;color:white;
+}
+#admin #artPreviewBadge .v7-stamp-inner i{
+  width:55%;max-width:57px;height:clamp(5px,.46vw,8px);
+  background:repeating-linear-gradient(115deg,#fff 0 4px,transparent 4px 8px);
+}
+#admin #artPreviewBadge .v7-stamp-corner{position:absolute;z-index:3;width:12%;height:12%;border:0 solid white;opacity:.98}
+#admin #artPreviewBadge .v7-stamp-corner.tl{top:1%;left:1%;border-top-width:2px;border-left-width:2px}
+#admin #artPreviewBadge .v7-stamp-corner.tr{top:1%;right:1%;border-top-width:2px;border-right-width:2px}
+#admin #artPreviewBadge .v7-stamp-corner.bl{bottom:1%;left:1%;border-bottom-width:2px;border-left-width:2px}
+#admin #artPreviewBadge .v7-stamp-corner.br{bottom:1%;right:1%;border-bottom-width:2px;border-right-width:2px}
+#admin #artStage .art-stage-top{z-index:30}
+@media (min-width:1660px){
+ #admin #artStage #artPreviewBadge{top:calc(var(--badge-top,10%) - 3.5%)!important}
+}
+@media(max-width:800px){
+ #admin .v15-crop-rail-visual{flex-wrap:wrap}
+ #admin #artPreviewScene .hero-art-wrap{
+  left:0!important;width:100%!important;height:calc(100% - 153px)!important;
+  bottom:125px!important;
+ }
+ #admin #artStage #artPreviewBadge{
+  right:var(--badge-mobile-right,8%)!important;top:var(--badge-mobile-top,66%)!important;
+  left:auto!important;width:90px!important;height:90px!important;
+ }
+ #admin #artPreviewBadge .v7-stamp-detail{display:none!important}
+ #admin #artPreviewBadge .v7-stamp-original{display:block!important}
+ #admin #artStage #artPreviewBadge{
+  background:var(--accent)!important;border:2px solid var(--deep)!important;
+  border-radius:50%!important;color:var(--deep)!important;
+ }
+}

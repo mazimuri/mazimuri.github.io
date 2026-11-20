@@ -35,8 +35,9 @@
   count.textContent=`${String(ix+1).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;
   if(total)total.textContent=String(n).padStart(2,'0');
   if(paperNum)paperNum.textContent=String(n).padStart(2,'0');
-  batch.disabled=n<=4;
-  batch.title=n<=4?'5人以上の公開キャラが増えると4人単位で移動します':'次の4人にジャンプ';
+  batch.disabled=false;
+  batch.title=n<=4?'全キャラクター一覧を見る':'次の4人にジャンプ';
+  const batchLabel=rail.querySelector('.v5-batch-label');if(batchLabel)batchLabel.textContent=n<=4?'ALL CAST':'JUMP +04';
   batch.setAttribute('aria-label',batch.title);
   const offsets=[3,2,1,0];
   stack.innerHTML=offsets.map((off,slot)=>itemHtml(b[mod(ix+off,n)],slot)).join('');
@@ -102,7 +103,8 @@
   const card=e.target.closest('[data-v5-target]');if(card)chooseCard(card.dataset.v5Target);
  });
  batch.addEventListener('click',()=>{
-  const n=buttons().length;if(n<=4||Date.now()<busyUntil)return;
+  const n=buttons().length;if(Date.now()<busyUntil)return;
+  if(n<=4){document.getElementById('openIndex')?.click();return;}
   busyUntil=Date.now()+410;activate(Math.max(0,selectedIx())+4,0);
  });
  rail.addEventListener('wheel',e=>{if(!desktop())return;
