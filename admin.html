@@ -13,7 +13,7 @@
   <script src="cloud-config.js" defer></script>
   <script src="cloud-data.js" defer></script>
   <link rel="stylesheet" href="cloud-admin.css">
-  <script src="app.js?v=5.9.9.2" defer></script>
+  <script src="app.js?v=5.9.9.3" defer></script>
   <script src="publisher.js" defer></script>
   <script src="admin.js" defer></script>
   <script src="visual-engine.js" defer></script>
@@ -64,6 +64,7 @@
   <button type="button" class="mobile-nav-link" data-nav="worlds"><small>03 / WORLDS</small><strong>世界観</strong><b>↗</b></button>
   <button type="button" class="mobile-nav-link" data-nav="about"><small>04 / ABOUT</small><strong>サイト案内</strong><b>↗</b></button>
   <button type="button" class="mobile-motion" id="mobileMotionToggle">MOTION <b>ON</b></button>
+  <div class="mobile-social" aria-label="作者のSNSリンク"><small>CREATOR / CONNECT</small><div class="mobile-social-links" id="mobileSocialLinks"></div></div>
 </nav>
   <main id="main">
     <section class="hero theme-orphe is-entering" id="hero" aria-label="キャラクター選択画面">
@@ -94,10 +95,29 @@
         <div class="mini-meta mono" id="heroMeta">ZETA / ロジエ邸 <span>●</span> 001</div>
       </div>
       <div class="hero-art-wrap" id="artWrap"><img class="hero-art" src="assets/orphe.png" id="heroArt" alt="オルフェ・ロジエのイラスト" draggable="false"></div>
+<section class="mobile-quote" id="mobileQuote" aria-label="キャラクターの名前と台詞">
+  <div class="mobile-quote-name" id="mobileQuoteName">オルフェ・ロジエ</div>
+  <p id="mobileQuoteText"></p>
+</section>
+<button type="button" class="mobile-profile" id="mobileOpenDetail" aria-label="キャラクタープロフィールを開く">
+  <span class="mobile-profile-label"><small>FILE / ACCESS</small><strong>PROFILE</strong></span><span class="mobile-profile-arrow" aria-hidden="true">↗</span>
+</button>
+<section class="mobile-intro" id="mobileIntroduction" aria-label="キャラクター人物紹介">
+  <div class="mobile-intro-head"><strong>INTRODUCTION</strong><small id="mobileIntroNumber">001 / CHARACTER FILE</small></div>
+  <div class="mobile-intro-reading"><p class="mobile-intro-text" id="mobileIntroText"></p><span class="mobile-intro-track" id="mobileIntroTrack" aria-hidden="true"><i id="mobileIntroThumb"></i></span></div>
+</section>
       <div class="hero-art-stamp" id="artStamp" aria-hidden="true"><span>FILE<br><b>001</b></span></div>
       <div class="side-dash mono" id="sideDash" aria-hidden="true">IDENTITY VERIFIED / SIGNAL ACTIVE</div>
       <div class="hero-bottomline mono" aria-hidden="true"><span><i></i><i></i><i></i> SELECT YOUR CHARACTER</span><span>← / → KEY TO SWITCH</span></div>
     </section>
+<section class="mobile-picker" aria-label="スマホ用キャラクター切り替え">
+  <div class="mobile-picker-row">
+    <button type="button" id="mobilePrev" class="mobile-picker-arrow" aria-label="前のキャラクター">←</button>
+    <div class="mobile-portrait-viewport" id="mobilePortraitViewport" role="tablist" aria-label="登場キャラクター"><div class="mobile-portrait-track" id="mobilePortraitTrack"></div></div>
+    <button type="button" id="mobileNext" class="mobile-picker-arrow" aria-label="次のキャラクター">→</button>
+  </div>
+  <div class="mobile-picker-foot"><span id="mobilePickerCount">01 / 04</span><button type="button" id="mobileAllCast">▦ <span>ALL CAST</span> ↗</button></div>
+</section>
     <section class="picker" aria-label="キャラクター切り替え">
       <div class="picker-title"><span class="picker-label mono"><i></i> NOW BROWSING</span><strong>CHOOSE<br><em>YOUR</em> CAST<span class="period">.</span></strong><span class="picker-count mono" id="pickerCount">03 SIGNALS DETECTED</span></div>
       <div class="picker-carousel" id="pickerCarousel">
@@ -107,7 +127,7 @@
       </div>
       <div class="picker-nav"><button type="button" id="prev" aria-label="前のキャラ">← <small>PREV</small></button><button type="button" id="next" aria-label="次のキャラ"><small>NEXT</small> →</button><button type="button" class="picker-index" id="openIndex" aria-label="キャラ一覧を開く">☷ <small>キャラ一覧</small></button></div>
     </section>
-    <div id="draftIndicator" class="preview-banner" hidden><span>◉ DRAFT PREVIEW — このブラウザ内だけの下書き表示</span><button id="backToAdmin" type="button">EDIT MODE に戻る ↗</button></div>
+    <div id="draftIndicator" class="preview-banner" hidden><span>◉ DRAFT PREVIEW — 非公開キャラを含む管理者専用プレビュー。公開サイトには反映されません</span><button id="backToAdmin" type="button">EDIT MODE に戻る ↗</button></div>
     <div class="footer-bar mono"><span>CAST / SIGNAL — ORIGINAL CHARACTER ARCHIVE</span><div class="footer-social" id="footerSocial"></div><span>© PERSONAL PROJECT / CONCEPT BUILD 05.4</span></div>
   </main>
 
@@ -181,10 +201,10 @@
       <div class="admin-brand"><span class="admin-brand-icon">✳</span><div><strong>CAST<span>//</span>SIGNAL</strong><small>CONTROL ROOM / V5.9.7 CLOUD</small></div></div>
       <span class="admin-draft-tag" id="adminStatus">● CLOUD DRAFT</span>
       <div class="admin-top-actions">
-        <button type="button" class="admin-action ghost" id="adminPreview">◉ 下書きを見る</button>
+        <button type="button" class="admin-action ghost" id="adminPreview">◉ 下書きを見る（非公開含む）</button>
         <button type="button" class="admin-action primary" id="adminPublish">↗ サイトに公開する</button>
         <button type="button" class="admin-action ghost" id="cloudLogout">⎋ ログアウト</button>
-        <button type="button" class="admin-action close" id="adminExit">× プレビューへ</button>
+        <button type="button" class="admin-action close" id="adminExit">× 公開済みをプレビュー</button>
       </div>
     </header>
     <div class="admin-frame">
