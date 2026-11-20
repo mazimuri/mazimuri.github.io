@@ -1100,3 +1100,48 @@ body.detail-open .hero-art-wrap{transition:transform 760ms cubic-bezier(.18,.73,
   bottom: 0;
   z-index: 12;
 }
+
+/* CAST // SIGNAL v5.10 — responsive PC SELECT stage.
+   Keep the 1170px reference composition independent of window height;
+   short viewports scroll, and art/text stop growing on ultrawide screens.
+   This is desktop-only; mobile SELECT and saved artPosition data are untouched. */
+@media (min-width:801px){
+  #hero.hero,
+  #hero.hero:has(.hero-intel:not([hidden])),
+  #hero.hero:has(.hero-voice:not([hidden])){
+    height:clamp(875px,79vw,930px);
+    min-height:875px;
+  }
+  #hero .hero-copy{
+    top:clamp(76px,8.5vw,110px);
+    left:clamp(30px,4vw,72px);
+    width:min(41%,515px);
+  }
+  #hero .hero-copy .title-stack h1{
+    font-size:clamp(77px,10vw,125px)!important;
+  }
+  #hero .hero-copy .title-outline{
+    font-size:clamp(49px,6.1vw,83px)!important;
+  }
+  #hero .hero-copy .hero-jp{
+    font-size:clamp(21px,2vw,28px)!important;
+  }
+  #hero.hero .hero-art-wrap{
+    right:calc(30% - min(28vw,350px));
+    width:min(56vw,700px);
+  }
+  #hero.hero.theme-orphe .hero-art-wrap{
+    right:calc(30% - min(30vw,370px));
+    width:min(60vw,740px);
+  }
+  #hero.hero.theme-rov .hero-art-wrap{
+    right:calc(30% - min(29vw,357px));
+    width:min(58vw,714px);
+  }
+  #hero.hero.theme-unnamed .hero-art-wrap{
+    right:calc(30% - min(26.5vw,329px));
+    width:min(53vw,658px);
+  }
+  /* PROFILE opens a side dossier; preserve the artwork's leftward transition. */
+  body.detail-open #hero.hero .hero-art-wrap{right:40%;}
+}
