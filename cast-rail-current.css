@@ -162,7 +162,7 @@
    border-radius:clamp(11px,1.15vw,20px) 0 clamp(11px,1.15vw,20px) 0!important;
    background:linear-gradient(137deg,#313c42 0%,#1c2429 13%,#0b1014 51%,#192126 84%,#293238 100%)!important;
    box-shadow:inset 1px 1px 0 #ffffff34,inset -2px -2px 0 #0008,2px 3px 0 #080c10a6,4px 7px 12px #0003!important;
-   filter:none!important;translate:none;
+   filter:none!important;translate:none;outline:none!important;
    overflow:hidden!important;
    transition:translate .22s cubic-bezier(.18,.82,.25,1),box-shadow .22s ease!important;
  }
@@ -177,11 +177,7 @@
  /* A restrained edge reflection on the upper-right is part of the chassis. */
  #main .v5-item .v5-card-outer::after,
  #main .v5-item[data-slot="3"] .v5-card-outer::after{
-   content:""!important;display:block!important;position:absolute;
-   right:0;top:0;width:2px;height:29%;z-index:9;
-   opacity:.45!important;transform:none!important;
-   background:linear-gradient(#dce6df4c,transparent)!important;
-   pointer-events:none;
+   content:none!important;display:none!important; /* remove stray thin light seam on slanted edge */
  }
  /* Portrait bay. Respect x/y/zoom supplied by the existing image editor. */
  #main .v5-item .v5-card-inner,
@@ -190,12 +186,10 @@
    border:0!important;
    border-radius:clamp(7px,.72vw,12px) 0 0 0!important;
    background:linear-gradient(148deg,color-mix(in srgb,var(--soft) 45%,#b4c0c3) 0%,color-mix(in srgb,var(--soft) 22%,#839196) 44%,color-mix(in srgb,var(--deep) 42%,#87949a) 100%)!important;
-   box-shadow:inset 0 1px 0 #fff5,inset 0 -5px 10px #080d1380!important;
+   box-shadow:inset 0 1px 0 #c8d4d52a,inset 0 -5px 10px #080d1380!important;
  }
  #main .v5-item .v5-card-inner::before{
-   content:""!important;position:absolute;inset:0;z-index:2;
-   background:linear-gradient(135deg,#ffffff20 0%,#ffffff08 19%,transparent 37%,transparent 85%)!important;
-   opacity:.36!important;mix-blend-mode:normal!important;pointer-events:none;
+   content:none!important;display:none!important; /* remove independent glossy white photo overlay */
  }
  #main .v5-item .v5-card-inner::after{
    content:""!important;position:absolute;inset:0;z-index:3;
@@ -224,12 +218,7 @@
  /* No hover photo filter: retain crisp portraits while the shell lifts. */
  #main .v5-item .v5-card:hover .v5-card-outer,
  #main .v5-item .v5-card:focus-visible .v5-card-outer{
-   filter:none!important;translate:-2px -2px!important;
-   box-shadow:5px 8px 0 #0005,0 13px 18px #0003!important;
- }
- #main .v5-item[data-slot="3"] .v5-card:hover .v5-card-outer,
- #main .v5-item[data-slot="3"] .v5-card:focus-visible .v5-card-outer{
-   box-shadow:7px 11px 0 #0004,0 16px 20px #0003!important;
+   filter:none!important;translate:-2px -2px!important; /* keep the exact resting shadow + inset bevel */
  }
 
  /* Integrated name fascia, one narrow readout at the base of each card. */
@@ -242,7 +231,7 @@
    display:flex!important;align-items:center!important;justify-content:center!important;
    transform:skewX(11deg)!important;
    border:0!important;border-radius:0!important;
-   border-top:1px solid #e8f5ee42!important;
+   border-top:1px solid #71828b40!important;
    background:linear-gradient(105deg,#121a1f 0%,#070a0d 48%,#1b252b 100%)!important;
    box-shadow:inset 0 2px 0 #ffffff10,inset 0 -2px 0 #000c!important;
    color:#f4f6f5!important;text-shadow:0 1px 0 #0009!important;
@@ -340,19 +329,19 @@
    align-items:center!important;justify-content:center!important;flex-direction:row!important;
    gap:clamp(4px,.52vw,8px)!important;
    padding:6px clamp(7px,.7vw,12px)!important;
-   border:3px solid #0a0f12!important;
-   border-left:4px solid #10171b!important;border-bottom:5px solid #090e11!important;
+   border:2px solid #11191c!important;
+   border-left:3px solid #10171b!important;border-bottom:4px solid #090e11!important;
+   outline:none!important;
    border-radius:13px 4px 12px 4px!important;
-   background:linear-gradient(150deg,#f7ffae 0%,#edff58 18%,#dcf24a 72%,#c7df40 100%)!important;
+   background:linear-gradient(155deg,#ebff60 0%,#e3f94d 54%,#d4ed40 100%)!important;
    color:#141a1c!important;writing-mode:horizontal-tb!important;
    transform:skewX(-11deg)!important;
-   box-shadow:inset 1px 1px 0 #ffffffb8,inset -2px -2px 0 #82992f55,3px 4px 0 #070e11b8,5px 8px 14px #0003!important;
+   box-shadow:3px 4px 0 #070e11b8,5px 8px 14px #0003!important;
    transition:filter .18s ease,translate .18s ease!important;
    z-index:16!important;pointer-events:auto!important;cursor:pointer!important;
  }
  #main .v5-item[data-slot="3"] .v5-allcast::before{
-   content:"";position:absolute;left:10px;top:4px;width:26%;height:2px;
-   border-radius:999px;background:#fff9;transform:skewX(11deg);pointer-events:none;
+   content:none!important;display:none!important;
  }
  #main .v5-item[data-slot="3"] .v5-allcast::after{
    content:""!important;position:absolute;
@@ -365,7 +354,7 @@
    transform:none!important;pointer-events:none!important;
  }
  #main .v5-item[data-slot="3"] .v5-allcast:hover{
-   filter:brightness(1.06)!important;translate:-3px -2px!important;
+   filter:none!important;outline:none!important;translate:-3px -2px!important;
  }
  #main .v5-item[data-slot="3"] .v5-allcast:focus-visible{
    outline:3px solid #ff4357!important;outline-offset:4px!important;
