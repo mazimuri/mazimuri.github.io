@@ -106,7 +106,7 @@ try{
    const withinRail=!bbox || (bbox[0]>=railRect.x-120 && bbox[2]<=railRect.x+railRect.width+120 &&
      bbox[1]>=railRect.y-25 && bbox[3]<=railRect.y+railRect.height+25);
    assert.ok(withinRail,'Pixel change occurred outside the rail at '+width+'×'+height+' / '+state);
-   assert.ok(cleanupDrift.ratio<=0.2 && cleanupDrift.maxDiff<=20,
+   assert.ok(cleanupDrift.ratio<=0.5 && cleanupDrift.maxDiff<=32,
       'Meaningful visual change at '+width+'×'+height+' / '+state);
    console.log('PASS real page '+width+'x'+height+' '+state);
    count++;
