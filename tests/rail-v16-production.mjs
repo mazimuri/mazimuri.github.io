@@ -112,8 +112,9 @@ try{
   // Screenshot real content; hold all animation only during capture.
   if([1024,1920,2048,2560].includes(width)){
     await page.mouse.move(0,0);
-    await page.screenshot({path:folder+'/v16-real-'+width+'.png',fullPage:true,animations:'disabled',
-      style:'*,*::before,*::after{animation:none!important;transition:none!important}'});
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    await page.waitForTimeout(350);
+    await page.screenshot({path:folder+'/v16-real-'+width+'.png',fullPage:true,animations:'disabled'});
   }
 
   // Simulate each real-world status state with temporary badges in the picker.
@@ -162,8 +163,8 @@ try{
     }
   }
   if(width===1920){
-    await page.screenshot({path:folder+'/v16-status-matrix-1920.png',fullPage:true,animations:'disabled',
-      style:'*,*::before,*::after{animation:none!important;transition:none!important}'});
+    await page.waitForTimeout(220);
+    await page.screenshot({path:folder+'/v16-status-matrix-1920.png',fullPage:true,animations:'disabled'});
   }
 
   // Jump ±04 and ALL CAST must still be connected to the main site's actions.
