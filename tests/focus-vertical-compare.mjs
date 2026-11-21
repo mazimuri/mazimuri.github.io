@@ -4,18 +4,18 @@ import {execFileSync} from 'node:child_process';
 import {chromium} from 'playwright';
 
 const site='https://mazimuri.github.io/';
-// User's Full HD screenshot is 1919x1079 bitmap, but the page begins
-// around y=121 and Windows taskbar around y=1033. Hence its CSS viewport
-// is about 1919x912 at 100% browser zoom, NOT 1919x1079.
-// User's 2K bitmap was reduced to 2048px wide; test an approximately
-// 2560x1278 CSS viewport for the original 2560x1440 monitor as well.
+// Exact Chrome measurements supplied by the user (local standalone tab):
+// Full HD: innerWidth=1920, innerHeight=911, visualViewport=1905x911.
+// 2K:      innerWidth=2560, innerHeight=1271, visualViewport=2560x1271.
+// The 15px visualViewport width difference on Full HD is likely the scrollbar;
+// CSS breakpoint conditions use the layout viewport, not screenshot pixels.
 
 const candidate=readFileSync('cast-side-rail.css','utf8');
 const baseline=execFileSync('git',['show','origin/main:cast-side-rail.css'],{encoding:'utf8',maxBuffer:2_000_000});
 assert.ok(candidate.includes('(max-height:1130px)')&&candidate.includes('calc(904px - 80svh)'));
 mkdirSync('fullhd-hero-review',{recursive:true});
 const browser=await chromium.launch();
-const sizes=[[1440,900],[1919,912],[1920,900],[1920,1080],[2048,1149],[2560,1278],[2560,1440]];
+const sizes=[[1440,900],[1905,911],[1920,911],[1920,900],[1920,1080],[2048,1149],[2560,1271],[2560,1440]];
 async function render(width,height,css,label){
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});
  await page.route('**/cast-side-rail.css*',r=>r.fulfill({status:200,contentType:'text/css',body:css}));
@@ -44,7 +44,7 @@ async function render(width,height,css,label){
  });
  assert.ok(m.cta.bottom<m.hero.bottom-15,'PROFILE control clipped for '+width+'/'+height+' '+label);
  assert.ok(!m.romanClipped,'Roman headline clipped at '+width+'/'+height+' '+label);
- if((width===1919&&height===912)||(width===1920&&height===1080)||(width===2560&&height===1278)){
+ if((width===1920&&height===911)||(width===2560&&height===1271)){
    await page.screenshot({path:'fullhd-hero-review/'+width+'x'+height+'-'+label+'.png',
      fullPage:true,animations:'disabled'});
  }
