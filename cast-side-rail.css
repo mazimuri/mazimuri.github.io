@@ -647,8 +647,8 @@
  #hero .hero-copy .title-stack h1{font-size:clamp(78px,8.35vw,172px)!important}
  #hero .hero-copy .title-outline{font-size:clamp(51px,5.08vw,107px)!important}
  #hero .hero-copy .hero-jp{font-size:clamp(21px,1.9vw,32px)!important}
- #hero.hero .hero-art-wrap,#hero.hero.theme-rov .hero-art-wrap,#hero.hero.theme-unnamed .hero-art-wrap{left:18.5%!important;width:min(78.3%,1570px)!important;height:97%!important;z-index:7!important}
- #hero.hero.theme-orphe .hero-art-wrap{left:18.5%!important;width:min(78.3%,1570px)!important;height:106%!important;z-index:7!important}
+ #hero.hero .hero-art-wrap,#hero.hero.theme-rov .hero-art-wrap,#hero.hero.theme-unnamed .hero-art-wrap{width:min(78.3%,1570px)!important;height:97%!important;z-index:7!important}
+ #hero.hero.theme-orphe .hero-art-wrap{width:min(78.3%,1570px)!important;height:106%!important;z-index:7!important}
  /* FILE badge: on open accent area to the right of the art, never beneath the cast rail. */
  #hero .hero-art-stamp{
    position:absolute!important;left:clamp(835px,62.5vw,1320px)!important;right:auto!important;
@@ -964,9 +964,9 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  #hero.hero .hero-art-wrap,
  #hero.hero.theme-rov .hero-art-wrap,
  #hero.hero.theme-unnamed .hero-art-wrap{
-   left:18.5%!important;
+   left:var(--select-art-base-left,17.3%)!important;
  }
- #hero.hero.theme-orphe .hero-art-wrap{left:18.5%!important}
+ #hero.hero.theme-orphe .hero-art-wrap{left:var(--select-art-base-left,17.3%)!important}
  body.detail-open #hero.hero .hero-art-wrap{left:7%!important}
 
  /* The previous italic digits have a right-side optical overhang. Move just
@@ -1432,6 +1432,12 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
    Move copy toward portrait; enlarge Japanese name, voice, bio and CTA.
    Surname and Roman name remain behind the foreground illustration. */
 @media (min-width:1850px){
+  /* The tall 2K composition uses a slightly more central shared art base.
+     Full HD 1920x911 keeps the earlier alignment. Per-character artPosition
+     remains independent from this responsive base and is not overwritten. */
+  @media (min-height:1131px){
+    #hero.hero{--select-art-base-left:18.5%}
+  }
   #hero .hero-copy{
     left:clamp(120px,6.7vw,174px)!important;
     width:min(45%,710px)!important;
