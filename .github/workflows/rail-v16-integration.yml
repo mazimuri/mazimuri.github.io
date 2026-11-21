@@ -3,7 +3,9 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - cast-side-rail.css
       - cast-rail-current.css
+      - tests/hero-wide-integrity.mjs
       - cast-side-rail.js
       - index.html
       - tests/rail-v16-production.mjs
@@ -26,11 +28,15 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Test real-site V16 components
         run: node tests/rail-v16-production.mjs
+      - name: Verify adopted FOCUS layout at 800 to 2560px
+        run: node tests/hero-wide-integrity.mjs
       - name: Save 1024, 1920, 2048, 2560 previews
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v16-real-site-preview
-          path: v16-review/*.png
+          path: |
+            v16-review/*.png
+            hero-wide-implementation/*.png
           if-no-files-found: ignore
           retention-days: 14
