@@ -158,18 +158,30 @@
 
  /* One continuous moulded shell. The case provides the only outer edge and
     bevel; image bay and fascia do not draw competing hairline frames. */
+ /* Stationary shadow track: button does not move, faceplate lifts. */
+ #main .v5-item .v5-card::before{
+   content:"";display:block;position:absolute;inset:0;pointer-events:none;
+   transform:skewX(-11deg);transform-origin:center;
+   border-radius:clamp(11px,1.15vw,20px) 0 clamp(11px,1.15vw,20px) 0;
+   background:#11191e;z-index:0;
+   box-shadow:2px 3px 0 #080c10a6,4px 7px 12px #0003;
+ }
+ #main .v5-item[data-slot="3"] .v5-card::before{
+   box-shadow:4px 5px 0 #070b0cba,8px 11px 20px #0004;
+ }
  #main .v5-item .v5-card-outer{
+   z-index:1;
    border:var(--v16-case-size) solid #0b1115!important;
    border-radius:clamp(11px,1.15vw,20px) 0 clamp(11px,1.15vw,20px) 0!important;
    background:linear-gradient(135deg,#283238 0%,#11191e 34%,#0d1419 72%,#283137 100%)!important;
-   box-shadow:inset 0 0 0 1px #4d5a5b25,2px 3px 0 #080c10a6,4px 7px 12px #0003!important;
+   box-shadow:inset 0 0 0 1px #4d5a5b25!important;
    filter:none!important;translate:none;outline:none!important;
    background-clip:padding-box;
    overflow:hidden!important;
-   transition:translate .22s cubic-bezier(.18,.82,.25,1),box-shadow .22s ease!important;
+   transition:translate .22s cubic-bezier(.18,.82,.25,1)!important;
  }
  #main .v5-item[data-slot="3"] .v5-card-outer{
-   box-shadow:inset 0 0 0 1px #5d6e712b,4px 5px 0 #070b0cba,8px 11px 20px #0004!important;
+   box-shadow:inset 0 0 0 1px #5d6e712b!important;
  }
  /* Removed indicator: never place an LED/pill at the shell's top-left. */
  #main .v5-item .v5-card-outer::before,
