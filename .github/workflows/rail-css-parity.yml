@@ -1,0 +1,32 @@
+name: RIGHT CAST RAIL CSS parity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - cast-side-rail.css
+      - tests/rail-css-parity.mjs
+      - tests/rail-live-visual-parity.mjs
+      - .github/workflows/rail-css-parity.yml
+  workflow_dispatch:
+jobs:
+  parity:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare baseline
+        run: git fetch origin main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 pngjs@7.0.0
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Compare original and refactored CSS
+        run: node tests/rail-css-parity.mjs
+      - name: Compare actual published SELECT display (read-only)
+        run: node tests/rail-live-visual-parity.mjs
