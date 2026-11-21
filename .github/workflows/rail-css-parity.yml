@@ -14,6 +14,9 @@ on:
   workflow_dispatch:
 jobs:
   parity:
+    # Exact visual identity is required only for no-redesign refactor PRs.
+    # Approved V16 intentionally changes appearance and uses its own integration suite.
+    if: startsWith(github.head_ref, 'refactor/') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
