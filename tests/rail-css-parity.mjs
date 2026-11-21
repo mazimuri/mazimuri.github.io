@@ -8,7 +8,7 @@ import { chromium } from 'playwright';
    The fixture covers the live v5 class structure; this does not replace
    manual checks with real portraits or other pages. */
 const baseline = execFileSync('git', ['show','origin/main:cast-side-rail.css'], {encoding:'utf8',maxBuffer:2_000_000});
-const candidate = readFileSync('cast-side-rail.css','utf8');
+const candidate = ['cast-side-rail.css','cast-view-adjustments.css','cast-rail-current.css'].map(file=>readFileSync(file,'utf8')).join('');
 const foundation = readFileSync('style.css','utf8');
 
 function fixture(css) {
