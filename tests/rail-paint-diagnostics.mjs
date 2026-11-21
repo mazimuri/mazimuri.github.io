@@ -40,7 +40,7 @@ try{
   await page.locator('#v5Stack .v5-item[data-slot="3"]').waitFor();
   await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.querySelectorAll('#v5Stack img')].map(x=>x.decode?.().catch(()=>{})??Promise.resolve()))});
   await page.waitForTimeout(450);
-  const injected=await page.addStyleTag({content:''});
+  const injected=await page.addStyleTag({content:'/* diagnostic */'});
   for(const [name,style] of conditions){
    await injected.evaluate((el,body)=>el.textContent=body,style);
    await page.waitForTimeout(360);
