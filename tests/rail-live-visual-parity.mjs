@@ -10,7 +10,7 @@ import {PNG} from 'pngjs';
    This test is read-only for https://mazimuri.github.io/. */
 const url='https://mazimuri.github.io/';
 const baseline=execFileSync('git',['show','origin/main:cast-side-rail.css'],{encoding:'utf8',maxBuffer:2_000_000});
-const candidate=readFileSync('cast-side-rail.css','utf8');
+const candidate=['cast-side-rail.css','cast-view-adjustments.css','cast-rail-current.css'].map(file=>readFileSync(file,'utf8')).join('');
 
 const properties=['display','position','left','right','top','bottom','width','height','opacity','zIndex',
  'transform','filter','backgroundColor','backgroundImage','color','fontSize','border','borderRadius',
