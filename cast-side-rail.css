@@ -1434,8 +1434,9 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
 @media (min-width:1850px){
   #hero .hero-copy{
     /* Keep the 2K composition unchanged, but raise the whole editorial
-       block on shorter Full HD windows instead of resizing individual lines. */
-    --focus-short-screen-lift:clamp(0px,calc(472px - 40svh),48px);
+       block on shorter Full HD windows instead of resizing individual lines.
+       At ~1150px CSS viewport height (2K screenshot), the lift becomes zero. */
+    --focus-short-screen-lift:clamp(0px,calc(680px - 59svh),48px);
     top:max(38px,calc(clamp(44px,7.4vh,110px) - var(--focus-short-screen-lift)))!important;
     left:clamp(120px,6.7vw,174px)!important;
     width:min(45%,710px)!important;
