@@ -9,24 +9,30 @@ const doc=()=>api.getDraft();
 const selected=()=>doc().characters.find(c=>c.id===state.charId);
 const world=()=>doc().worlds.find(w=>w.id===state.worldId);
 const sortId=(arr,id,delta)=>{const idx=arr.findIndex(x=>x.id===id);const target=idx+delta;if(idx<0||target<0||target>=arr.length)return;[arr[idx],arr[target]]=[arr[target],arr[idx]]};
-function persist(note='クラウドに保存済み'){const el=$('saveStatus');el.textContent='クラウド保存中…';api.saveDraft().then(ok=>{el.textContent=ok?note:'⚠ クラウド保存失敗。ネット接続・権限を確認してね';el.style.color=ok?'#b8cc98':'#ff9b82'});return true}
+function persist(note='クラウドに保存済み'){$('adminStatus').textContent='● CLOUD DRAFT';const el=$('saveStatus');el.textContent='クラウド保存中…';api.saveDraft().then(ok=>{el.textContent=ok?note:'⚠ クラウド保存失敗。ネット接続・権限を確認してね';el.style.color=ok?'#b8cc98':'#ff9b82'});return true}
 function notify(m){pub.toast(m)}
 function visible(on){$('admin').hidden=!on;document.body.classList.toggle('admin-open',on);document.body.style.overflow=on?'hidden':''}
 function enter(){visible(true);render()}
 function exit(){visible(false);pub.refresh('published')}
 function preview(){visible(false);pub.refresh('draft');notify('下書きプレビューです。ネットには公開されません')}
 async function publish(){
- const yes=confirm('公開するキャラクターとWORLDを確認しましたか？\n\n「公開する」を押すと、公開用データが更新されます。オンライン公開切り替え後は訪問者にも反映されます。');
+ const yes=confirm('公開するキャラクターとWORLDを確認しましたか？\n\n公開用データをSupabaseに保存し、公開サイトから実際に読み取れることまで確認します。HTML/CSSの変更やGitHubへの自動アップロードは行いません。');
  if(!yes)return;
  const button=$('adminPublish');button.disabled=true;
+ let verified=false;
  $('adminStatus').textContent='● PUBLISHING…';
  try{
   if(!(await api.publish()))throw Error(api.getLastError?.()||'公開できませんでした');
-  visible(false);pub.refresh('published');
+  verified=true;visible(false);pub.refresh('published');
   const live=api.getPublished();const characterCount=live.characters?.length??0;const worldCount=live.worlds?.length??0;
-  notify(`公開完了：キャラ${characterCount}人／WORLD${worldCount}件。別タブの公開サイトに戻るか、再読み込みして確認してね`);
- }catch(e){notify('公開失敗：'+(e.message||String(e)));}
- finally{button.disabled=false;$('adminStatus').textContent='● CLOUD DRAFT'}
+  notify(`公開サイトからの読み取り確認済み：キャラ${characterCount}人／WORLD${worldCount}件。公開中のタブも自動更新を試みます`);
+ }catch(e){
+  const message=e.message||String(e);
+  $('saveStatus').textContent='⚠ 公開の確認が必要：'+message;
+  $('saveStatus').style.color='#ff9b82';
+  notify('公開の確認が必要：'+message);
+ }
+ finally{button.disabled=false;$('adminStatus').textContent=verified?'● PUBLIC VERIFIED':'● PUBLISH CHECK FAILED'}
 }
 function setSection(s){state.section=s;state.charId=null;state.worldId=null;render()}
 function headline(kicker,title,desc,right=''){return `<div class="admin-headline"><div><div class="admin-kicker">${esc(kicker)}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p></div>${right}</div>`}
@@ -128,7 +134,7 @@ function renderAboutEditor(){
  <section class="form-section"><h3>NEW SIGNAL / 新着ラベル</h3><p class="hint">新規キャラが初めて公開された日から指定日数「NEW」を表示。既存キャラの編集ではカウントがリセットされません。0ならオフ。</p><div class="form-grid"><div class="form-field"><label>NEWの表示日数（0〜90日）</label><input type="number" data-site-days min="0" max="90" value="${Math.max(0,Math.min(90,Number(t.newDays)||0))}"></div></div></section>
  <div class="form-actions">${btn('preview-about','ABOUTをプレビュー ↗','accent')}</div>`;
 }
-function renderPublish(){const d=doc();return `${headline('06 / DEPLOYMENT','PUBLISH / GITHUB EXPORT','公開するキャラクターは各キャラの「公開対象」で設定。上部の「サイトに公開する」でオンライン公開用データを更新。ZIP出力は予備の手動公開手段です。')}<div class="admin-two"><div class="admin-card"><div class="admin-kicker">01 / READY TO DEPLOY</div><h3>公開用ZIPを書き出す ↗</h3><p>「公開対象」にしたキャラだけ出力し、WORLDはチェックで選択できます。<strong>元画像を改変せず</strong>、登録データの画像を書き出すよ。</p><div class="publish-select" id="publishSelections"><p>CHARACTERS</p>${d.characters.map((c,i)=>`<label><input type="checkbox" data-pub-char="${esc(c.id)}" ${c.published!==false?'checked':''}><span>${String(i+1).padStart(3,'0')} / ${esc(c.name)}</span></label>`).join('')}<p>WORLDS</p>${d.worlds.map((w,i)=>`<label><input type="checkbox" data-pub-world="${esc(w.id)}" ${w.published!==false?'checked':''}><span>${String(i+1).padStart(2,'0')} / ${esc(w.title)}</span></label>`).join('')}</div>${btn('export-publish','↓ 公開用ZIPを作成','accent')}<p class="admin-publish-status" id="publishStatus">まだ書き出していません。</p></div><div class="admin-card"><div class="admin-kicker">02 / HOW TO PUBLISH</div><h3>GitHubへアップロード</h3><p>出力ZIPを解凍し、<code>content</code>と<code>assets</code>フォルダ内のファイルをGitHubにアップロードしてね。</p><p>今の公開サイト本体のHTML/CSSやOGP画像を上書きする必要はありません。</p><div class="backup-box"><strong>公開リポジトリの注意</strong><p>非公開キャラを除外しても、既にGitHubに存在する古いファイルは自動削除されません。機密データはGitHubへ載せないでね。</p></div>${btn('show-backup','← JSONバックアップを確認','small')}</div></div>`}
+function renderPublish(){const d=doc();return `${headline('06 / DEPLOYMENT','CLOUD PUBLISH / BACKUP EXPORT','キャラクターやWORLDを公開するときは上部の「サイトに公開する」を使ってね。データをSupabaseへ公開し、訪問者側から読み取れるか確認します。ZIPは手動バックアップ用です。')}<div class="admin-two"><div class="admin-card"><div class="admin-kicker">01 / READY TO DEPLOY</div><h3>公開用ZIPを書き出す ↗</h3><p>「公開対象」にしたキャラだけ出力し、WORLDはチェックで選択できます。<strong>元画像を改変せず</strong>、登録データの画像を書き出すよ。</p><div class="publish-select" id="publishSelections"><p>CHARACTERS</p>${d.characters.map((c,i)=>`<label><input type="checkbox" data-pub-char="${esc(c.id)}" ${c.published!==false?'checked':''}><span>${String(i+1).padStart(3,'0')} / ${esc(c.name)}</span></label>`).join('')}<p>WORLDS</p>${d.worlds.map((w,i)=>`<label><input type="checkbox" data-pub-world="${esc(w.id)}" ${w.published!==false?'checked':''}><span>${String(i+1).padStart(2,'0')} / ${esc(w.title)}</span></label>`).join('')}</div>${btn('export-publish','↓ 公開用ZIPを作成','accent')}<p class="admin-publish-status" id="publishStatus">まだ書き出していません。</p></div><div class="admin-card"><div class="admin-kicker">02 / PUBLICATION RULES</div><h3>公開データとデザインの違い</h3><p>キャラ・WORLD・ABOUTの文章や画像は、上部の公開ボタンからSupabaseへ反映します。公開後は訪問者と同じ読み取り権限で照合します。</p><p>サイトのレイアウト・HTML・CSS・JavaScriptはGitHub Pagesで管理し、この公開ボタンでは変更しません。</p><div class="backup-box"><strong>公開リポジトリの注意</strong><p>非公開キャラを除外しても、既にGitHubに存在する古いファイルは自動削除されません。機密データはGitHubへ載せないでね。</p></div>${btn('show-backup','← JSONバックアップを確認','small')}</div></div>`}
 function renderBackup(){return `${headline('04 / CLOUD WORKSPACE','BACKUP','下書きはクラウドに保存されます。定期的なJSONバックアップもおすすめ！')}<div class="backup-box"><strong>IMPORTANT / 試作品の保存範囲</strong><p>下書きはログイン中の管理者だけが読み書きできるSupabaseのデータベースに保存されます。新しく登録した画像は下書きでは非公開、公開時に公開用画像としてアップロードされます。定期的にJSONバックアップも保存してください。</p></div><div class="admin-two"><div class="admin-card"><h3>EXPORT DATA ↗</h3><p>登録したキャラ、WORLD、タグ、アップロード画像をひとつのJSONとして保存します。定期的な書き出し推奨。</p>${btn('export','↓ JSONバックアップを書き出す','accent')}</div><div class="admin-card"><h3>IMPORT DATA ↙</h3><p>以前書き出したCAST / SIGNAL v5のJSONバックアップを読み込み、下書き全体を置き換えます。</p><input type="file" id="backupInput" accept="application/json,.json" style="font-size:12px;max-width:100%;margin-top:14px"></div></div><div class="admin-card" style="margin-top:18px"><h3>RESTORE PUBLISHED DATA</h3><p>現在の公開用データで下書きを置き換えます。未公開の変更は失われます。</p>${btn('reset','公開中のデータに下書きを戻す','danger')}</div>`}
 
 /* Mirror the live selected rail card's inner image aspect ratio. The rail

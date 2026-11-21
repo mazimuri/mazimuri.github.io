@@ -63,10 +63,10 @@
   // publishes while the visitor keeps this tab open, check the PUBLIC row when
   // the tab is revisited. Never request private draft data from the public app.
   let checkingPublished=false,lastPublishedCheck=0;
-  async function checkPublishedWhenActive(){
+  async function checkPublishedWhenActive(force=false){
     if(checkingPublished||document.hidden||/\/admin\.html$/i.test(location.pathname))return;
     const now=Date.now();
-    if(now-lastPublishedCheck<3000)return;
+    if(force!==true && now-lastPublishedCheck<3000)return;
     checkingPublished=true;lastPublishedCheck=now;
     try{
       await window.CAST_DATA_READY;
@@ -89,4 +89,12 @@
   window.addEventListener('pageshow',event=>{
     if(event.persisted)checkPublishedWhenActive();
   });
+  // A successful admin publication sends this event to other same-origin
+  // tabs. Existing focus/visibility rechecks remain the fallback.
+  if('BroadcastChannel' in window){
+    const publishedUpdates=new BroadcastChannel('cast-signal-published');
+    publishedUpdates.addEventListener('message',event=>{
+      if(event.data?.type==='published')checkPublishedWhenActive(true);
+    });
+  }
 })();
