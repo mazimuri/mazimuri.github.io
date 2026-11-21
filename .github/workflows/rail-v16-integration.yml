@@ -1,0 +1,42 @@
+name: RIGHT CAST RAIL V16 integration
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - cast-side-rail.css
+      - cast-rail-current.css
+      - tests/hero-wide-integrity.mjs
+      - cast-side-rail.js
+      - index.html
+      - tests/rail-v16-production.mjs
+      - .github/workflows/rail-v16-integration.yml
+  workflow_dispatch:
+jobs:
+  approved-v16:
+    if: startsWith(github.head_ref, 'design/rail-v16') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test browser
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 pngjs@7.0.0
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Test real-site V16 components
+        run: node tests/rail-v16-production.mjs
+      - name: Verify adopted FOCUS layout at 800 to 2560px
+        run: node tests/hero-wide-integrity.mjs
+      - name: Save 1024, 1920, 2048, 2560 previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v16-real-site-preview
+          path: |
+            v16-review/*.png
+            hero-wide-implementation/*.png
+          if-no-files-found: ignore
+          retention-days: 14

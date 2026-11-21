@@ -1426,5 +1426,51 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
   }
 }
 
-
-
+/* V16 / SELECT HERO WIDE TYPE — 1850px+
+   Single intentional responsive range, not another prototype stylesheet.
+   Keep <=1849px layouts and the real artPosition settings unchanged.
+   Move copy toward portrait; enlarge Japanese name, voice, bio and CTA.
+   Surname and Roman name remain behind the foreground illustration. */
+@media (min-width:1850px){
+  #hero .hero-copy{
+    left:clamp(120px,6.7vw,174px)!important;
+    width:min(45%,710px)!important;
+  }
+  #hero .hero-copy .title-stack h1{
+    font-size:clamp(180px,7.55vw,194px)!important;
+  }
+  #hero .hero-copy .title-outline{
+    font-size:clamp(113px,4.9vw,126px)!important;
+  }
+  /* This exact selector pair overrides the earlier high-specificity :has rule. */
+  #hero .hero-copy .hero-jp,
+  #hero .hero-copy:has(.hero-intel:not([hidden])) .hero-jp{
+    font-size:clamp(34px,1.55vw,40px)!important;
+  }
+  #hero .hero-intel{
+    width:min(470px,100%)!important;
+    max-width:min(470px,96%)!important;
+  }
+  #hero .hero-bio{
+    width:100%!important;
+    max-width:none!important;
+  }
+  #hero .hero-voice p{
+    font-size:clamp(19px,1vw,23px)!important;
+    line-height:1.47!important;
+  }
+  #hero .hero-bio p{
+    font-size:clamp(14px,.70vw,18px)!important;
+    line-height:1.55!important;
+    max-width:100%!important;
+  }
+  #hero .hero-copy .hero-cta,
+  #hero .hero-copy:has(.hero-intel:not([hidden])) .hero-cta{
+    width:clamp(320px,16vw,365px)!important;
+    max-width:365px!important;
+    height:clamp(58px,3vw,67px)!important;
+  }
+  #hero .hero-cta strong{
+    font-size:clamp(15px,.8vw,18px)!important;
+  }
+}

@@ -16,11 +16,20 @@
  let currentId=null,nextDirection=0,previous=null,framePending=false,busyUntil=0,gestureTime=0,touchY=null,queuedSteps=0,queueTimer=null;
  function snapshot(){return Array.from(stack.querySelectorAll('.v5-item:not(.v6-rail-ghost)')).map(el=>({
   id:el.dataset.person,slot:+el.dataset.slot,rect:el.getBoundingClientRect(),node:el.cloneNode(true)}));}
- function itemHtml(b,slot){const p=read(b),active=slot===3;
-  return `<div class="v5-item" data-slot="${slot}" data-person="${esc(p.id)}">
-    <button type="button" class="v5-card" data-v5-target="${esc(p.id)}" role="tab" aria-selected="${active}" aria-label="${esc(p.name)}を選択">
-     <span class="v5-card-outer"><span class="v5-card-inner"><img src="${esc(p.src)}" alt="" style="${esc(p.imageStyle)}"></span><span class="v155-card-index" aria-hidden="true">FILE / ${esc(p.number)}</span><span class="v5-card-name">${esc(p.name)}</span></span>
-     ${(p.zeta||p.recent)?`<span class="v5-badges">${p.zeta?'<b>zeta</b>':''}${p.recent?'<b class="is-new">NEW</b>':''}</span>`:''}
+ /* Status data comes from real picker entries, never from fixture data. */
+ function statusHtml(p){
+  if(!p.zeta&&!p.recent)return '';
+  const zeta=p.zeta?'<span class="v5-status-chip is-zeta" title="zetaで遊べる"><span class="long">zeta</span><span class="short">Z</span></span>':'';
+  const recent=p.recent?'<span class="v5-status-chip is-new" title="新着キャラ"><span class="long">NEW</span><span class="short">N</span></span>':'';
+  return '<span class="v5-status" aria-hidden="true">'+zeta+recent+'</span>';
+ }
+ function itemHtml(b,slot){
+  const p=read(b),active=slot===3;
+  const statusCount=Number(p.zeta)+Number(p.recent);
+  const statusName=[p.zeta?'zetaで遊べる':'',p.recent?'NEWキャラ':''].filter(Boolean).join('・');
+  return `<div class="v5-item" data-slot="${slot}" data-person="${esc(p.id)}" data-status-count="${statusCount}">
+    <button type="button" class="v5-card" data-v5-target="${esc(p.id)}" role="tab" aria-selected="${active}" aria-label="${esc(p.name)}を選択${statusName?'・'+statusName:''}">
+     <span class="v5-card-outer"><span class="v5-card-inner"><img src="${esc(p.src)}" alt="" style="${esc(p.imageStyle)}"></span><span class="v5-card-name">${esc(p.name)}</span>${statusHtml(p)}</span>
     </button>${active?'<button type="button" class="v5-allcast" aria-label="全キャラ一覧を見る"><span class="v155-grid" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="v155-action-text"><strong>ALL CAST</strong><small>全キャラを見る</small></span><span class="v155-action-arrow" aria-hidden="true">↗</span></button>':''}</div>`;
  }
  function render(){
