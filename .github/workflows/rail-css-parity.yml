@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - cast-side-rail.css
+      - cast-view-adjustments.css
+      - cast-rail-current.css
+      - index.html
+      - tests/rail-css-modules-integrity.mjs
       - tests/rail-css-parity.mjs
       - tests/rail-live-visual-parity.mjs
       - .github/workflows/rail-css-parity.yml
@@ -22,6 +26,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify CSS modules preserve the original stylesheet exactly
+        run: node tests/rail-css-modules-integrity.mjs
       - name: Install browser test dependency
         run: npm install --no-save --ignore-scripts playwright@1.56.1 pngjs@7.0.0
       - name: Install Chromium
