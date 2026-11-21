@@ -27,12 +27,12 @@ jobs:
         run: npm install --no-save --ignore-scripts playwright@1.56.1 pngjs@7.0.0
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Test real-site V16 components
-        run: node tests/rail-v16-production.mjs
-      - name: Verify adopted FOCUS layout at 800 to 2560px
-        run: node tests/hero-wide-integrity.mjs
       - name: Verify V16 frame and ALL CAST polish on real page
         run: node tests/rail-frame-polish-qa.mjs
+      - name: Verify adopted FOCUS layout at 800 to 2560px
+        run: node tests/hero-wide-integrity.mjs
+      - name: Test real-site V16 components
+        run: node tests/rail-v16-production.mjs
       - name: Save 1024, 1920, 2048, 2560 previews
         if: always()
         uses: actions/upload-artifact@v4
