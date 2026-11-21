@@ -22,7 +22,9 @@ async function publish(){
  $('adminStatus').textContent='● PUBLISHING…';
  try{
   if(!(await api.publish()))throw Error(api.getLastError?.()||'公開できませんでした');
-  visible(false);pub.refresh('published');notify('公開用データを更新しました！ 公開サイトの反映を確認してね');
+  visible(false);pub.refresh('published');
+  const live=api.getPublished();const characterCount=live.characters?.length??0;const worldCount=live.worlds?.length??0;
+  notify(`公開完了：キャラ${characterCount}人／WORLD${worldCount}件。別タブの公開サイトに戻るか、再読み込みして確認してね`);
  }catch(e){notify('公開失敗：'+(e.message||String(e)));}
  finally{button.disabled=false;$('adminStatus').textContent='● CLOUD DRAFT'}
 }
