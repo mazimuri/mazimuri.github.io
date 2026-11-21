@@ -1723,3 +1723,42 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  }
 }
 @media(min-width:801px) and (max-height:770px){#main .v5-control-head{top:5.2%!important}}
+
+/* V15.3: paired navigation aligned directly above the receding top card.
+   Neither button occupies the crowded space under the selected card. */
+@media(min-width:801px){
+ #main .v5-control-head{
+  top:3.6%!important;right:15%!important;gap:2px!important;
+  align-items:center!important;pointer-events:auto!important;
+ }
+ #main .v5-batch-pair{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:center!important;gap:6px!important;
+  background:color-mix(in srgb,var(--soft) 78%,transparent)!important;
+  padding:4px 5px!important;
+  border:1px solid color-mix(in srgb,var(--deep) 25%,transparent)!important;
+  border-radius:8px!important;box-shadow:0 2px 8px #0002!important;
+ }
+ #main .v5-batch{
+  width:clamp(34px,2.45vw,45px)!important;
+  height:clamp(32px,2.4vw,42px)!important;
+  border-width:2px!important;border-radius:7px 7px 4px 7px!important;
+  box-shadow:2px 3px 0 #121518!important;
+ }
+ #main .v5-batch svg{width:22px!important;height:16px!important}
+ #main .v5-batch-label{
+  font-size:clamp(7px,.56vw,9px)!important;letter-spacing:.09em!important;
+  background:none!important;border:0!important;padding:2px 5px!important;
+ }
+ #main .v5-batch:not(:disabled):hover{
+  transform:translateY(-2px)!important;box-shadow:2px 5px 0 #121518!important;
+ }
+ #main .v5-batch:active{
+  transform:translateY(1px)!important;box-shadow:1px 1px 0 #121518!important;
+ }
+}
+@media(min-width:801px) and (max-height:770px){
+ #main .v5-control-head{top:2.5%!important}
+ #main .v5-batch-pair{padding:3px 4px!important;gap:4px!important}
+ #main .v5-batch{height:32px!important;width:34px!important}
+}
