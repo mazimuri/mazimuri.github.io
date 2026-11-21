@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {chromium} from 'playwright';
+import {PNG} from 'pngjs';
 
 /* Compare the production site against the refactored CSS within ONE rendered
    page, without changing any server files. Actual character data and images
@@ -14,6 +15,18 @@ const candidate=readFileSync('cast-side-rail.css','utf8');
 const properties=['display','position','left','right','top','bottom','width','height','opacity','zIndex',
  'transform','filter','backgroundColor','backgroundImage','color','fontSize','border','borderRadius',
  'outline','boxShadow','padding','clipPath','objectPosition','transformOrigin'];
+function imageDiff(first,second){
+ const a=PNG.sync.read(first),b=PNG.sync.read(second);
+ assert.equal(a.width,b.width);assert.equal(a.height,b.height);
+ let pixels=0,maxDiff=0,x1=a.width,y1=a.height,x2=0,y2=0;
+ for(let y=0;y<a.height;y++)for(let x=0;x<a.width;x++){
+  const p=(y*a.width+x)*4;
+  const d=Math.max(...[0,1,2,3].map(c=>Math.abs(a.data[p+c]-b.data[p+c])));
+  if(d){pixels++;maxDiff=Math.max(maxDiff,d);x1=Math.min(x1,x);y1=Math.min(y1,y);x2=Math.max(x2,x);y2=Math.max(y2,y);}
+ }
+ return {pixels,maxDiff,ratio:Math.round(pixels/(a.width*a.height)*100000)/1000,
+   bbox:pixels?[x1,y1,x2,y2]:null};
+}
 const selectors=['#v5Rail','.v5-control-head','.v5-batch-pair','#v5BatchPrev','#v5BatchNext',
  '.v5-batch-label','#v5Stack','.v5-readout'];
 for(let slot=0;slot<4;slot++){
@@ -65,9 +78,14 @@ try{
    if(state==='focus')await page.locator('#v5BatchNext').focus();
    if(state==='normal')await page.mouse.move(0,0);
    const before=await snapshot(page,style,baseline);
+   const repeat=await snapshot(page,style,baseline);
    const after=await snapshot(page,style,candidate);
+   assert.deepEqual(repeat.computed,before.computed,'Baseline itself changed at '+width+'×'+height+' / '+state);
    assert.deepEqual(after.computed,before.computed,'Real page computed styles differ at '+width+'×'+height+' / '+state);
-   assert.ok(after.png.equals(before.png),'Real page rendered pixels differ at '+width+'×'+height+' / '+state);
+   const baselineDrift=imageDiff(before.png,repeat.png);
+   const cleanupDrift=imageDiff(repeat.png,after.png);
+   console.log('DIFF '+width+'x'+height+' '+state+' baseline-repeat='+JSON.stringify(baselineDrift)+' css-change='+JSON.stringify(cleanupDrift));
+   assert.ok(after.png.equals(repeat.png),'Real page rendered pixels differ at '+width+'×'+height+' / '+state);
    console.log('PASS real page '+width+'x'+height+' '+state);
    count++;
   }
