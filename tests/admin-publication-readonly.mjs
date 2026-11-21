@@ -9,7 +9,7 @@ const app=readFileSync('admin.js','utf8');
 const cfg=readFileSync('cloud-config.js','utf8');
 const assets=['cast-side-rail.css','cast-view-adjustments.css','cast-rail-current.css','cast-side-rail.js'];
 for(const name of assets){
-  const match=new RegExp(name.replace(/\./g,'\\.')+'\\?v=([^"\\']+)');
+  const match=new RegExp(name.replace(/\./g,'\\.')+'\\?v=([0-9.]+)');
   const a=admin.match(match),p=publicHtml.match(match);
   assert.ok(a&&p,'Missing current V16 asset: '+name);
   assert.equal(a[1],p[1],'Admin and public V16 asset version mismatch for '+name);
