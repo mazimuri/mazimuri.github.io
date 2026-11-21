@@ -1,0 +1,33 @@
+name: RIGHT CAST RAIL anchored shadow preview
+on:
+  pull_request:
+    branches: [fix/v16-rail-frame-and-allcast-polish]
+    paths:
+      - cast-rail-current.css
+      - tests/rail-anchored-shadow-preview.mjs
+      - .github/workflows/rail-anchored-shadow-preview.yml
+  workflow_dispatch:
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependencies
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 pngjs@7.0.0
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify stationary shadow and raised face plate
+        run: node tests/rail-anchored-shadow-preview.mjs
+      - name: Save verified real-site previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anchored-shadow-compare
+          path: anchored-shadow-review/*.png
+          if-no-files-found: ignore
+          retention-days: 14
