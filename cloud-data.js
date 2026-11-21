@@ -146,22 +146,58 @@
       if(publicDoc.worlds.some(x=>x.id===w.id))w.image=replaceStoredImage(w.image);
     }
   }
+  // Verify that a logged-out visitor can read this exact published revision.
+  // An authenticated upsert can succeed even when public SELECT is blocked.
+  async function verifyPublicVisibility(revision){
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),12000);
+    try{
+      const url=cfg.url+'/rest/v1/cast_documents?kind=eq.published&select=payload';
+      const response=await fetch(url,{
+        headers:{apikey:cfg.publishableKey,Accept:'application/json'},
+        cache:'no-store',signal:controller.signal
+      });
+      if(!response.ok)throw new Error('公開データの匿名読み取りに失敗 (HTTP '+response.status+')。Supabaseのpublished行のSELECT権限を確認してください');
+      const rows=await response.json(),seen=rows?.[0]?.payload;
+      if(!validDoc(seen))throw new Error('公開サイトと同じ接続でpublished行を読み取れません。公開閲覧権限を確認してください');
+      if(seen.publicationId!==revision)
+        throw new Error('公開データの更新を読み取り側で確認できません。キャッシュ・公開権限を確認してください');
+    }finally{clearTimeout(timeout)}
+  }
   async function publish(){
-    try {
+    let committed=false;
+    try{
       if((await flushDraft())===false)throw new Error(lastError||'下書き保存が失敗しています');
-      const now=new Date().toISOString(), next=clone(draft);
-      for(const c of next.characters){if(c.published!==false && !c.firstPublishedAt)c.firstPublishedAt=now}
-      for(const w of next.worlds){if(w.published!==false && !w.firstPublishedAt)w.firstPublishedAt=now}
+      const now=new Date().toISOString(),next=clone(draft);
+      for(const c of next.characters){if(c.published!==false&&!c.firstPublishedAt)c.firstPublishedAt=now}
+      for(const w of next.worlds){if(w.published!==false&&!w.firstPublishedAt)w.firstPublishedAt=now}
       const nextPublic=draftToPublic(next);
+      // Nonsecret revision: a new value per publish, even for identical data.
+      nextPublic.publicationId=crypto.randomUUID();
+      nextPublic.publishedAt=now;
       await publishImages(nextPublic,next);
-      // This one row write is the publication commit. If an image fails, the
-      // public document remains intact rather than partially updating.
+      // One-row atomic public data commit.
       await putRow('published',nextPublic);
+      committed=true;
       published=defaults(nextPublic);
       draft=defaults(next);
-      if(!(await saveDraft())) console.warn('Published, but normalized draft needs saving again');
+      if(!(await saveDraft()))console.warn('Published, but normalized draft needs saving again');
+      await verifyPublicVisibility(nextPublic.publicationId);
+      // Let a public tab on the same origin refresh without a manual reload.
+      if('BroadcastChannel' in window){
+        try{
+          const channel=new BroadcastChannel('cast-signal-published');
+          channel.postMessage({type:'published',revision:nextPublic.publicationId});
+          channel.close();
+        }catch(e){console.warn('Published, but cross-tab notification was unavailable',e)}
+      }
       lastError='';return true;
-    } catch(e){lastError=e.message||String(e);console.error('CAST publish failed',e);return false}
+    }catch(e){
+      const reason=e.message||String(e);
+      lastError=(committed?'公開用データはクラウドに保存されましたが、公開サイト側の確認に失敗しました：':'公開できませんでした：')+reason;
+      console.error('CAST publish/visibility check failed',e);
+      return false;
+    }
   }
   async function replaceDraft(value){
     if(!validDoc(value))return false;
