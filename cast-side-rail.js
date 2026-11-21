@@ -4,7 +4,6 @@
  const source=document.getElementById('pickerStrip'), stack=document.getElementById('v5Stack'),rail=document.getElementById('v5Rail');
  const count=document.getElementById('v5Count'),batchPrev=document.getElementById('v5BatchPrev'),batchNext=document.getElementById('v5BatchNext'),total=document.getElementById('v6Total'),paperNum=document.getElementById('v6PaperNumber');
  if(!source||!stack||!rail)return;
- rail.insertAdjacentHTML('afterbegin',"<svg class=\"v155-guides\" aria-hidden=\"true\" viewBox=\"0 0 420 900\" preserveAspectRatio=\"none\"><path class=\"trace\" d=\"M281 102 L-25 839\"/><path class=\"trace accent\" d=\"M411 95 L396 861\"/><path class=\"trace\" d=\"M287 105 L411 105\"/><path class=\"trace\" d=\"M205 300 L413 300\"/><path class=\"trace\" d=\"M120 505 L415 505\"/><path class=\"trace\" d=\"M2 708 L411 708\"/><rect class=\"tick\" x=\"286\" y=\"99\" width=\"6\" height=\"6\"/><rect class=\"tick\" x=\"206\" y=\"296\" width=\"6\" height=\"6\"/><rect class=\"tick\" x=\"120\" y=\"502\" width=\"7\" height=\"7\"/></svg>");
  const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const mod=(x,n)=>(x%n+n)%n;
  const buttons=()=>Array.from(source.querySelectorAll('[data-person]'));
