@@ -3,6 +3,9 @@ on:
   pull_request:
     branches: [design/rail-v16-approved-production]
     paths:
+      - cast-side-rail.css
+      - index.html
+      - tests/hero-wide-integrity.mjs
       - tests/hero-wide-compare.mjs
       - .github/workflows/hero-wide-preview.yml
   workflow_dispatch:
@@ -20,6 +23,8 @@ jobs:
         run: npm install --no-save --ignore-scripts playwright@1.56.1
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Verify adopted Focus CSS against real site (no publication)
+        run: node tests/hero-wide-integrity.mjs
       - name: Render original, balanced and bold at 1920 and 2560
         run: node tests/hero-wide-compare.mjs
       - name: Save screenshots
@@ -27,6 +32,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hero-wide-typography-variants
-          path: hero-wide-review/*.png
+          path: |
+            hero-wide-review/*.png
+            hero-wide-implementation/*.png
           if-no-files-found: ignore
           retention-days: 14
