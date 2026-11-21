@@ -1763,104 +1763,107 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  #main .v5-batch{height:32px!important;width:34px!important}
 }
 
-
-/* V15.4 / EXPERIMENT — perspective-side jump navigator.
-   Keep the four depth-scaled character cards untouched. Navigation occupies
-   the negative space to the LEFT of the distant card, not the vanishing point
-   above it. No boxed controls or shared backdrop. */
-@media (min-width:801px){
+/* V15.4 / APPROVED — Perspective-aligned navigation cap, +24px.
+   Integrated into the vanishing-point composition directly above rear card.
+   The four depth-scaled cards and navigation logic remain unchanged.
+   Replaces the former yellow boxed buttons with a slim instrument rail. */
+@media (min-width:801px) {
  #main .v5-control-head{
-   top:12.4%!important;
-   left:clamp(9px,7%,28px)!important;
-   right:auto!important;
+   top:3.2%!important;
+   left:auto!important;
+   right:calc(.8% - 24px)!important;
+   width:49%!important;
+   padding:0 5% 7px!important;
+   gap:2px!important;
    z-index:9!important;
-   width:clamp(44px,3.9vw,62px)!important;
    display:flex!important;
    flex-direction:column!important;
    align-items:center!important;
-   gap:3px!important;
-   padding-left:8px!important;
-   transform:none!important;
+   transform:skewX(-11deg)!important;
    color:var(--deep)!important;
    pointer-events:auto!important;
  }
- /* Micro scale: the accent marker implies an archive navigation mechanism. */
  #main .v5-control-head:before{
-   content:"";
-   position:absolute;
-   left:0;top:4px;
-   width:5px;height:65px;
-   background:repeating-linear-gradient(to bottom,
-     color-mix(in srgb,var(--deep) 62%,transparent) 0 2px,
-     transparent 2px 10px);
-   opacity:.9;pointer-events:none;
+   content:"";position:absolute;
+   left:4%;top:auto;bottom:0;
+   width:92%;height:2px;
+   background:color-mix(in srgb,var(--deep) 73%,transparent);
+   opacity:1;pointer-events:none;
  }
  #main .v5-control-head:after{
-   content:"";
-   position:absolute;
-   left:-1px;top:24px;
-   width:7px;height:13px;
+   content:"";position:absolute;
+   left:4%;top:auto;bottom:-1px;
+   width:22%;height:4px;
    background:var(--accent);
-   clip-path:polygon(0 0,100% 0,85% 100%,0 100%);
    pointer-events:none;
  }
  #main .v5-batch-pair{
    display:flex!important;
-   flex-direction:column!important;
+   flex-direction:row!important;
    align-items:center!important;
    justify-content:center!important;
-   gap:0!important;
+   gap:clamp(3px,.7vw,9px)!important;
    width:100%!important;
-   background:transparent!important;
    padding:0!important;
+   background:transparent!important;
    border:0!important;
    border-radius:0!important;
    box-shadow:none!important;
+   transform:skewX(11deg)!important;
  }
  #main .v5-batch{
    display:grid!important;place-items:center!important;
-   width:clamp(38px,2.7vw,46px)!important;
-   height:31px!important;
-   padding:5px!important;
+   width:clamp(31px,2.5vw,42px)!important;
+   height:30px!important;
+   padding:4px 6px!important;
    border:0!important;
    border-radius:0!important;
    background:transparent!important;
    color:var(--deep)!important;
    box-shadow:none!important;
    filter:none!important;
-   opacity:1!important;
    transition:background .18s,transform .18s,color .18s!important;
  }
- #main .v5-batch svg{width:27px!important;height:20px!important}
+ #main .v5-batch svg{
+   display:block!important;
+   width:23px!important;height:17px!important;
+ }
  #main .v5-batch svg path{stroke-width:3.2!important}
  #main .v5-batch:not(:disabled):hover{
-   transform:translateX(3px)!important;
+   transform:translateY(-3px)!important;
    box-shadow:none!important;
    background:var(--accent)!important;
    color:var(--deep)!important;
-   clip-path:polygon(0 0,100% 0,100% 75%,80% 100%,0 100%);
+   clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
  }
  #main .v5-batch:active{
-   transform:translateX(4px) scale(.94)!important;
+   transform:translateY(0) scale(.94)!important;
    box-shadow:none!important;
  }
- #main .v5-batch:disabled{opacity:.28!important}
+ #main .v5-batch:disabled{
+   opacity:.28!important;
+   cursor:default!important;
+ }
  #main .v5-batch-label{
    display:block!important;
-   padding:3px 0 0!important;
-   background:transparent!important;
+   transform:skewX(11deg)!important;
+   font:850 clamp(7px,.55vw,9px)/1 var(--mono)!important;
+   letter-spacing:.03em!important;
+   padding:0!important;
+   margin:0!important;
+   color:var(--deep)!important;
+   background:none!important;
    border:0!important;
    border-radius:0!important;
-   font:850 8px/1.1 var(--mono)!important;
-   letter-spacing:.03em!important;
-   color:var(--deep)!important;
-   opacity:.82!important;
+   opacity:.75!important;
    white-space:nowrap!important;
    text-align:center!important;
  }
 }
-/* The rail uses a 622px minimum stage; this keeps the navigator within the
-   empty upper-left wedge even in compact desktop-height windows. */
+@media (min-width:801px) and (max-width:1100px){
+ #main .v5-control-head{top:3%!important;padding-inline:2%!important}
+ #main .v5-batch-pair{gap:3px!important}
+}
 @media (min-width:801px) and (max-height:770px){
- #main .v5-control-head{top:11.9%!important}
+ #main .v5-control-head{top:3%!important}
 }
