@@ -9,8 +9,14 @@ try{
 for(const [width,height] of [[1920,911],[2560,1271]]){
  const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1,reducedMotion:'reduce'});
  await page.goto('https://mazimuri.github.io/',{waitUntil:'domcontentloaded',timeout:60000});
+ await page.waitForFunction(()=>{
+   return !!window.CAST_PUBLIC &&
+     document.getElementById('heroIntel')?.hidden===false &&
+     document.getElementById('heroBio')?.textContent?.trim().length>15;
+ },null,{timeout:30000});
  await page.locator('#nav-index').click();
- await page.locator('#directory.open').waitFor({timeout:15000});
+ await page.waitForFunction(()=>document.getElementById('directory')?.classList.contains('open'),null,{timeout:15000});
+ await page.locator('#directory.open').waitFor({state:'visible',timeout:15000});
  await page.waitForFunction(()=>{const cards=[...document.querySelectorAll('#directoryItems .cast-gallery-card')];return cards.length>=4 && cards.every(c=>{const i=c.querySelector('img');return i?.complete&&i?.naturalWidth>0})},null,{timeout:35000});
  await page.evaluate(async()=>{document.body.classList.add('no-motion');await document.fonts.ready;await Promise.all([...document.querySelectorAll('#directoryItems .cast-gallery-card img')].map(i=>i.decode().catch(()=>{})))});
  for(const [name,css] of variants){
