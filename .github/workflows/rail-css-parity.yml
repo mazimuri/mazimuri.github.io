@@ -5,6 +5,7 @@ on:
     paths:
       - cast-side-rail.css
       - tests/rail-css-parity.mjs
+      - tests/rail-live-visual-parity.mjs
       - .github/workflows/rail-css-parity.yml
   workflow_dispatch:
 jobs:
@@ -27,3 +28,5 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Compare original and refactored CSS
         run: node tests/rail-css-parity.mjs
+      - name: Compare actual published SELECT display (read-only)
+        run: node tests/rail-live-visual-parity.mjs
