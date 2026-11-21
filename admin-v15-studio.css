@@ -176,3 +176,53 @@
 }
 #admin .v15-icon-studio .crop-phone-preview strong{font:900 12px var(--jpn);overflow-wrap:anywhere}
 #admin .v15-icon-studio .crop-mode-tabs{flex-wrap:wrap}
+
+/* V15.3 / RIGHT CAST RAIL — geometric mirror of the actual selected card.
+   An outer -11deg frame and an inner +11deg image cancel perspective skew,
+   preserving human facial proportions while keeping the angular silhouette.
+   The editor ratio is measured from the live selected card by admin.js. */
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode{
+ aspect-ratio:var(--v15-live-card-ratio,2.25)!important;
+ width:min(100%,470px)!important;
+ border:0!important;outline:2px solid #eaff54!important;
+ clip-path:none!important;overflow:visible!important;
+ background:transparent!important;box-shadow:none!important;
+}
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode:before,
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode:after{display:none!important}
+#admin .v15-icon-studio .crop-rail-frame{
+ aspect-ratio:var(--v15-live-card-ratio,2.25)!important;
+ width:clamp(142px,17vw,220px)!important;height:auto!important;
+ clip-path:none!important;overflow:visible!important;
+ background:transparent!important;
+}
+#admin .v15-icon-studio .crop-rail-frame:after{display:none!important}
+#admin .v15-icon-studio .v15-rail-shell{
+ position:absolute!important;inset:0!important;
+ display:block!important;overflow:hidden!important;
+ background:#101115!important;border-radius:20px 0 20px 0!important;
+ transform:skewX(-11deg)!important;
+}
+#admin .v15-icon-studio .v15-rail-inner{
+ position:absolute!important;inset:2%!important;
+ display:block!important;overflow:hidden!important;
+ border-radius:clamp(8px,.85vw,16px) 0 clamp(8px,.85vw,16px) 0!important;
+ border-bottom:4px solid var(--accent,#eaff54)!important;
+ background:#56595e!important;
+}
+#admin .v15-icon-studio .v15-rail-inner img[data-crop-render]{
+ display:block!important;position:absolute!important;inset:0!important;
+ width:100%!important;height:100%!important;min-width:0!important;
+ max-width:none!important;object-fit:cover!important;
+ object-position:var(--crop-x,50%) var(--crop-y,50%)!important;
+ transform:skewX(11deg) scale(1.15) scale(var(--crop-zoom,1))!important;
+ transform-origin:var(--crop-x,50%) var(--crop-y,50%)!important;
+ border:0!important;
+}
+#admin .v15-icon-studio .crop-rail-frame .v15-mini-name{
+ z-index:5!important;border-radius:999px!important;
+ padding:3px 8px!important;background:#050608!important;
+}
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode .v15-crop-label{
+ bottom:-1%!important;z-index:5!important;
+}
