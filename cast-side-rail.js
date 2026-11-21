@@ -4,6 +4,7 @@
  const source=document.getElementById('pickerStrip'), stack=document.getElementById('v5Stack'),rail=document.getElementById('v5Rail');
  const count=document.getElementById('v5Count'),batchPrev=document.getElementById('v5BatchPrev'),batchNext=document.getElementById('v5BatchNext'),total=document.getElementById('v6Total'),paperNum=document.getElementById('v6PaperNumber');
  if(!source||!stack||!rail)return;
+ rail.insertAdjacentHTML('afterbegin',"<svg class=\"v155-guides\" aria-hidden=\"true\" viewBox=\"0 0 420 900\" preserveAspectRatio=\"none\"><path class=\"trace\" d=\"M281 102 L-25 839\"/><path class=\"trace accent\" d=\"M411 95 L396 861\"/><path class=\"trace\" d=\"M287 105 L411 105\"/><path class=\"trace\" d=\"M205 300 L413 300\"/><path class=\"trace\" d=\"M120 505 L415 505\"/><path class=\"trace\" d=\"M2 708 L411 708\"/><rect class=\"tick\" x=\"286\" y=\"99\" width=\"6\" height=\"6\"/><rect class=\"tick\" x=\"206\" y=\"296\" width=\"6\" height=\"6\"/><rect class=\"tick\" x=\"120\" y=\"502\" width=\"7\" height=\"7\"/></svg>");
  const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const mod=(x,n)=>(x%n+n)%n;
  const buttons=()=>Array.from(source.querySelectorAll('[data-person]'));
@@ -12,16 +13,16 @@
  const selectedIx=()=>buttons().findIndex(b=>b.getAttribute('aria-selected')==='true');
  const read=(b)=>({id:b.dataset.person,name:b.querySelector('.person-data strong')?.textContent.trim()||'UNKNOWN',
   src:b.querySelector('img')?.getAttribute('src')||'',imageStyle:b.querySelector('img')?.getAttribute('style')||'',
-  zeta:!!b.querySelector('.zeta-badge'),recent:!!b.querySelector('.cast-new')});
+  zeta:!!b.querySelector('.zeta-badge'),recent:!!b.querySelector('.cast-new'),number:((b.querySelector('.person-no')?.textContent||'').split('NO.')[1]||'--').trim().split(' ')[0]});
  let currentId=null,nextDirection=0,previous=null,framePending=false,busyUntil=0,gestureTime=0,touchY=null,queuedSteps=0,queueTimer=null;
  function snapshot(){return Array.from(stack.querySelectorAll('.v5-item:not(.v6-rail-ghost)')).map(el=>({
   id:el.dataset.person,slot:+el.dataset.slot,rect:el.getBoundingClientRect(),node:el.cloneNode(true)}));}
  function itemHtml(b,slot){const p=read(b),active=slot===3;
   return `<div class="v5-item" data-slot="${slot}" data-person="${esc(p.id)}">
     <button type="button" class="v5-card" data-v5-target="${esc(p.id)}" role="tab" aria-selected="${active}" aria-label="${esc(p.name)}を選択">
-     <span class="v5-card-outer"><span class="v5-card-inner"><img src="${esc(p.src)}" alt="" style="${esc(p.imageStyle)}"></span><span class="v5-card-name">${esc(p.name)}</span></span>
+     <span class="v5-card-outer"><span class="v5-card-inner"><img src="${esc(p.src)}" alt="" style="${esc(p.imageStyle)}"></span><span class="v155-card-index" aria-hidden="true">FILE / ${esc(p.number)}</span><span class="v5-card-name">${esc(p.name)}</span></span>
      ${(p.zeta||p.recent)?`<span class="v5-badges">${p.zeta?'<b>zeta</b>':''}${p.recent?'<b class="is-new">NEW</b>':''}</span>`:''}
-    </button>${active?'<button type="button" class="v5-allcast" aria-label="全キャラクター一覧を開く"><span>▦ ALL CAST</span></button>':''}</div>`;
+    </button>${active?'<button type="button" class="v5-allcast" aria-label="全キャラ一覧を見る"><span class="v155-grid" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="v155-action-text"><strong>ALL CAST</strong><small>全キャラを見る</small></span><span class="v155-action-arrow" aria-hidden="true">↗</span></button>':''}</div>`;
  }
  function render(){
   framePending=false;
