@@ -58,4 +58,35 @@
   }
   window.CAST_DATA={initial:published,clone,getPublished:()=>clone(published),getDraft:()=>clone(published)};
   window.CAST_DATA_READY=load();
+
+  // The published document is fetched at initial page load. If an editor
+  // publishes while the visitor keeps this tab open, check the PUBLIC row when
+  // the tab is revisited. Never request private draft data from the public app.
+  let checkingPublished=false,lastPublishedCheck=0;
+  async function checkPublishedWhenActive(){
+    if(checkingPublished||document.hidden||/\/admin\.html$/i.test(location.pathname))return;
+    const now=Date.now();
+    if(now-lastPublishedCheck<3000)return;
+    checkingPublished=true;lastPublishedCheck=now;
+    try{
+      await window.CAST_DATA_READY;
+      const configured=/^https:\/\/[\w-]+\.supabase\.co$/.test(cfg.url||'')
+        && typeof cfg.publishableKey==='string'
+        && cfg.publishableKey.length>20
+        && !cfg.publishableKey.startsWith('YOUR_');
+      const latest=configured?await fromCloud():await fromGitHub();
+      if(valid(latest)&&JSON.stringify(latest)!==JSON.stringify(published)){
+        published=latest;
+        window.CAST_PUBLIC?.refresh?.('published');
+      }
+    }catch(error){console.warn('CAST / SIGNAL public data recheck failed:',error)}
+    finally{checkingPublished=false}
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden)checkPublishedWhenActive();
+  });
+  window.addEventListener('focus',checkPublishedWhenActive);
+  window.addEventListener('pageshow',event=>{
+    if(event.persisted)checkPublishedWhenActive();
+  });
 })();
