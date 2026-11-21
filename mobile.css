@@ -568,3 +568,26 @@
  .mobile-portrait{flex-basis:48px;width:48px}
 }
 @media(prefers-reduced-motion:reduce){.mobile-portrait{transition:none!important}}
+
+/* V15.2: mobile now uses all four character palette channels.
+   Accent/diagonal, deep/black field, soft/paper, bright/UI rules. */
+@media(max-width:620px){
+ #hero.hero{background:var(--soft,#f0f0ea)!important}
+ #hero .hero-surface{background:var(--soft,#f0f0ea)!important}
+ #hero .hero-dark-panel{background:var(--deep,#121317)!important}
+ #hero .hero-accent-slab{background:var(--accent,#f00)!important}
+ #hero .hero-pattern{
+  background-image:linear-gradient(90deg,color-mix(in srgb,var(--bright,#fff) 17%,transparent) 1px,transparent 1px),
+    linear-gradient(color-mix(in srgb,var(--bright,#fff) 17%,transparent) 1px,transparent 1px)!important;
+ }
+ #hero .hero-circles span{border-color:color-mix(in srgb,var(--bright,#fff) 32%,transparent)!important}
+ #hero .mobile-intro{background:linear-gradient(to bottom,transparent 0 11px,var(--deep,#151619) 11px)!important}
+ #hero .mobile-intro:before{border-top-color:var(--bright,#eaff54)!important;box-shadow:0 2px 0 color-mix(in srgb,var(--accent,#f00) 45%,transparent)!important}
+ #hero .mobile-intro-reading{border-left-color:var(--accent,#f00)!important}
+ #hero .mobile-intro-track i{background:var(--bright,#eaff54)!important}
+ #hero .mobile-quote-name:before{background:var(--bright,#eaff54)!important}
+ #hero .mobile-profile{box-shadow:3px 3px 0 var(--deep,#151619)!important}
+ #hero .mobile-profile-arrow{color:var(--bright,#eaff54)!important}
+ .mobile-picker{border-top-color:var(--bright,#eaff54)!important}
+ .mobile-portrait[aria-selected=true]{background:var(--accent,#f00)!important}
+}

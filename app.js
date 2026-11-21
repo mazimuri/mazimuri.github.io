@@ -6,7 +6,7 @@ const validUrl=x=>/^https?:\/\/[^\s]+$/i.test(x||'')?x:'';
 const api=window.CAST_DATA;
 const state={people:[],doc:null,index:0,panel:null,tab:'profile',filter:'all',world:'',mode:'published',animations:!matchMedia('(prefers-reduced-motion: reduce)').matches,timer:null,enterTimer:null,enterNonce:0,directoryView:'gallery'};
 const stage=$('hero'), cur=()=>state.people[state.index];
-const cropOf=(c,view='choose')=>{const legacy={x:50,y:30,zoom:c?.icon?1:2.05,...(c?.iconCrop||{y:Number.isFinite(Number(c?.iconPosition))?Number(c.iconPosition):30})};return view==='all'?{...legacy,...(c?.allCastCrop||{})}:legacy};
+const cropOf=(c,view='choose')=>{const legacy={x:50,y:30,zoom:c?.icon?1:2.05,...(c?.iconCrop||{y:Number.isFinite(Number(c?.iconPosition))?Number(c.iconPosition):30})};return view==='all'?{...legacy,...(c?.allCastCrop||{})}:view==='mobile'?{...legacy,...(c?.mobileIconCrop||{})}:legacy};
 const cropStyle=(c,view='choose')=>{const p=cropOf(c,view);return `--crop-x:${Number(p.x)||0}%;--crop-y:${Number(p.y)||0}%;--crop-zoom:${Number(p.zoom)||1}`};
 const galleryState={items:[],index:0,returnFocus:null,view:'mosaic',focus:0};
 const website=()=>({...api.initial.site,...(state.doc?.site||{})});
@@ -67,7 +67,7 @@ function updateMobileIntroProgress(){
 function renderMobileSelection(){
  const c=cur(),track=$('mobilePortraitTrack'), viewport=$('mobilePortraitViewport');
  if(!c||!track)return;
- track.innerHTML=state.people.map(p=>`<button type="button" class="mobile-portrait" role="tab" data-mobile-person="${esc(p.id)}" aria-selected="${p.id===c.id}" style="--portrait-accent:${esc(p.colors.accent)}" aria-label="${esc(p.name)}を選ぶ" title="${esc(p.name)}"><span><img src="${esc(icon(p))}" alt="" style="${cropStyle(p,'choose')}" class="cast-icon ${p.icon?'has-face':''}" data-crop-render></span></button>`).join('');
+ track.innerHTML=state.people.map(p=>`<button type="button" class="mobile-portrait" role="tab" data-mobile-person="${esc(p.id)}" aria-selected="${p.id===c.id}" style="--portrait-accent:${esc(p.colors.accent)}" aria-label="${esc(p.name)}を選ぶ" title="${esc(p.name)}"><span><img src="${esc(icon(p))}" alt="" style="${cropStyle(p,'mobile')}" class="cast-icon ${p.icon?'has-face':''}" data-crop-render></span></button>`).join('');
  setText('mobilePickerCount',String(state.index+1).padStart(2,'0')+' / '+String(state.people.length).padStart(2,'0'));
  requestAnimationFrame(()=>{const chosen=track.querySelector('[aria-selected="true"]');if(!chosen)return;
  const destination=chosen.offsetLeft+chosen.offsetWidth/2-viewport.clientWidth/2;
