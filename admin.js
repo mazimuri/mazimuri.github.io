@@ -26,8 +26,13 @@ async function publish(){
   verified=true;visible(false);pub.refresh('published');
   const live=api.getPublished();const characterCount=live.characters?.length??0;const worldCount=live.worlds?.length??0;
   notify(`公開サイトからの読み取り確認済み：キャラ${characterCount}人／WORLD${worldCount}件。公開中のタブも自動更新を試みます`);
- }catch(e){notify('公開の確認が必要：'+(e.message||String(e)));}
- finally{button.disabled=false;$('adminStatus').textContent=verified?'● PUBLIC VERIFIED':'● CLOUD DRAFT'}
+ }catch(e){
+  const message=e.message||String(e);
+  $('saveStatus').textContent='⚠ 公開の確認が必要：'+message;
+  $('saveStatus').style.color='#ff9b82';
+  notify('公開の確認が必要：'+message);
+ }
+ finally{button.disabled=false;$('adminStatus').textContent=verified?'● PUBLIC VERIFIED':'● PUBLISH CHECK FAILED'}
 }
 function setSection(s){state.section=s;state.charId=null;state.worldId=null;render()}
 function headline(kicker,title,desc,right=''){return `<div class="admin-headline"><div><div class="admin-kicker">${esc(kicker)}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p></div>${right}</div>`}
