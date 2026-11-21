@@ -1868,7 +1868,7 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  #main .v5-control-head{top:3%!important}
 }
 
-/* V15.6 / INTEGRATED RAIL — APPROVED VISUAL. Desktop visual system study.
+/* V15.7 / INTEGRATED RAIL — QUIET UPPER CORNER. Desktop visual system study.
    Keep V15.4 perspective cap, four-character geometry, authored face crops,
    and keyboard/wheel/touch selection logic unchanged. */
 @media(min-width:801px){
@@ -1879,37 +1879,36 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  #main .v5-item .v5-card-outer{
    border:var(--v155-edge) solid #090d11!important;
    border-radius:clamp(10px,1.2vw,21px) 0 clamp(10px,1.2vw,21px) 0!important;
-   background:linear-gradient(133deg,#495158 0%,#14191e 14%,#080b0e 57%,#27323a 100%)!important;
-   box-shadow:inset 0 -2px 0 #0009,3px 5px 0 color-mix(in srgb,var(--deep) 35%,transparent),0 9px 17px #0002!important;
+   background:linear-gradient(137deg,#273036 0%,#171d22 22%,#0a0d10 57%,#1a2227 100%)!important;
+   box-shadow:inset 0 1px 0 #ffffff24,inset 0 -2px 0 #0008,3px 5px 0 color-mix(in srgb,var(--deep) 35%,transparent),0 9px 17px #0002!important;
    transition:filter .2s ease,translate .2s ease,box-shadow .2s ease!important;
  }
  #main .v5-item[data-slot="3"] .v5-card-outer{
-   box-shadow:inset 0 -2px 0 #0009,5px 7px 0 color-mix(in srgb,var(--deep) 38%,transparent),8px 13px 22px #0004!important;
+   box-shadow:inset 0 1px 0 #ffffff2e,inset 0 -2px 0 #0009,5px 7px 0 color-mix(in srgb,var(--deep) 38%,transparent),8px 13px 22px #0004!important;
  }
  #main .v5-item .v5-card-outer:before{
-   content:"";position:absolute;top:0;left:0;width:58%;height:3px;z-index:6;
-   background:linear-gradient(90deg,#ffffffa6 0 8%,var(--accent) 8% 58%,color-mix(in srgb,var(--accent) 50%,#fff) 58% 80%,transparent 80%);
-   opacity:.9;pointer-events:none;
+   content:"";position:absolute;top:0;left:0;width:37%;height:3px;z-index:6;
+   background:var(--accent);opacity:.83;pointer-events:none;
  }
- #main .v5-item[data-slot="3"] .v5-card-outer:before{width:65%;height:5px;opacity:1}
+ #main .v5-item[data-slot="3"] .v5-card-outer:before{width:42%;height:4px;opacity:1}
  #main .v5-item .v5-card-outer:after,
  #main .v5-item[data-slot="3"] .v5-card-outer:after{
-   content:"";position:absolute;top:0;right:0;width:5px;height:64%;
-   background:linear-gradient(180deg,#ffffffb3 0%,var(--accent) 17%,color-mix(in srgb,var(--accent) 35%,transparent) 34%,transparent 84%)!important;
-   opacity:.75;transform:none!important;z-index:6;pointer-events:none;
+   content:"";position:absolute;top:0;right:0;width:3px;height:38%;
+   background:linear-gradient(to bottom,var(--accent),transparent)!important;
+   opacity:.30;transform:none!important;z-index:6;pointer-events:none;
  }
  #main .v5-item .v5-card-inner,
  #main .v5-item[data-slot="3"] .v5-card-inner{
    inset:clamp(3px,.33vw,6px) clamp(3px,.33vw,6px) var(--v155-h)!important;
    border:0!important;
    border-radius:clamp(5px,.75vw,12px) 0 0 0!important;
-   background:linear-gradient(143deg,color-mix(in srgb,var(--soft) 70%,#fcfef5),color-mix(in srgb,var(--soft) 40%,#7b8790) 54%,color-mix(in srgb,var(--deep) 48%,#9ba5aa))!important;
-   box-shadow:inset 0 -3px 8px #0b122326!important;
+   background:linear-gradient(141deg,color-mix(in srgb,var(--soft) 42%,#bec8cc) 0%,color-mix(in srgb,var(--deep) 25%,#8e9ba0) 55%,color-mix(in srgb,var(--deep) 52%,#87949a) 100%)!important;
+   box-shadow:inset 0 1px 0 #ffffff32,inset -2px -3px 9px #0b12231e!important;
  }
  #main .v5-item .v5-card-inner:before{
    content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-   background:linear-gradient(118deg,#ffffff38 0%,#ffffff10 26%,transparent 45%,transparent 79%,#06151a38 100%);
-   opacity:.40;mix-blend-mode:screen;
+   background:linear-gradient(126deg,#ffffff15 0%,#ffffff06 27%,transparent 47%,transparent 84%,#07111622 100%);
+   opacity:.28;mix-blend-mode:screen;
  }
  #main .v5-item .v5-card-inner:after{
    content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
@@ -1956,17 +1955,6 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
    font:1000 clamp(9px,.85vw,14px)/1 var(--mono);pointer-events:none;
  }
  #main .v5-item:not([data-slot="3"]) .v5-card-name:after{content:none!important}
- #main .v155-card-index{
-   position:absolute;z-index:5;top:4px;left:clamp(8px,1.2vw,16px);
-   display:block;padding:2px 4px;background:linear-gradient(90deg,#060a0de3,#1c2628bd);
-   border-left:2px solid var(--accent);
-   font:900 clamp(7px,.55vw,10px)/1 var(--mono);
-   color:#fff;letter-spacing:.04em;transform:skewX(11deg);pointer-events:none;
- }
- #main .v5-item[data-slot="0"] .v155-card-index{opacity:.45;font-size:7px}
- #main .v5-item[data-slot="1"] .v155-card-index{opacity:.62;font-size:8px}
- #main .v5-item[data-slot="2"] .v155-card-index{opacity:.8;font-size:8px}
- #main .v5-item[data-slot="3"] .v155-card-index{font-size:10px;padding:4px 6px}
  #main .v5-item[data-slot="0"] .v5-badges{opacity:.60}
  #main .v5-item[data-slot="1"] .v5-badges{opacity:.75}
  #main .v5-item[data-slot="2"] .v5-badges{opacity:.90}
