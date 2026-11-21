@@ -570,57 +570,57 @@
  body.detail-open #hero.hero .hero-art-wrap{left:7%!important;height:94%!important;}
  #main .v4-rail,#main .v3-rail{display:none!important}
  #main .v5-rail{
-   display:block!important;position:absolute;top:0;right:clamp(6px,1.6vw,30px);
-   width:var(--v5-width);height:var(--v2-stage);min-height:622px;
-   background:transparent!important;border:0!important;box-shadow:none!important;
-   z-index:24;pointer-events:none;color:var(--deep);overflow:visible;
+   display:block!important;position:absolute;top:0;
+   height:var(--v2-stage);min-height:622px;
+   border:0!important;box-shadow:none!important;
+   pointer-events:none;color:var(--deep);
  }
  .v5-rail button{pointer-events:auto;cursor:pointer}
- .v5-control-head{position:absolute;z-index:6;top:3%;right:16%;display:flex;align-items:center;flex-direction:column;gap:2px;color:var(--deep)}
- .v5-batch{width:34px;height:31px;display:grid;place-items:center;border:0;background:transparent;color:var(--deep);filter:drop-shadow(1px 2px 0 var(--acid));transition:transform .23s,opacity .23s}
- .v5-batch:not(:disabled):hover{transform:translateY(-4px);color:var(--accent)}
+ .v5-control-head{position:absolute;z-index:6;display:flex;align-items:center;flex-direction:column;gap:2px;}
+ .v5-batch{display:grid;place-items:center;border:0;background:transparent;transition:transform .23s,opacity .23s}
+ .v5-batch:not(:disabled):hover{transform:translateY(-4px);}
  .v5-batch:disabled{opacity:.32;cursor:default;filter:none}
  .v5-batch-label{font:850 8px/1 var(--mono);letter-spacing:.11em;color:var(--deep);opacity:.54;white-space:nowrap}
- .v5-stack{position:absolute;inset:0;pointer-events:none;overflow:visible;isolation:isolate}
+ .v5-stack{position:absolute;inset:0;pointer-events:none;isolation:isolate}
  .v5-item{position:absolute;right:0;min-width:0;pointer-events:none;transform-origin:right center;will-change:transform,opacity}
  .v5-item .v5-card{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;padding:0;background:transparent;text-align:left;color:white;pointer-events:auto;overflow:visible;isolation:isolate}
  /* Outer and inner *both* share a slanted shape with rounded upper-left / lower-right.
     The portrait is unskewed, so the facial proportions stay correct. */
- .v5-card-outer{position:absolute;inset:0;display:block;transform:skewX(-11deg);border-radius:20px 0 20px 0;background:#101115;overflow:hidden;box-shadow:none;filter:drop-shadow(2px 3px 0 #0003)}
- .v5-card-inner{position:absolute;inset:clamp(4px,.42vw,8px);display:block;overflow:hidden;border-radius:clamp(8px,.85vw,16px) 0 clamp(8px,.85vw,16px) 0;background:#56595e}
- .v5-card-inner img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--crop-x,50%) 22%;transform:skewX(11deg) scale(1.15);transform-origin:center center;filter:grayscale(1) contrast(1.04) brightness(1.05);transition:filter .25s ease}
- .v5-item[data-slot="3"] .v5-card-inner{border-bottom:4px solid var(--accent);background:var(--soft)}
+ .v5-card-outer{position:absolute;inset:0;display:block;transform:skewX(-11deg);background:#101115;overflow:hidden;filter:drop-shadow(2px 3px 0 #0003)}
+ .v5-card-inner{position:absolute;inset:clamp(4px,.42vw,8px);display:block;overflow:hidden;background:#56595e}
+ .v5-card-inner img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.04) brightness(1.05);transition:filter .25s ease}
+ .v5-item[data-slot="3"] .v5-card-inner{background:var(--soft)}
  .v5-item[data-slot="3"] .v5-card-inner img{filter:grayscale(0) contrast(1.02) brightness(1.03)}
  .v5-card:hover .v5-card-inner img,.v5-card:focus-visible .v5-card-inner img{filter:grayscale(.16) brightness(1.1)}
  .v5-card:focus-visible{outline:3px solid var(--acid);outline-offset:6px}
- .v5-card-name{position:absolute;z-index:4;bottom:-3px;left:18%;right:12%;max-width:80%;width:max-content;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  border-radius:999px;background:#0e0f13;color:#f6f6f2;padding:3px 12px 4px;text-align:center;font:850 clamp(9px,.88vw,15px)/1.1 var(--jpn);box-shadow:2px 2px 0 #1115}
- .v5-item[data-slot="3"] .v5-card-name{font-size:clamp(12px,.93vw,18px);color:var(--accent);padding:5px 13px 6px;background:#111216}
- .v5-badges{position:absolute;top:7px;right:8%;display:flex;gap:4px;z-index:5;transform:skewX(-11deg)}
- .v5-badges b{font:900 clamp(7px,.48vw,10px)/1 var(--mono);letter-spacing:.04em;padding:3px 4px;color:#141414;background:var(--acid);box-shadow:0 1px 0 #151515;white-space:nowrap}
- .v5-item[data-slot="0"] .v5-badges,.v5-item[data-slot="1"] .v5-badges{transform:skewX(-11deg) scale(.84);transform-origin:right top;top:4px}
+ .v5-card-name{z-index:4;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  background:#0e0f13;color:#f6f6f2;text-align:center;font:850 clamp(9px,.88vw,15px)/1.1 var(--jpn);}
+ .v5-item[data-slot="3"] .v5-card-name{background:#111216}
+ .v5-badges{position:absolute;display:flex;}
+ .v5-badges b{letter-spacing:.04em;white-space:nowrap}
+ .v5-item[data-slot="0"] .v5-badges,.v5-item[data-slot="1"] .v5-badges{top:4px}
  .v5-item[data-slot="3"] .v5-badges{top:6px;right:8%}
  .v5-item[data-slot="3"] .v5-card-outer{background:#111215;outline:1px solid var(--deep)}
- .v5-item[data-slot="3"] .v5-card-outer:after{content:'';position:absolute;top:0;right:0;width:27%;height:13px;pointer-events:none;background:repeating-linear-gradient(90deg,var(--acid) 0 43%,transparent 43% 54%);transform:skewX(0deg)}
+ .v5-item[data-slot="3"] .v5-card-outer:after{position:absolute;top:0;right:0;width:27%;height:13px;pointer-events:none;background:repeating-linear-gradient(90deg,var(--acid) 0 43%,transparent 43% 54%);transform:skewX(0deg)}
  .v5-allcast{
-   display:none;position:absolute;left:0;top:10%;bottom:2%;width:9.5%;min-width:25px;
-   border:4px solid #101115;border-radius:20px 0 20px 0;
-   background:var(--acid);color:#101115;transform:skewX(-11deg);
+   display:none;position:absolute;
+   border:4px solid #101115;
+   background:var(--acid);color:#101115;
    align-items:center;justify-content:center;writing-mode:vertical-rl;
    font:1000 clamp(8px,.64vw,12px)/1 var(--mono);letter-spacing:.06em;
-   box-shadow:2px 3px 0 #0002;pointer-events:auto;
+   pointer-events:auto;
  }
  .v5-item[data-slot="3"] .v5-allcast{display:flex}
- .v5-allcast>span{transform:skewX(11deg) rotate(180deg);display:block;white-space:nowrap}
- .v5-allcast:hover,.v5-allcast:focus-visible{background:var(--bright);outline:2px solid var(--accent);outline-offset:3px}
+ .v5-allcast>span{display:block;white-space:nowrap}
+ .v5-allcast:hover,.v5-allcast:focus-visible{background:var(--bright);outline-offset:3px}
  .v5-item.v5-enter{animation:v5-emerge .34s both}
  @keyframes v5-emerge{from{opacity:0;transform:translateY(-22px) scale(.85)}to{opacity:1;transform:translateY(0) scale(1)}}
- .v5-readout{position:absolute;right:3%;bottom:0;display:flex;gap:10px;align-items:center;justify-content:flex-end;color:var(--deep);font:850 clamp(8px,.53vw,10px)/1 var(--mono);letter-spacing:.08em;opacity:.72}
+ .v5-readout{position:absolute;display:flex;gap:10px;align-items:center;justify-content:flex-end;color:var(--deep);font:850 clamp(8px,.53vw,10px)/1 var(--mono);}
  .v5-readout span:last-child{opacity:.62}
- body.detail-open .v5-rail{opacity:.42;pointer-events:none}
+ body.detail-open .v5-rail{pointer-events:none}
 }
 @media(min-width:801px) and (max-height:770px){
- .v5-item[data-slot="0"]{top:11.3%;height:12.0%}
+ .v5-item[data-slot="0"]{height:12.0%}
  .v5-item[data-slot="1"]{top:28.8%;height:15.3%}
  .v5-item[data-slot="2"]{top:48.8%;height:18.9%}
  .v5-card-name{bottom:-2px}
@@ -689,16 +689,16 @@
  #main .v5-rail{right:clamp(12px,1.8vw,37px)!important;width:var(--v6-rail-width)!important;overflow:visible!important;z-index:25!important}
  .v5-stack{overflow:visible!important}
  /* Perspective follows two converging diagonal rails. Upper cards are smaller. */
- .v5-item[data-slot="0"]{top:12.6%!important;right:0%!important;width:57%!important;height:12.9%!important;z-index:1!important}
- .v5-item[data-slot="1"]{top:29.3%!important;right:1.6%!important;width:70%!important;height:15.6%!important;z-index:2!important}
- .v5-item[data-slot="2"]{top:49.2%!important;right:3.4%!important;width:84%!important;height:18.9%!important;z-index:3!important}
- .v5-item[data-slot="3"]{top:71.9%!important;right:5.3%!important;width:103%!important;height:23.6%!important;z-index:5!important}
- .v5-card-outer{border-radius:clamp(11px,1.2vw,22px) 0 clamp(11px,1.2vw,22px) 0!important;box-shadow:4px 7px 0 color-mix(in srgb,var(--deep) 22%,transparent)!important}
+ .v5-item[data-slot="0"]{z-index:1!important}
+ .v5-item[data-slot="1"]{z-index:2!important}
+ .v5-item[data-slot="2"]{z-index:3!important}
+ .v5-item[data-slot="3"]{z-index:5!important}
+ .v5-card-outer{border-radius:clamp(11px,1.2vw,22px) 0 clamp(11px,1.2vw,22px) 0!important;}
  .v5-card-inner{border-radius:clamp(6px,.8vw,14px) 0 clamp(6px,.8vw,14px) 0!important}
  .v5-card-name{position:absolute!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:clamp(5px,.67vw,11px)!important;max-width:78%!important;min-width:38%!important;width:max-content!important;border-radius:99px!important;box-shadow:none!important;padding:3px 12px 4px!important;font-size:clamp(10px,.86vw,16px)!important;line-height:1.2!important}
  .v5-item[data-slot="3"] .v5-card-outer:after{display:none!important;content:none!important}
  .v5-item[data-slot="3"] .v5-card-inner{border-bottom:3px solid var(--accent)!important}
- .v5-badges{z-index:8!important;top:4px!important;right:5%!important;gap:4px!important;transform:skewX(-11deg)!important}
+ .v5-badges{transform:skewX(-11deg)!important}
  .v5-badges b{padding:4px 6px!important;font:950 clamp(7px,.62vw,12px)/1 var(--mono)!important;background:var(--acid)!important;color:#101114!important;box-shadow:2px 2px 0 #10111455!important}
  .v5-badges b.is-new{background:var(--accent)!important;color:var(--bright)!important}
  .v5-allcast{left:0!important;top:4%!important;bottom:2%!important;width:9.5%!important;border-radius:23px 5px 23px 5px!important;transform:skewX(-11deg)!important;box-shadow:5px 6px 0 color-mix(in srgb,var(--deep) 22%,transparent)!important;min-width:26px!important}
@@ -708,7 +708,7 @@
  .v5-batch svg{width:18px!important;height:14px!important}
  .v5-batch:not(:disabled):hover{opacity:1;color:var(--accent)!important}
  .v5-batch-label{display:none!important}
- .v5-readout{bottom:0!important;right:6%!important;opacity:.66}
+ .v5-readout{bottom:0!important;right:6%!important;}
  .v6-exit{pointer-events:none!important;z-index:32!important}
  .v6-incoming{animation:none!important}
  .v6-rail-ghost{pointer-events:none!important;z-index:32!important}
@@ -828,7 +828,7 @@
  .v5-item[data-slot="0"] .v5-card-name{bottom:0!important}
  .v5-item[data-slot="1"] .v5-card-name{bottom:0!important}
  .v5-item[data-slot="2"] .v5-card-name{bottom:0!important}
- .v5-item[data-slot="3"] .v5-card-name{bottom:0!important;border-top:3px solid var(--accent)!important;padding:4px 15px 5px!important}
+ .v5-item[data-slot="3"] .v5-card-name{bottom:0!important;}
  .v5-card-outer{
   box-shadow:5px 8px 0 color-mix(in srgb,var(--deep) 24%,transparent),
    10px 13px 20px color-mix(in srgb,var(--deep) 28%,transparent)!important
@@ -890,10 +890,10 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  
  /* Consistent perspective convergence. The visible card faces grow both leftward
     and in width, with the selected card unmistakably nearest to the viewer. */
- .v5-item[data-slot="0"]{top:12.7%!important;right:.8%!important;width:49%!important;height:12.2%!important}
- .v5-item[data-slot="1"]{top:29.2%!important;right:1.5%!important;width:64%!important;height:15.7%!important}
- .v5-item[data-slot="2"]{top:49.2%!important;right:2.7%!important;width:78%!important;height:19.0%!important}
- .v5-item[data-slot="3"]{top:71.8%!important;right:4.7%!important;width:120%!important;height:23.6%!important}
+ .v5-item[data-slot="0"]{top:12.7%!important;right:.8%!important;height:12.2%!important}
+ .v5-item[data-slot="1"]{top:29.2%!important;right:1.5%!important;height:15.7%!important}
+ .v5-item[data-slot="2"]{top:49.2%!important;right:2.7%!important;height:19.0%!important}
+ .v5-item[data-slot="3"]{top:71.8%!important;right:4.7%!important;height:23.6%!important}
  .v5-item[data-slot="0"]{--v8-band:clamp(14px,1.48vw,18px)}
  .v5-item[data-slot="1"]{--v8-band:clamp(15px,1.65vw,21px)}
  .v5-item[data-slot="2"]{--v8-band:clamp(17px,1.86vw,25px)}
@@ -914,19 +914,18 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
     black rail. It touches that rail (no floating pill or outside pixels). */
  .v5-item .v5-card-name{
    position:absolute!important;z-index:5!important;left:50%!important;right:auto!important;
-   bottom:0!important;transform:translateX(-50%) skewX(11deg)!important;
+   
    box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;
-   min-width:0!important;max-width:94%!important;width:auto!important;
-   height:var(--v8-band)!important;margin:0!important;
-   border:0!important;border-top:0!important;border-radius:clamp(7px,.64vw,12px) clamp(7px,.64vw,12px) 0 0!important;
-   background:#111216!important;color:#f6f7f4!important;box-shadow:none!important;
+   min-width:0!important;width:auto!important;
+   margin:0!important;
+   border-top:0!important;
+   
    text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
-   padding:1px clamp(6px,.65vw,14px) 0!important;
-   font-size:clamp(8px,.71vw,13px)!important;line-height:1!important
- }
+   
+   font-size:clamp(8px,.71vw,13px)!important;}
  .v5-item[data-slot="3"] .v5-card-name{
-   color:var(--accent)!important;font-size:clamp(12px,.96vw,19px)!important;
-   padding-inline:clamp(10px,1.3vw,27px)!important;
+   
+   
    border-top:2px solid var(--accent)!important;
  }
  /* The selected frame keeps its crimson character-color upper lip, not a
@@ -937,13 +936,12 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  .v5-item[data-slot="3"] .v5-card-outer:before{content:'';position:absolute;top:0;left:0;right:0;
      height:clamp(3px,.35vw,6px);background:var(--accent);z-index:6;pointer-events:none}
  /* The cast button is a companion part in acid color rather than a black-edged widget. */
- .v5-item[data-slot="3"] .v5-allcast{left:.4%!important;top:9%!important;bottom:3%!important;
-   min-width:27px!important;width:8.6%!important;box-sizing:border-box!important;
-   border:2px solid color-mix(in srgb,var(--acid) 72%,var(--soft))!important;
-   border-radius:clamp(12px,1.2vw,23px) 4px clamp(12px,1.2vw,23px) 4px!important;
-   background:var(--acid)!important;color:#141517!important;
-   box-shadow:4px 6px 0 color-mix(in srgb,var(--acid) 35%,transparent),
-     7px 10px 15px color-mix(in srgb,var(--deep) 22%,transparent)!important}
+ .v5-item[data-slot="3"] .v5-allcast{
+   box-sizing:border-box!important;
+   
+   
+   
+   }
  .v5-allcast:hover,.v5-allcast:focus-visible{filter:brightness(1.06);outline:2px solid var(--accent)!important}
 }
 @media(min-width:801px) and (max-height:770px){
@@ -1034,13 +1032,13 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
    font-weight:900!important;
    line-height:1!important;
  }
- .v5-item[data-slot="0"] .v5-card-name{font-size:clamp(7px,.55vw,10px)!important;padding-inline:5px!important}
- .v5-item[data-slot="1"] .v5-card-name{font-size:clamp(8px,.63vw,12px)!important;padding-inline:6px!important}
- .v5-item[data-slot="2"] .v5-card-name{font-size:clamp(9px,.73vw,14px)!important;padding-inline:8px!important}
+ .v5-item[data-slot="0"] .v5-card-name{font-size:clamp(7px,.55vw,10px)!important;}
+ .v5-item[data-slot="1"] .v5-card-name{font-size:clamp(8px,.63vw,12px)!important;}
+ .v5-item[data-slot="2"] .v5-card-name{font-size:clamp(9px,.73vw,14px)!important;}
  .v5-item[data-slot="3"] .v5-card-name{
     min-width:50%!important;
-    color:var(--accent)!important;
-    font-size:clamp(12px,1vw,20px)!important;
+    
+    
     border-color:#dde1d9c9!important;
     border-bottom:0!important;
     border-top-width:1px!important;
@@ -1127,19 +1125,19 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
      hardcoded 50% of the card. Natural inline text width at every slot. */
   .v5-item .v5-card-name,
   .v5-item[data-slot="3"] .v5-card-name {
-    left:50%!important;right:auto!important;
+    
     bottom:clamp(1px,.12vw,3px)!important;
-    width:max-content!important;min-width:0!important;
-    max-width:calc(100% - 14px)!important;
-    height:calc(var(--v8-band) + var(--v9-overlap))!important;
+    
+    
+    
     transform:translateX(-50%) skewX(11deg)!important;
-    box-sizing:border-box!important;
-    display:flex!important;justify-content:center!important;align-items:center!important;
-    border:0!important;outline:0!important;
-    border-radius:999px!important;
-    background:#06080b!important;
-    box-shadow:0 1px 0 #232528!important;
-    overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+    
+    
+    
+    
+    
+    
+    
   }
   /* The dark pill overlaps the black bottom frame by design;
      only its round shoulders protrude into the picture. */
@@ -1148,7 +1146,7 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
   .v5-item[data-slot="2"] .v5-card-name{padding:var(--v9-overlap) 10px 1px!important}
   .v5-item[data-slot="3"] .v5-card-name{
     padding:var(--v9-overlap) clamp(12px,1.15vw,22px) 1px!important;
-    color:var(--accent)!important;
+    
   }
 
   /* True curved wordmark. Text is carried by an SVG circular arc instead of
@@ -1239,9 +1237,9 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
     outline:0!important;
     border-radius:999px!important;
     background:#06080b!important;
-    font-family:'Arial Rounded MT Bold','M PLUS Rounded 1c','Hiragino Maru Gothic ProN','Yu Gothic','Meiryo',sans-serif!important;
-    font-weight:1000!important;
-    letter-spacing:.02em!important;
+    
+    
+    
     line-height:1!important;
     color:#f4f5f3!important;
     text-align:center!important;
