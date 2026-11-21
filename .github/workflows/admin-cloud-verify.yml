@@ -1,0 +1,30 @@
+name: CAST admin cloud publish verification
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - admin.html
+      - admin.js
+      - cloud-data.js
+      - data.js
+      - index.html
+      - tests/admin-publication-readonly.mjs
+      - .github/workflows/admin-cloud-verify.yml
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax checks
+        run: |
+          node --check admin.js
+          node --check cloud-data.js
+          node --check data.js
+      - name: Verify V16 admin/public asset versions and anonymous Supabase visibility (read only)
+        run: node tests/admin-publication-readonly.mjs
