@@ -6,7 +6,7 @@ import {chromium} from 'playwright';
 const site='https://mazimuri.github.io/';
 const candidate=readFileSync('cast-side-rail.css','utf8');
 const baseline=execFileSync('git',['show','origin/main:cast-side-rail.css'],{encoding:'utf8',maxBuffer:2_000_000});
-assert.ok(candidate.includes('--focus-short-screen-lift'));
+assert.ok(candidate.includes('(max-height:1130px)')&&candidate.includes('calc(904px - 80svh)'));
 mkdirSync('fullhd-hero-review',{recursive:true});
 const browser=await chromium.launch();
 const sizes=[[1440,900],[1920,900],[1919,1079],[1920,1080],[2048,1149],[2560,1440]];
