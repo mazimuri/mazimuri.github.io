@@ -1762,3 +1762,108 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  #main .v5-batch-pair{padding:3px 4px!important;gap:4px!important}
  #main .v5-batch{height:32px!important;width:34px!important}
 }
+
+/* V15.4 / APPROVED — Perspective-aligned navigation cap, +24px.
+   Integrated into the vanishing-point composition directly above rear card.
+   The four depth-scaled cards and navigation logic remain unchanged.
+   Replaces the former yellow boxed buttons with a slim instrument rail. */
+@media (min-width:801px) {
+ #main .v5-control-head{
+   top:3.2%!important;
+   left:auto!important;
+   right:calc(.8% - 24px)!important;
+   width:49%!important;
+   padding:0 5% 7px!important;
+   gap:2px!important;
+   z-index:9!important;
+   display:flex!important;
+   flex-direction:column!important;
+   align-items:center!important;
+   transform:skewX(-11deg)!important;
+   color:var(--deep)!important;
+   pointer-events:auto!important;
+ }
+ #main .v5-control-head:before{
+   content:"";position:absolute;
+   left:4%;top:auto;bottom:0;
+   width:92%;height:2px;
+   background:color-mix(in srgb,var(--deep) 73%,transparent);
+   opacity:1;pointer-events:none;
+ }
+ #main .v5-control-head:after{
+   content:"";position:absolute;
+   left:4%;top:auto;bottom:-1px;
+   width:22%;height:4px;
+   background:var(--accent);
+   pointer-events:none;
+ }
+ #main .v5-batch-pair{
+   display:flex!important;
+   flex-direction:row!important;
+   align-items:center!important;
+   justify-content:center!important;
+   gap:clamp(3px,.7vw,9px)!important;
+   width:100%!important;
+   padding:0!important;
+   background:transparent!important;
+   border:0!important;
+   border-radius:0!important;
+   box-shadow:none!important;
+   transform:skewX(11deg)!important;
+ }
+ #main .v5-batch{
+   display:grid!important;place-items:center!important;
+   width:clamp(31px,2.5vw,42px)!important;
+   height:30px!important;
+   padding:4px 6px!important;
+   border:0!important;
+   border-radius:0!important;
+   background:transparent!important;
+   color:var(--deep)!important;
+   box-shadow:none!important;
+   filter:none!important;
+   transition:background .18s,transform .18s,color .18s!important;
+ }
+ #main .v5-batch svg{
+   display:block!important;
+   width:23px!important;height:17px!important;
+ }
+ #main .v5-batch svg path{stroke-width:3.2!important}
+ #main .v5-batch:not(:disabled):hover{
+   transform:translateY(-3px)!important;
+   box-shadow:none!important;
+   background:var(--accent)!important;
+   color:var(--deep)!important;
+   clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+ }
+ #main .v5-batch:active{
+   transform:translateY(0) scale(.94)!important;
+   box-shadow:none!important;
+ }
+ #main .v5-batch:disabled{
+   opacity:.28!important;
+   cursor:default!important;
+ }
+ #main .v5-batch-label{
+   display:block!important;
+   transform:skewX(11deg)!important;
+   font:850 clamp(7px,.55vw,9px)/1 var(--mono)!important;
+   letter-spacing:.03em!important;
+   padding:0!important;
+   margin:0!important;
+   color:var(--deep)!important;
+   background:none!important;
+   border:0!important;
+   border-radius:0!important;
+   opacity:.75!important;
+   white-space:nowrap!important;
+   text-align:center!important;
+ }
+}
+@media (min-width:801px) and (max-width:1100px){
+ #main .v5-control-head{top:3%!important;padding-inline:2%!important}
+ #main .v5-batch-pair{gap:3px!important}
+}
+@media (min-width:801px) and (max-height:770px){
+ #main .v5-control-head{top:3%!important}
+}
