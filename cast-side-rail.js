@@ -2,7 +2,7 @@
    The previous selected character never visibly wraps around the back of the stack. */
 (()=>{
  const source=document.getElementById('pickerStrip'), stack=document.getElementById('v5Stack'),rail=document.getElementById('v5Rail');
- const count=document.getElementById('v5Count'),batch=document.getElementById('v5Batch'),total=document.getElementById('v6Total'),paperNum=document.getElementById('v6PaperNumber');
+ const count=document.getElementById('v5Count'),batchPrev=document.getElementById('v5BatchPrev'),batchNext=document.getElementById('v5BatchNext'),total=document.getElementById('v6Total'),paperNum=document.getElementById('v6PaperNumber');
  if(!source||!stack||!rail)return;
  const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const mod=(x,n)=>(x%n+n)%n;
@@ -35,10 +35,10 @@
   count.textContent=`${String(ix+1).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;
   if(total)total.textContent=String(n).padStart(2,'0');
   if(paperNum)paperNum.textContent=String(n).padStart(2,'0');
-  batch.disabled=false;
-  batch.title=n<=4?'全キャラクター一覧を見る':'次の4人にジャンプ';
-  const batchLabel=rail.querySelector('.v5-batch-label');if(batchLabel)batchLabel.textContent=n<=4?'ALL CAST':'JUMP +04';
-  batch.setAttribute('aria-label',batch.title);
+  batchPrev.disabled=n<2;batchNext.disabled=n<2;
+  batchPrev.title=n<=4?'前のキャラクターへ':'4人前へ';batchNext.title=n<=4?'次のキャラクターへ':'4人先へ';
+  const batchLabel=rail.querySelector('.v5-batch-label');if(batchLabel)batchLabel.textContent=n<=4?'SELECT ±01':'JUMP ±04';
+  batchPrev.setAttribute('aria-label',batchPrev.title);batchNext.setAttribute('aria-label',batchNext.title);
   const offsets=[3,2,1,0];
   stack.innerHTML=offsets.map((off,slot)=>itemHtml(b[mod(ix+off,n)],slot)).join('');
   const animate=desktop()&&!reduced()&&oldId!==null&&chosen!==oldId&&Math.abs(changes)===1;
@@ -102,11 +102,15 @@
   if(e.target.closest('.v5-allcast')){document.getElementById('openIndex')?.click();return;}
   const card=e.target.closest('[data-v5-target]');if(card)chooseCard(card.dataset.v5Target);
  });
- batch.addEventListener('click',()=>{
-  const n=buttons().length;if(Date.now()<busyUntil)return;
-  if(n<=4){document.getElementById('openIndex')?.click();return;}
-  busyUntil=Date.now()+410;activate(Math.max(0,selectedIx())+4,0);
- });
+ function jumpGroup(direction){
+  const n=buttons().length;if(n<2||Date.now()<busyUntil)return;
+  if(queueTimer){clearTimeout(queueTimer);queueTimer=null;queuedSteps=0;}
+  busyUntil=Date.now()+410;
+  const amount=n<=4?1:4;
+  activate(Math.max(0,selectedIx())+direction*amount,0);
+ }
+ batchPrev.addEventListener('click',()=>jumpGroup(-1));
+ batchNext.addEventListener('click',()=>jumpGroup(1));
  rail.addEventListener('wheel',e=>{if(!desktop())return;
   e.preventDefault();const now=Date.now();if(now-gestureTime<360)return;gestureTime=now;
   if(queueTimer){clearTimeout(queueTimer);queueTimer=null;queuedSteps=0;}
