@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync,mkdirSync} from 'node:fs';
 import {chromium} from 'playwright';
+import {PNG} from 'pngjs';
 
 const site='https://mazimuri.github.io/';
 const css=readFileSync('cast-rail-current.css','utf8');
@@ -8,6 +9,29 @@ const js=readFileSync('cast-side-rail.js','utf8');
 const folder='v16-review';
 mkdirSync(folder,{recursive:true});
 const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+/* A decoded <img> may still fail to appear in a headless Chromium capture
+   when a content sync has just replaced the cast cards. Detect empty photo
+   areas from their edge detail instead of approving a blank screenshot. */
+function photoDetailScores(bytes,rects){
+ const im=PNG.sync.read(bytes),scores=[];
+ for(const r of rects){
+   const x0=Math.max(1,Math.floor(r.x+r.width*.22));
+   const x1=Math.min(im.width-1,Math.floor(r.x+r.width*.78));
+   const y0=Math.max(0,Math.floor(r.y+r.height*.20));
+   const y1=Math.min(im.height-1,Math.floor(r.y+r.height*.67));
+   let count=0,high=0,total=0;
+   for(let y=y0;y<y1;y+=2){
+     for(let x=x0+1;x<x1;x+=2){
+       const i=(y*im.width+x)*4,j=i-4;
+       const d=Math.max(Math.abs(im.data[i]-im.data[j]),Math.abs(im.data[i+1]-im.data[j+1]),Math.abs(im.data[i+2]-im.data[j+2]));
+       high+=Number(d>18);total+=d;count++;
+     }
+   }
+   scores.push({highFraction:count?high/count:0,meanDifference:count?total/count:0});
+ }
+ return scores;
+}
+
 const browser=await chromium.launch({headless:true});
 const desktopSizes=[[801,740],[850,740],[1024,768],[1440,900],[1920,1080],[2048,1080],[2560,1440]];
 let scenarios=0;
@@ -112,9 +136,25 @@ try{
   // Screenshot real content; hold all animation only during capture.
   if([1024,1920,2048,2560].includes(width)){
     await page.mouse.move(0,0);
-    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-    await page.waitForTimeout(350);
-    await page.screenshot({path:folder+'/v16-real-'+width+'.png',fullPage:true,animations:'disabled'});
+    let screenshotGood=false;
+    for(let shotAttempt=0;shotAttempt<4;shotAttempt++){
+      await page.waitForTimeout(900);
+      await page.waitForFunction(()=>{
+        const images=[...document.querySelectorAll('#v5Stack .v5-item:not(.v6-rail-ghost) .v5-card-inner img')];
+        return images.length===4 && images.every(im=>im.complete&&im.naturalWidth>0);
+      },null,{timeout:15000});
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      const rects=await page.locator('#v5Stack .v5-item:not(.v6-rail-ghost) .v5-card-inner').evaluateAll(
+        els=>els.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}})
+      );
+      const screenshot=await page.screenshot({path:folder+'/v16-real-'+width+'.png',fullPage:true});
+      const scores=photoDetailScores(screenshot,rects);
+      console.log('V16 PORTRAIT RASTER '+width+'x'+height+' attempt '+shotAttempt+': '+JSON.stringify(scores));
+      if(scores.length===4&&scores.every(x=>x.highFraction>.012&&x.meanDifference>2)){
+        screenshotGood=true;break;
+      }
+    }
+    assert.ok(screenshotGood,'One or more card images were blank in captured screenshot after retries: '+width+'x'+height);
   }
 
   // Simulate each real-world status state with temporary badges in the picker.
