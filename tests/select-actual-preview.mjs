@@ -28,6 +28,16 @@ async function render(width,height,kind,css){
     return intro && !intro.hidden && bio && bio.textContent.trim().length>15;
   },null,{timeout:30000});
   await page.locator('#v5Stack .v5-item[data-slot="3"] .v5-card').waitFor();
+  // Each character portrait must be loaded in BOTH before and after states:
+  // otherwise the first screenshot can show empty images while the second
+  // benefits from browser cache, creating a false visual comparison.
+  await page.waitForFunction(()=>{
+    const images=[...document.querySelectorAll('#v5Stack .v5-item img')];
+    return images.length>=4 && images.every(i=>i.complete && i.naturalWidth>0);
+  },null,{timeout:40000});
+  await page.evaluate(async()=>{
+    await Promise.all([...document.querySelectorAll('#v5Stack .v5-item img')].map(i=>i.decode?.().catch(()=>{})));
+  });
   await page.evaluate(async()=>{
     await document.fonts.ready;
     const img=document.getElementById('heroArt');
