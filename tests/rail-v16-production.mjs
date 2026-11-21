@@ -25,10 +25,26 @@ try{
   await page.goto(site,{waitUntil:'domcontentloaded',timeout:45000});
   await page.locator('#v5Stack .v5-item[data-slot="3"] .v5-card').waitFor({timeout:20000});
   assert.ok(cssRequests>0 && jsRequests>0,'Local V16 CSS+JS must have been substituted');
-  await page.evaluate(async()=>{
-    await document.fonts.ready;
-    await Promise.all([...document.querySelectorAll('#v5Stack img')].map(img=>img.decode?.().catch(()=>{})??Promise.resolve()));
-  });
+  // A screenshot cannot count as visually reviewed if a portrait failed to load.
+  // GitHub-hosted assets can sometimes race the initial page render; reload
+  // a bounded number of times instead of silently capturing a blank card.
+  let loaded=[];
+  for(let attempt=0;attempt<3;attempt++){
+    loaded=await page.evaluate(async()=>{
+      await document.fonts.ready;
+      const imgs=[...document.querySelectorAll('#v5Stack .v5-item:not(.v6-rail-ghost) img')];
+      await Promise.all(imgs.map(img=>img.decode?.().catch(()=>{})??Promise.resolve()));
+      return imgs.map(img=>({src:img.getAttribute('src'),ok:img.complete&&img.naturalWidth>0}));
+    });
+    if(loaded.length===4&&loaded.every(x=>x.ok))break;
+    if(attempt<2){
+      console.log('RETRY image load '+width+'x'+height+' attempt '+(attempt+1)+': '+JSON.stringify(loaded));
+      await page.reload({waitUntil:'domcontentloaded',timeout:45000});
+      await page.locator('#v5Stack .v5-item[data-slot="3"] .v5-card').waitFor();
+    }
+  }
+  assert.equal(loaded.length,4,'Exactly 4 real portraits expected');
+  assert.ok(loaded.every(x=>x.ok),'Missing real image(s) after retries: '+JSON.stringify(loaded));
   const rail=page.locator('#v5Rail');
   assert.equal(await rail.evaluate(el=>getComputedStyle(el).display),'block','Desktop rail must remain visible');
   const info=await page.evaluate(()=>{
