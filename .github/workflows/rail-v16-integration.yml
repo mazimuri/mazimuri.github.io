@@ -24,9 +24,11 @@ jobs:
         with:
           node-version: '22'
       - name: Install test browser
-        run: npm install --no-save --ignore-scripts playwright@1.56.1 pngjs@7.0.0
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 pngjs@7.0.0 pngjs@7.0.0
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Diagnose paint compositing, independent of production CSS
+        run: node tests/rail-paint-diagnostics.mjs
       - name: Verify V16 frame and ALL CAST polish on real page
         run: node tests/rail-frame-polish-qa.mjs
       - name: Verify adopted FOCUS layout at 800 to 2560px
@@ -42,5 +44,6 @@ jobs:
             v16-review/*.png
             hero-wide-implementation/*.png
             rail-frame-review/*.png
+            rail-paint-diagnostics/*.png
           if-no-files-found: ignore
           retention-days: 14
