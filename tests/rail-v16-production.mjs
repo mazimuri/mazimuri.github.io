@@ -32,7 +32,7 @@ function photoDetailScores(bytes,rects){
  return scores;
 }
 
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:process.env.RAIL_HEADED_TEST!=='1'});
 const desktopSizes=[[801,740],[850,740],[1024,768],[1440,900],[1920,1080],[2048,1080],[2560,1440]];
 let scenarios=0;
 
