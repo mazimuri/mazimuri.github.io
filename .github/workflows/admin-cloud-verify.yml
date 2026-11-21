@@ -9,6 +9,7 @@ on:
       - data.js
       - index.html
       - tests/admin-publication-readonly.mjs
+      - tests/admin-publish-mock.mjs
       - .github/workflows/admin-cloud-verify.yml
   workflow_dispatch:
 jobs:
@@ -26,5 +27,7 @@ jobs:
           node --check admin.js
           node --check cloud-data.js
           node --check data.js
+      - name: Exercise publisher with a fake database (no production writes)
+        run: node tests/admin-publish-mock.mjs
       - name: Verify V16 admin/public asset versions and anonymous Supabase visibility (read only)
         run: node tests/admin-publication-readonly.mjs
