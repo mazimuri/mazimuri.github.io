@@ -1,13 +1,46 @@
 import assert from 'node:assert/strict';
-import {readFileSync,mkdirSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {PNG} from 'pngjs';
 import {chromium} from 'playwright';
 
 const site='https://mazimuri.github.io/';
 const candidate=readFileSync('cast-rail-current.css','utf8');
 const output='rail-frame-review';
 mkdirSync(output,{recursive:true});
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:process.env.RAIL_HEADED_TEST!=='1'});
 const sizes=[[1024,768],[1920,1080],[2560,1440]];
+
+function photoTextureScores(bytes,rects){
+ const im=PNG.sync.read(bytes);
+ return rects.map(r=>{
+  const l=Math.max(1,Math.floor(r.x+r.width*.25)),right=Math.min(im.width-1,Math.floor(r.x+r.width*.75));
+  const t=Math.max(0,Math.floor(r.y+r.height*.25)),bot=Math.min(im.height-1,Math.floor(r.y+r.height*.66));
+  let count=0,total=0,high=0;
+  for(let y=t;y<bot;y+=2)for(let x=l+1;x<right;x+=2){
+   const p=(y*im.width+x)*4,q=p-4;
+   const diff=Math.max(...[0,1,2].map(ch=>Math.abs(im.data[p+ch]-im.data[q+ch])));
+   count++;total+=diff;high+=Number(diff>18);
+  }
+  return count?{fraction:high/count,mean:total/count}:{fraction:0,mean:0};
+ });
+}
+async function checkedCapture(page,path){
+ for(let attempt=0;attempt<8;attempt++){
+  await page.waitForTimeout(250);
+  const rects=await page.locator('#v5Stack .v5-item:not(.v6-rail-ghost) .v5-card-inner').evaluateAll(
+   els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}})
+  );
+  const shot=await page.screenshot({fullPage:true,animations:'disabled'});
+  const scores=photoTextureScores(shot,rects);
+  if(scores.length===4&&scores.every(x=>x.fraction>.015&&x.mean>2)){
+    writeFileSync(path,shot);
+    console.log('VERIFIED SCREENSHOT '+path+' retries='+attempt+' texture='+scores.map(x=>x.fraction.toFixed(2)).join(','));
+    return;
+  }
+ }
+ throw Error('Screenshot paint never showed all four portrait images: '+path);
+}
+
 let ok=0;
 try{
  for(const [width,height] of sizes){
@@ -52,7 +85,7 @@ try{
 
   await page.waitForTimeout(240);
   if(width>=1920){
-    await page.screenshot({path:output+'/polished-'+width+'-rest.png',fullPage:true,animations:'disabled'});
+    await checkedCapture(page,output+'/polished-'+width+'-rest.png');
   }
   await front.hover({force:true});
   await page.waitForTimeout(100);
@@ -68,7 +101,7 @@ try{
   assert.equal(hover.filter,'none','Whole card image is filtered on hover');
   assert.ok(hover.translate.includes('-2px'),'Card did not retain tactile lift');
   if(width>=1920){
-    await page.screenshot({path:output+'/polished-'+width+'-hover.png',fullPage:true,animations:'disabled'});
+    await checkedCapture(page,output+'/polished-'+width+'-hover.png');
   }
   await page.mouse.move(0,0);
   const buttonIdle=await all.evaluate(el=>{
