@@ -12,14 +12,14 @@
  const selectedIx=()=>buttons().findIndex(b=>b.getAttribute('aria-selected')==='true');
  const read=(b)=>({id:b.dataset.person,name:b.querySelector('.person-data strong')?.textContent.trim()||'UNKNOWN',
   src:b.querySelector('img')?.getAttribute('src')||'',imageStyle:b.querySelector('img')?.getAttribute('style')||'',
-  zeta:!!b.querySelector('.zeta-badge'),recent:!!b.querySelector('.cast-new'),number:((b.querySelector('.person-no')?.textContent||'').split('NO.')[1]||'--').trim().split(' ')[0]});
+  zeta:!!b.querySelector('.zeta-badge'),recent:!!b.querySelector('.cast-new')});
  let currentId=null,nextDirection=0,previous=null,framePending=false,busyUntil=0,gestureTime=0,touchY=null,queuedSteps=0,queueTimer=null;
  function snapshot(){return Array.from(stack.querySelectorAll('.v5-item:not(.v6-rail-ghost)')).map(el=>({
   id:el.dataset.person,slot:+el.dataset.slot,rect:el.getBoundingClientRect(),node:el.cloneNode(true)}));}
  function itemHtml(b,slot){const p=read(b),active=slot===3;
   return `<div class="v5-item" data-slot="${slot}" data-person="${esc(p.id)}">
     <button type="button" class="v5-card" data-v5-target="${esc(p.id)}" role="tab" aria-selected="${active}" aria-label="${esc(p.name)}を選択">
-     <span class="v5-card-outer"><span class="v5-card-inner"><img src="${esc(p.src)}" alt="" style="${esc(p.imageStyle)}"></span><span class="v155-card-index" aria-hidden="true">FILE / ${esc(p.number)}</span><span class="v5-card-name">${esc(p.name)}</span></span>
+     <span class="v5-card-outer"><span class="v5-card-inner"><img src="${esc(p.src)}" alt="" style="${esc(p.imageStyle)}"></span><span class="v5-card-name">${esc(p.name)}</span></span>
      ${(p.zeta||p.recent)?`<span class="v5-badges">${p.zeta?'<b>zeta</b>':''}${p.recent?'<b class="is-new">NEW</b>':''}</span>`:''}
     </button>${active?'<button type="button" class="v5-allcast" aria-label="全キャラ一覧を見る"><span class="v155-grid" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="v155-action-text"><strong>ALL CAST</strong><small>全キャラを見る</small></span><span class="v155-action-arrow" aria-hidden="true">↗</span></button>':''}</div>`;
  }
