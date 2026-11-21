@@ -14,13 +14,20 @@ async function render(width,height,css,label){
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});
  await page.route('**/cast-side-rail.css*',r=>r.fulfill({status:200,contentType:'text/css',body:css}));
  await page.goto(site,{waitUntil:'domcontentloaded',timeout:45000});
- await page.locator('#openDetail').waitFor();
+ // Wait for the actual published character to hydrate. Testing while
+ // hero-intel is still hidden yields wildly different CTA positions.
+ await page.waitForFunction(()=>{
+   const intro=document.getElementById('heroIntel');
+   const bio=document.getElementById('heroBio');
+   return intro&&!intro.hidden&&bio?.textContent?.trim().length>15;
+ },null,{timeout:20000});
+ await page.locator('#v5Stack .v5-item[data-slot="3"] .v5-card').waitFor();
  await page.evaluate(async()=>{
    await document.fonts.ready;
    const img=document.getElementById('heroArt');
    await img?.decode?.().catch(()=>{});
  });
- await page.waitForTimeout(300);
+ await page.waitForTimeout(500);
  const m=await page.evaluate(()=>{
   const rect=id=>{const r=document.getElementById(id).getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,height:r.height}};
   const copy=document.getElementById('heroCopy');
