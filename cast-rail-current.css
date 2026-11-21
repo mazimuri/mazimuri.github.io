@@ -156,18 +156,20 @@
  }
  #main .v5-item[data-slot="3"] .v5-card{left:10.2%!important;width:89.8%!important}
 
- /* One continuous moulded shell: all materials belong to the frame itself. */
+ /* One continuous moulded shell. The case provides the only outer edge and
+    bevel; image bay and fascia do not draw competing hairline frames. */
  #main .v5-item .v5-card-outer{
-   border:var(--v16-case-size) solid #070a0d!important;
+   border:var(--v16-case-size) solid #0b1115!important;
    border-radius:clamp(11px,1.15vw,20px) 0 clamp(11px,1.15vw,20px) 0!important;
-   background:linear-gradient(137deg,#313c42 0%,#1c2429 13%,#0b1014 51%,#192126 84%,#293238 100%)!important;
-   box-shadow:inset 1px 1px 0 #ffffff34,inset -2px -2px 0 #0008,2px 3px 0 #080c10a6,4px 7px 12px #0003!important;
+   background:linear-gradient(135deg,#283238 0%,#11191e 34%,#0d1419 72%,#283137 100%)!important;
+   box-shadow:inset 0 0 0 1px #4d5a5b25,2px 3px 0 #080c10a6,4px 7px 12px #0003!important;
    filter:none!important;translate:none;outline:none!important;
+   background-clip:padding-box;
    overflow:hidden!important;
    transition:translate .22s cubic-bezier(.18,.82,.25,1),box-shadow .22s ease!important;
  }
  #main .v5-item[data-slot="3"] .v5-card-outer{
-   box-shadow:inset 1px 1px 0 #ffffff48,inset -2px -3px 0 #0009,4px 5px 0 #070b0cba,8px 11px 20px #0004!important;
+   box-shadow:inset 0 0 0 1px #5d6e712b,4px 5px 0 #070b0cba,8px 11px 20px #0004!important;
  }
  /* Removed indicator: never place an LED/pill at the shell's top-left. */
  #main .v5-item .v5-card-outer::before,
@@ -184,9 +186,9 @@
  #main .v5-item[data-slot="3"] .v5-card-inner{
    inset:clamp(4px,.34vw,7px) clamp(4px,.34vw,7px) var(--v16-label-height)!important;
    border:0!important;
-   border-radius:clamp(7px,.72vw,12px) 0 0 0!important;
+   border-radius:clamp(6px,.64vw,11px) 0 0 0!important;
    background:linear-gradient(148deg,color-mix(in srgb,var(--soft) 45%,#b4c0c3) 0%,color-mix(in srgb,var(--soft) 22%,#839196) 44%,color-mix(in srgb,var(--deep) 42%,#87949a) 100%)!important;
-   box-shadow:inset 0 1px 0 #c8d4d52a,inset 0 -5px 10px #080d1380!important;
+   box-shadow:none!important; /* no extra bevel: shell is the only frame */
  }
  #main .v5-item .v5-card-inner::before{
    content:none!important;display:none!important; /* remove independent glossy white photo overlay */
@@ -231,9 +233,9 @@
    display:flex!important;align-items:center!important;justify-content:center!important;
    transform:skewX(11deg)!important;
    border:0!important;border-radius:0!important;
-   border-top:1px solid #71828b40!important;
+   border-top:0!important; /* no pale seam between photo and fascia */
    background:linear-gradient(105deg,#121a1f 0%,#070a0d 48%,#1b252b 100%)!important;
-   box-shadow:inset 0 2px 0 #ffffff10,inset 0 -2px 0 #000c!important;
+   box-shadow:inset 0 -2px 0 #000c!important;
    color:#f4f6f5!important;text-shadow:0 1px 0 #0009!important;
    font-family:"Noto Sans CJK JP","Meiryo","Yu Gothic",sans-serif!important;
    font-weight:900!important;line-height:1!important;letter-spacing:.015em!important;
