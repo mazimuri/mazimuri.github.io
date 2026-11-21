@@ -583,12 +583,7 @@
  .v5-batch-label{font:850 8px/1 var(--mono);letter-spacing:.11em;color:var(--deep);opacity:.54;white-space:nowrap}
  .v5-stack{position:absolute;inset:0;pointer-events:none;overflow:visible;isolation:isolate}
  .v5-item{position:absolute;right:0;min-width:0;pointer-events:none;transform-origin:right center;will-change:transform,opacity}
- .v5-item[data-slot="0"]{top:11.8%;width:58%;height:12.2%;z-index:1}
- .v5-item[data-slot="1"]{top:29.0%;width:72%;height:15%;z-index:2}
- .v5-item[data-slot="2"]{top:48.4%;width:86%;height:18.7%;z-index:3}
- .v5-item[data-slot="3"]{top:70.0%;width:100%;height:25.0%;z-index:5}
  .v5-item .v5-card{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;padding:0;background:transparent;text-align:left;color:white;pointer-events:auto;overflow:visible;isolation:isolate}
- .v5-item[data-slot="3"] .v5-card{left:12%;width:88%}
  /* Outer and inner *both* share a slanted shape with rounded upper-left / lower-right.
     The portrait is unskewed, so the facial proportions stay correct. */
  .v5-card-outer{position:absolute;inset:0;display:block;transform:skewX(-11deg);border-radius:20px 0 20px 0;background:#101115;overflow:hidden;box-shadow:none;filter:drop-shadow(2px 3px 0 #0003)}
@@ -600,12 +595,9 @@
  .v5-card:focus-visible{outline:3px solid var(--acid);outline-offset:6px}
  .v5-card-name{position:absolute;z-index:4;bottom:-3px;left:18%;right:12%;max-width:80%;width:max-content;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   border-radius:999px;background:#0e0f13;color:#f6f6f2;padding:3px 12px 4px;text-align:center;font:850 clamp(9px,.88vw,15px)/1.1 var(--jpn);box-shadow:2px 2px 0 #1115}
- .v5-item[data-slot="0"] .v5-card-name{font-size:clamp(8px,.58vw,11px);padding:2px 7px 3px}
- .v5-item[data-slot="1"] .v5-card-name{font-size:clamp(9px,.68vw,12px);padding:3px 8px}
  .v5-item[data-slot="3"] .v5-card-name{font-size:clamp(12px,.93vw,18px);color:var(--accent);padding:5px 13px 6px;background:#111216}
  .v5-badges{position:absolute;top:7px;right:8%;display:flex;gap:4px;z-index:5;transform:skewX(-11deg)}
  .v5-badges b{font:900 clamp(7px,.48vw,10px)/1 var(--mono);letter-spacing:.04em;padding:3px 4px;color:#141414;background:var(--acid);box-shadow:0 1px 0 #151515;white-space:nowrap}
- .v5-badges b.is-new{background:var(--accent);color:var(--deep)}
  .v5-item[data-slot="0"] .v5-badges,.v5-item[data-slot="1"] .v5-badges{transform:skewX(-11deg) scale(.84);transform-origin:right top;top:4px}
  .v5-item[data-slot="3"] .v5-badges{top:6px;right:8%}
  .v5-item[data-slot="3"] .v5-card-outer{background:#111215;outline:1px solid var(--deep)}
@@ -631,7 +623,6 @@
  .v5-item[data-slot="0"]{top:11.3%;height:12.0%}
  .v5-item[data-slot="1"]{top:28.8%;height:15.3%}
  .v5-item[data-slot="2"]{top:48.8%;height:18.9%}
- .v5-item[data-slot="3"]{top:70.7%;height:24.2%}
  .v5-card-name{bottom:-2px}
 }
 @media(max-width:800px){.v5-rail{display:none!important}}
@@ -702,20 +693,14 @@
  .v5-item[data-slot="1"]{top:29.3%!important;right:1.6%!important;width:70%!important;height:15.6%!important;z-index:2!important}
  .v5-item[data-slot="2"]{top:49.2%!important;right:3.4%!important;width:84%!important;height:18.9%!important;z-index:3!important}
  .v5-item[data-slot="3"]{top:71.9%!important;right:5.3%!important;width:103%!important;height:23.6%!important;z-index:5!important}
- .v5-item[data-slot="3"] .v5-card{left:12%!important;width:88%!important}
  .v5-card-outer{border-radius:clamp(11px,1.2vw,22px) 0 clamp(11px,1.2vw,22px) 0!important;box-shadow:4px 7px 0 color-mix(in srgb,var(--deep) 22%,transparent)!important}
  .v5-card-inner{border-radius:clamp(6px,.8vw,14px) 0 clamp(6px,.8vw,14px) 0!important}
  .v5-card-name{position:absolute!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:clamp(5px,.67vw,11px)!important;max-width:78%!important;min-width:38%!important;width:max-content!important;border-radius:99px!important;box-shadow:none!important;padding:3px 12px 4px!important;font-size:clamp(10px,.86vw,16px)!important;line-height:1.2!important}
- .v5-item[data-slot="0"] .v5-card-name{font-size:clamp(8px,.59vw,11px)!important;bottom:5px!important;padding:2px 8px!important}
- .v5-item[data-slot="1"] .v5-card-name{font-size:clamp(9px,.64vw,12px)!important;bottom:5px!important;padding:2px 9px!important}
- .v5-item[data-slot="2"] .v5-card-name{font-size:clamp(10px,.73vw,14px)!important;bottom:6px!important;padding:3px 9px!important}
- .v5-item[data-slot="3"] .v5-card-name{color:var(--accent)!important;bottom:clamp(7px,.72vw,13px)!important;min-width:48%!important;padding:5px 17px 6px!important;font-size:clamp(12px,1vw,19px)!important}
  .v5-item[data-slot="3"] .v5-card-outer:after{display:none!important;content:none!important}
  .v5-item[data-slot="3"] .v5-card-inner{border-bottom:3px solid var(--accent)!important}
  .v5-badges{z-index:8!important;top:4px!important;right:5%!important;gap:4px!important;transform:skewX(-11deg)!important}
  .v5-badges b{padding:4px 6px!important;font:950 clamp(7px,.62vw,12px)/1 var(--mono)!important;background:var(--acid)!important;color:#101114!important;box-shadow:2px 2px 0 #10111455!important}
  .v5-badges b.is-new{background:var(--accent)!important;color:var(--bright)!important}
- .v5-item[data-slot="0"] .v5-badges,.v5-item[data-slot="1"] .v5-badges{transform:skewX(-11deg) scale(.84)!important}
  .v5-allcast{left:0!important;top:4%!important;bottom:2%!important;width:9.5%!important;border-radius:23px 5px 23px 5px!important;transform:skewX(-11deg)!important;box-shadow:5px 6px 0 color-mix(in srgb,var(--deep) 22%,transparent)!important;min-width:26px!important}
  .v5-allcast>span{transform:rotate(180deg) skewY(-9deg)!important;letter-spacing:.09em!important;font-size:clamp(9px,.75vw,14px)!important}
  .v5-control-head{top:5.3%!important;right:14%!important;color:var(--deep)!important}
@@ -840,13 +825,6 @@
  #hero .v6-brand-stamp{left:30%!important;bottom:11%!important;opacity:.24!important}
  #hero .v6-paper-number{left:69%!important;top:30%!important;opacity:.06!important}
  #hero .v6-signal-mark{display:none!important}
- /* Integrated lower frame label rather than an externally hovering black pill. */
- .v5-item .v5-card-name{
-  bottom:0!important;left:50%!important;transform:translateX(-50%)!important;
-  border-radius:7px 7px 0 0!important;border:2px solid #101115!important;border-bottom:0!important;
-  background:#101115!important;box-shadow:0 2px 0 #101115!important;
-  min-height:15px!important;padding:2px 11px 3px!important;line-height:1.15!important
- }
  .v5-item[data-slot="0"] .v5-card-name{bottom:0!important}
  .v5-item[data-slot="1"] .v5-card-name{bottom:0!important}
  .v5-item[data-slot="2"] .v5-card-name{bottom:0!important}
@@ -916,7 +894,6 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  .v5-item[data-slot="1"]{top:29.2%!important;right:1.5%!important;width:64%!important;height:15.7%!important}
  .v5-item[data-slot="2"]{top:49.2%!important;right:2.7%!important;width:78%!important;height:19.0%!important}
  .v5-item[data-slot="3"]{top:71.8%!important;right:4.7%!important;width:120%!important;height:23.6%!important}
- .v5-item[data-slot="3"] .v5-card{left:10.2%!important;width:89.8%!important}
  .v5-item[data-slot="0"]{--v8-band:clamp(14px,1.48vw,18px)}
  .v5-item[data-slot="1"]{--v8-band:clamp(15px,1.65vw,21px)}
  .v5-item[data-slot="2"]{--v8-band:clamp(17px,1.86vw,25px)}
@@ -947,9 +924,6 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
    padding:1px clamp(6px,.65vw,14px) 0!important;
    font-size:clamp(8px,.71vw,13px)!important;line-height:1!important
  }
- .v5-item[data-slot="0"] .v5-card-name{font-size:clamp(7px,.54vw,10px)!important;padding-inline:5px!important}
- .v5-item[data-slot="1"] .v5-card-name{font-size:clamp(8px,.61vw,11px)!important;padding-inline:7px!important}
- .v5-item[data-slot="2"] .v5-card-name{font-size:clamp(9px,.69vw,13px)!important}
  .v5-item[data-slot="3"] .v5-card-name{
    color:var(--accent)!important;font-size:clamp(12px,.96vw,19px)!important;
    padding-inline:clamp(10px,1.3vw,27px)!important;
@@ -1034,7 +1008,6 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  .v5-item[data-slot="0"]{width:48%!important}
  .v5-item[data-slot="1"]{width:62.5%!important}
  .v5-item[data-slot="2"]{width:76%!important}
- .v5-item[data-slot="3"]{width:116%!important}
  .v5-item[data-slot="3"] .v5-card{left:10.2%!important;width:89.8%!important}
 
  /* The lower black rail and label are connected, but the rounded head
