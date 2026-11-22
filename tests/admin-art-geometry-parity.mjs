@@ -42,9 +42,8 @@ const frame=`<!doctype html><html><head><meta name="viewport" content="width=dev
  </body></html>`;
 const browser=await chromium.launch({headless:true});
 try{
-  const page=await browser.newPage();
   for(const [width,height] of [[1024,740],[1440,900],[1920,1080],[2560,1440],[760,900],[390,844]]){
-    await page.setViewportSize({width,height});
+    const page=await browser.newPage({viewport:{width,height}});
     await page.setContent(frame,{waitUntil:'load'});
     await page.addScriptTag({content:visual});
     const result=await page.evaluate(()=>{
@@ -90,8 +89,6 @@ try{
       assert.notEqual(result.note,'none','Editor mobile limitation must be explained');
     }
     await page.close();
-    // A new browsing context avoids stale mutation/resize observers across widths.
-    if(width!==390){continue}
   }
   console.log('PASS: live hero/editor artwork + FILE badge geometry at 1024/1440/1920/2560/760/390');
 } finally {await browser.close()}
