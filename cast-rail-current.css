@@ -142,19 +142,19 @@
  }
  /* Approved four-depth perspective. The selected art stays in the foreground. */
  #main .v5-item[data-slot="0"]{
-   top:calc(12.7% - var(--v16-rail-condense) * 0.084)!important;right:.8%!important;width:49%!important;height:calc(var(--v16-rail-stage) * 0.122)!important;z-index:1!important;
+   top:calc(12.7% - var(--v16-rail-condense) * .16)!important;right:.8%!important;width:49%!important;height:calc(var(--v16-rail-stage) * 0.122)!important;z-index:1!important;
    --v16-case-size:2px;--v16-label-height:calc(var(--v16-rail-stage) * 0.0137575236);--v16-status-height:calc(var(--v16-rail-stage) * 0.0111779879);
  }
  #main .v5-item[data-slot="1"]{
-   top:calc(29.2% - var(--v16-rail-condense) * 0.13)!important;right:1.5%!important;width:64%!important;height:calc(var(--v16-rail-stage) * 0.157)!important;z-index:2!important;
+   top:calc(29.2% - var(--v16-rail-condense) * .193)!important;right:1.5%!important;width:64%!important;height:calc(var(--v16-rail-stage) * 0.157)!important;z-index:2!important;
    --v16-case-size:2px;--v16-label-height:calc(var(--v16-rail-stage) * 0.0171969046);--v16-status-height:calc(var(--v16-rail-stage) * 0.0120378332);
  }
  #main .v5-item[data-slot="2"]{
-   top:calc(49.2% - var(--v16-rail-condense) * 0.19)!important;right:2.7%!important;width:78%!important;height:calc(var(--v16-rail-stage) * 0.19)!important;z-index:3!important;
+   top:calc(49.2% - var(--v16-rail-condense) * .19)!important;right:2.7%!important;width:78%!important;height:calc(var(--v16-rail-stage) * 0.19)!important;z-index:3!important;
    --v16-case-size:3px;--v16-label-height:calc(var(--v16-rail-stage) * 0.0214961307);--v16-status-height:calc(var(--v16-rail-stage) * 0.0137575236);
  }
  #main .v5-item[data-slot="3"]{
-   top:calc(71.8% - var(--v16-rail-condense) * .21)!important;right:4.7%!important;width:116%!important;height:calc(var(--v16-rail-stage) * .236)!important;z-index:5!important;
+   top:calc(71.8% - var(--v16-rail-condense) * .113)!important;right:4.7%!important;width:116%!important;height:calc(var(--v16-rail-stage) * .236)!important;z-index:5!important;
    --v16-case-size:4px;--v16-label-height:calc(var(--v16-rail-stage) * 0.0369733448);
    --v16-status-height:calc(var(--v16-rail-stage) * 0.0189165950);
  }
