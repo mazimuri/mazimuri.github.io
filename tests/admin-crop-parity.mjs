@@ -41,6 +41,9 @@ if(process.argv.includes('--browser')){
     #admin .v15-icon-studio{display:block}
     #admin .crop-canvas.crop-picker-mode{display:block}
     #admin .crop-rail-frame{display:block}
+    #testMobile{display:block!important;position:relative!important;width:53px!important;height:54px!important}
+    #testMobile>span{display:block!important;position:relative!important;width:100%!important;height:100%!important}
+    #testMobile img{display:block!important;width:100%!important;height:100%!important}
     </style></head><body>
     <div id="main"><div class="v5-rail" id="v5Rail"><div class="v5-stack" id="v5Stack">
     <div class="v5-item" data-slot="3"><button class="v5-card"><span class="v5-card-outer">
@@ -54,7 +57,7 @@ if(process.argv.includes('--browser')){
     <div class="crop-canvas crop-gallery-mode">${img('editGallery')}</div>
     <div class="crop-gallery-frame">${img('liveGallery')}</div>
     </div></div>
-    <div class="mobile-portrait"><span>${img('publicMobile')}</span></div>
+    <div class="mobile-portrait" id="testMobile"><span>${img('publicMobile')}</span></div>
     </body></html>`;
     const page=await browser.newPage();
     for(const width of [1280,1920,2560]){
@@ -96,7 +99,6 @@ if(process.argv.includes('--browser')){
         origin:[normalized('#publicMobile'),normalized('#editMobile'),normalized('#liveMobile')],
         all:cs('.crop-canvas.crop-gallery-mode').aspectRatio};
     });
-    console.log('DEBUG mobile origin',JSON.stringify(mob));
     assert.equal(mob.pub,mob.edit,'MOBILE editor scale mismatch');
     assert.equal(mob.pub,mob.live,'MOBILE LIVE scale mismatch');
     for(const origin of mob.origin)for(const axis of origin)
