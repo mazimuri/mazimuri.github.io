@@ -75,6 +75,7 @@ async function capture(width,height){
    intro.append(label,prose,measures);
    hero.after(intro);
  });
+ await page.mouse.move(5,5);
  await page.screenshot({path:folder+'/'+width+'x'+height+'-DETAIL-after-hero.png',animations:'disabled'});
  const detail=await page.evaluate(()=>{
   const content=document.getElementById('worldDetailContent');
@@ -92,6 +93,13 @@ async function capture(width,height){
  assert.ok(mainHref?.startsWith('https://zeta-ai.io/'),'Main story link changed or lost');
  const castVisible=await page.locator('.world-story-entry:first-child .world-story-cast-caption').evaluate(e=>getComputedStyle(e,'::before').content);
  assert.ok(castVisible.includes('登場キャラ'),'Characters label not visible');
+ const storyOrder=await page.locator('.world-story-entry:first-child').evaluate(el=>{
+   const title=el.querySelector('.world-story-item').getBoundingClientRect();
+   const cast=el.querySelector('.world-story-cast').getBoundingClientRect();
+   return {titleBottom:title.bottom,castTop:cast.top};
+ });
+ assert.ok(storyOrder.titleBottom<=storyOrder.castTop+4,
+   'Title or play action must precede appearing cast: '+JSON.stringify(storyOrder));
 
  if(width===1920){assert.ok(detail.heroHeight<height*.45,'Full HD WORLD detail hero consumes too much vertical space: '+detail.heroHeight);}
  if(width===2560){assert.ok(detail.heroHeight<height*.40,'2K WORLD detail hero consumes too much vertical space: '+detail.heroHeight);}
@@ -101,6 +109,7 @@ async function capture(width,height){
  }
  await page.evaluate(()=>document.getElementById('worldDetailContent').scrollTop=325);
  await page.waitForTimeout(200);
+ await page.mouse.move(5,5);
  await page.screenshot({path:folder+'/'+width+'x'+height+'-DETAIL-after-stories.png',animations:'disabled'});
  // Future-proof: a separate long-copy stress test uses only the already
  // published summary repeated, explicitly marked as dummy layout text.
