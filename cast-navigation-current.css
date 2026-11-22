@@ -1,0 +1,64 @@
+/* CAST // SIGNAL / Navigation UX V18
+   Owns contextual WORLD return + current character wayfinding.
+   These styles are deliberately scoped, not appended as another Study stack. */
+#dossier .dossier-head{display:flex;align-items:center;gap:clamp(6px,.7vw,15px)}
+#dossier .dossier-head>.mono{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dossier .dossier-world-return{
+  flex:0 1 auto;min-width:0;
+  margin-left:auto;padding:clamp(9px,.7vw,13px) clamp(11px,1vw,23px);
+  border:2px solid #eaff55;border-radius:3px;
+  background:#1d282c;color:#eaff55;
+  font:950 clamp(10px,.75vw,15px)/1.2 var(--jpn);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  box-shadow:3px 3px 0 #06090b;
+  transition:background .15s,color .15s,transform .15s;
+}
+#dossier .dossier-world-return:hover,
+#dossier .dossier-world-return:focus-visible{
+  background:#eaff55;color:#121b1d;transform:translateY(-1px);
+  outline:2px solid #eaff55;outline-offset:2px;
+}
+#dossier .dossier-world-return[hidden]{display:none!important}
+#dossier .dossier-head .panel-close{flex:0 0 auto}
+#directory #directoryItems .is-current-cast{position:relative}
+#directory #directoryItems.directory-gallery .cast-gallery-card.is-current-cast:not(:hover):not(:focus-visible){
+  outline-color:#eaff55!important;
+  box-shadow:inset 0 0 0 2px #eaff5570,0 2px 0 #0b0e10!important;
+}
+#directory #directoryItems.directory-gallery .cast-gallery-current{
+  display:block;position:absolute;z-index:6;
+  right:2px;top:3px;
+  min-height:15px;max-width:calc(100% - 15px);
+  padding:4px 5px 3px;
+  background:#eaff55;color:#12191b;
+  border:1px solid #0f1416;
+  font:1000 clamp(9px,.47vw,12px)/1 var(--mono);
+  letter-spacing:-.02em;box-shadow:2px 2px 0 #101519a9;
+  pointer-events:none;
+}
+#directory #directoryItems.directory-gallery .cast-gallery-card.is-current-cast .cast-gallery-visual{
+  border-bottom-color:#eaff55!important;
+}
+#directory #directoryItems.directory-detail .directory-item.is-current-cast{
+  outline:2px solid #eaff55;outline-offset:1px;
+  border-color:#eaff55!important;
+}
+#directory #directoryItems .d-current{
+  display:block;position:absolute;top:4px;right:4px;
+  z-index:4;background:#eaff55;color:#12191b;
+  padding:3px 5px;font:1000 10px/1 var(--mono);
+}
+#main .v5-control-head .v5-batch-label{
+  letter-spacing:.03em!important;
+  opacity:.75!important;
+}
+#main .v5-readout span:last-child{font-size:clamp(7px,.44vw,9px);letter-spacing:-.03em;white-space:nowrap}
+@media(max-width:800px){
+ #dossier .dossier-head{gap:6px;padding-inline:12px}
+ #dossier .dossier-head>.mono{display:none}
+ #dossier .dossier-world-return{margin-left:0;max-width:calc(100% - 118px);font-size:11px;padding:9px 10px}
+ #dossier .dossier-head .panel-close{margin-left:auto;padding:9px 11px;font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ #dossier .dossier-world-return{transition:none}
+}
