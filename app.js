@@ -394,7 +394,7 @@ $('openDetail').onclick=()=>{state.tab='profile';open('dossier')};
 $('openIndex').onclick=()=>{state.world='';state.filter='all';$('search').value='';open('directory')};
 $$('[data-nav]').forEach(b=>b.onclick=()=>{if(b.dataset.nav==='select')close();else if(b.dataset.nav==='index'){state.world='';state.filter='all';$('search').value='';open('directory')}else if(b.dataset.nav==='worlds')open('worldsPanel');else open('aboutPanel')});
 $('brandHome').onclick=e=>{e.preventDefault();if(state.people.length)choose(state.people[0].id)};
-$('[data-close]').forEach(b=>b.onclick=()=>{if(b.closest('#dossier')&&state.panel==='dossier'&&returnToOriginWorld())return;close()});$('scrim').onclick=()=>close();
+$$('[data-close]').forEach(b=>b.onclick=()=>{if(b.closest('#dossier')&&state.panel==='dossier'&&returnToOriginWorld())return;close()});$('scrim').onclick=()=>close();
 $$('.dossier-tabs [data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));$('search').addEventListener('input',()=>renderDirectory({resetScroll:true}));
 $$('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;state.world='';renderDirectory()});
 $('directoryItems').addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(b)choose(b.dataset.pick)});
