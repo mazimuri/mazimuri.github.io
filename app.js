@@ -336,11 +336,21 @@ function setNav(){$$('[data-nav]').forEach(b=>b.classList.toggle('active',state.
 function open(which,routing=true){close(false);state.panel=which;const el=$(which);el.setAttribute('aria-hidden','false');el.classList.add('open');$('scrim').hidden=false;requestAnimationFrame(()=>$('scrim').classList.add('visible'));document.body.style.overflow='hidden';document.body.classList.toggle('detail-open',which==='dossier');if(which==='dossier'){renderDossier();$('dossierContent').scrollTop=0;syncWorldReturn()}if(which==='directory'){renderDirectory();requestAnimationFrame(showSelectedAllCast)}if(which==='worldsPanel')renderWorlds();if(which==='worldDetailPanel')renderWorldDetail();if(which==='aboutPanel')renderAbout();setNav();if(routing)route(which==='dossier'?'char/'+cur().id+'/'+state.tab:which==='directory'?'index':which==='aboutPanel'?'about':which==='worldDetailPanel'?'world/'+state.world:'worlds');el.querySelector('[data-close]')?.focus({preventScroll:true})}
 function close(routing=true){hideConnectionTooltip();$$('.dossier,.directory').forEach(el=>{el.classList.remove('open');el.setAttribute('aria-hidden','true')});$('scrim').classList.remove('visible');$('scrim').hidden=true;document.body.style.overflow='';document.body.classList.remove('detail-open');const before=state.panel;state.panel=null;setNav();if(before&&routing&&cur())route('char/'+cur().id)}
 function syncWorldReturn(){
- const button=$('dossierWorldReturn');if(!button)return;
+ // One obvious BACK action: never offer conflicting destinations in the header.
+ const button=$('dossier')?.querySelector('.dossier-head [data-close]');if(!button)return;
  const w=worldById(state.returnWorldId);
- button.hidden=!w;
- button.textContent=w?'↶ '+w.title+'へ戻る':'';
- if(w)button.setAttribute('aria-label',w.title+'の世界観詳細に戻る');
+ button.textContent=w?'↶ '+w.title+'へ戻る':'BACK TO SELECT ×';
+ button.setAttribute('aria-label',w?w.title+'の世界観詳細に戻る':'キャラ選択に戻る');
+ button.classList.toggle('context-world-return',!!w);
+}
+function returnToOriginWorld(){
+ const id=state.returnWorldId;
+ if(!worldById(id))return false;
+ const scroll=state.returnWorldScroll;
+ state.returnWorldId='';
+ openWorld(id);
+ requestAnimationFrame(()=>$('worldDetailContent').scrollTop=scroll);
+ return true;
 }
 function openWorld(id){if(!worldById(id))return;state.world=id;state.filter='all';$('search').value='';open('worldDetailPanel')}
 function tab(k){hideConnectionTooltip();state.tab=k;renderDossier();$('dossierContent').scrollTop=0;route('char/'+cur().id+'/'+k)}
@@ -374,7 +384,7 @@ $('dossierContent').addEventListener('focusin',e=>{const button=e.target.closest
 $('dossierContent').addEventListener('focusout',e=>{const button=e.target.closest('.connection-avatar');if(button===activeConnection)hideConnectionTooltip()});
 $('dossierContent').addEventListener('scroll',hideConnectionTooltip,{passive:true});
 window.addEventListener('resize',hideConnectionTooltip);
-$('dossierContent').addEventListener('click',e=>{const rel=e.target.closest('[data-related-id]');if(rel){hideConnectionTooltip();choose(rel.dataset.relatedId,{detail:true});return}const w=e.target.closest('[data-related-world]');if(w){hideConnectionTooltip();openWorld(w.dataset.relatedWorld)}});
+$('dossierContent').addEventListener('click',e=>{const rel=e.target.closest('[data-related-id]');if(rel){hideConnectionTooltip();choose(rel.dataset.relatedId,{detail:true,fromWorldId:state.returnWorldId});return}const w=e.target.closest('[data-related-world]');if(w){hideConnectionTooltip();openWorld(w.dataset.relatedWorld)}});
 $('pickerStrip').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)choose(b.dataset.person)});
 $('prev').onclick=()=>shift(-1);$('next').onclick=()=>shift(1);
 $('pickerStrip').addEventListener('scroll',updatePickerEdges,{passive:true});$('heroBio').addEventListener('scroll',updateIntroScrollIndicator,{passive:true});
@@ -384,7 +394,7 @@ $('openDetail').onclick=()=>{state.tab='profile';open('dossier')};
 $('openIndex').onclick=()=>{state.world='';state.filter='all';$('search').value='';open('directory')};
 $$('[data-nav]').forEach(b=>b.onclick=()=>{if(b.dataset.nav==='select')close();else if(b.dataset.nav==='index'){state.world='';state.filter='all';$('search').value='';open('directory')}else if(b.dataset.nav==='worlds')open('worldsPanel');else open('aboutPanel')});
 $('brandHome').onclick=e=>{e.preventDefault();if(state.people.length)choose(state.people[0].id)};
-$$('[data-close]').forEach(b=>b.onclick=()=>close());$('scrim').onclick=()=>close();
+$('[data-close]').forEach(b=>b.onclick=()=>{if(b.closest('#dossier')&&state.panel==='dossier'&&returnToOriginWorld())return;close()});$('scrim').onclick=()=>close();
 $$('.dossier-tabs [data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));$('search').addEventListener('input',()=>renderDirectory({resetScroll:true}));
 $$('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;state.world='';renderDirectory()});
 $('directoryItems').addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(b)choose(b.dataset.pick)});
@@ -394,12 +404,6 @@ $$('[data-directory-view]').forEach(b=>b.addEventListener('click',()=>{state.dir
 $('copyFa').addEventListener('click',()=>{const t=website().faTag||'';if(navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>toast('FAタグをコピーしたよ')).catch(()=>window.prompt('FAタグをコピー',t));else window.prompt('FAタグをコピー',t)});
 $('worldCards').addEventListener('click',e=>{const b=e.target.closest('[data-world]');if(b)openWorld(b.dataset.world)});
 $('worldDetailBack').onclick=()=>open('worldsPanel');
-$('dossierWorldReturn').onclick=()=>{
- const id=state.returnWorldId,position=state.returnWorldScroll;
- if(!worldById(id))return;
- openWorld(id);
- requestAnimationFrame(()=>$('worldDetailContent').scrollTop=position);
-};
 $('worldDetailContent').addEventListener('click',e=>{
  const jump=e.target.closest('[data-world-story-jump]');
  if(jump){$('wd4Stories')?.scrollIntoView({behavior:state.animations?'smooth':'auto',block:'start'});return}
@@ -468,7 +472,7 @@ stage.addEventListener('touchend',e=>{
 stage.addEventListener('touchcancel',()=>{mobileSwipe=null},{passive:true});
 document.addEventListener('keydown',e=>{
  if(document.body.classList.contains('admin-open'))return;
- if(e.key==='Escape'&&state.panel){close();return}
+ if(e.key==='Escape'&&state.panel){if(state.panel!=='dossier'||!returnToOriginWorld())close();return}
  if(!['ArrowUp','ArrowDown'].includes(e.key)||state.panel||!$('galleryLightbox').hidden)return;
  const active=document.activeElement;
  if(active?.isContentEditable||active?.closest('input,textarea,select,[role="textbox"],[contenteditable="true"]'))return;
