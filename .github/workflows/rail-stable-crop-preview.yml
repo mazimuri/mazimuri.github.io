@@ -1,0 +1,33 @@
+name: RIGHT CAST RAIL / stable crop aspect preview
+on:
+  push:
+    branches: [fix/right-cast-rail-stable-crop-ratio-20261122]
+    paths:
+      - cast-side-rail.css
+      - cast-rail-current.css
+      - tests/rail-stable-crop-preview.mjs
+      - .github/workflows/rail-stable-crop-preview.yml
+  workflow_dispatch:
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch origin main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check tests/rail-stable-crop-preview.mjs
+      - run: npm install --no-save --ignore-scripts playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/rail-stable-crop-preview.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rail-stable-crop-before-after
+          path: rail-stable-crop-review/*
+          if-no-files-found: ignore
