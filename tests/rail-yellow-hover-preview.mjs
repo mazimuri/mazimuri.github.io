@@ -33,6 +33,7 @@ async function evaluate(width,height){
       border:styles.borderTopColor,outline:styles.outlineColor,
       shadow:styles.boxShadow,
       fasciaBorder:getComputedStyle(name).borderTopColor,
+      fasciaShadow:getComputedStyle(name).boxShadow,
       image:{objectPosition:im.objectPosition,transform:im.transform,filter:im.filter},
       cardAria:el.getAttribute('aria-label')};
  });
@@ -46,7 +47,8 @@ async function evaluate(width,height){
    await page.waitForTimeout(200);
    const hover=await read(slot);
    assert.equal(hover.border,'rgb(234, 255, 85)','Card shell should turn yellow on hover: '+tag+' '+slot);
-   assert.equal(hover.fasciaBorder,'rgb(234, 255, 85)','Name line should turn yellow on hover: '+tag+' '+slot);
+   assert.ok(hover.fasciaShadow.includes('rgb(234, 255, 85)'), 'Yellow fascia line missing on hover: '+tag+' '+slot+': '+hover.fasciaShadow);
+   if(slot===3)assert.equal(hover.fasciaBorder,'rgb(234, 255, 85)','Selected name border should switch to yellow on hover');
    const shifted=Math.abs(hover.card.w-none.card.w);
    assert.ok(hover.card.w>100&&hover.card.h>25,'Card remains usable');
    const name=hover.cardAria;assert.ok(name&&name.length>=2,'Accessible name preserved');
