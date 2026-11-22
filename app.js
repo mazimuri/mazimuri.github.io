@@ -260,7 +260,7 @@ function renderWorldDetail(){
  const rawStories=Array.isArray(w.stories)?w.stories:[];
  const stories=rawStories.filter(t=>t.title?.trim());
  const mainLink=validUrl(w.link);
- const mainAlready=stories.some(t=>validUrl(t.url)===mainLink&&mainLink);
+ const mainAlready=stories.some(t=>Boolean(mainLink)&&((storyPlotId(mainLink)&&storyPlotId(t.url)===storyPlotId(mainLink))||validUrl(t.url)===mainLink));
  const linkBlock=mainLink&&!mainAlready?`<a class="world-primary-link" href="${esc(mainLink)}" target="_blank" rel="noopener noreferrer"><span>↗ MAIN / WORLD LINK</span><b>登録した作品URLへ進む</b></a>`:'';
  const heroImage=w.image?`<img src="${esc(w.image)}" alt="" class="world-detail-art">`:'';
  const safeAccent=/^#[0-9a-f]{6}$/i.test(w.accent)?w.accent:'#eafa42';
@@ -376,7 +376,7 @@ $('worldCards').addEventListener('click',e=>{const b=e.target.closest('[data-wor
 $('worldDetailBack').onclick=()=>open('worldsPanel');
 $('worldDetailContent').addEventListener('click',e=>{
  const jump=e.target.closest('[data-world-story-jump]');
- if(jump){$('wd4Stories')?.scrollIntoView({behavior:state.animations?'smooth':'instant',block:'start'});return}
+ if(jump){$('wd4Stories')?.scrollIntoView({behavior:state.animations?'smooth':'auto',block:'start'});return}
  const b=e.target.closest('[data-world-character]');
  if(b)choose(b.dataset.worldCharacter,{detail:true});
 });
