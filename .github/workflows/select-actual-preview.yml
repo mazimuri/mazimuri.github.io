@@ -1,0 +1,37 @@
+name: CAST V16 actual-viewport visual previews
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - style.css
+      - cast-side-rail.css
+      - tests/select-actual-preview.mjs
+      - .github/workflows/select-actual-preview.yml
+  workflow_dispatch:
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch comparison baseline
+        run: git fetch origin main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser runner
+        run: npm install --no-save --ignore-scripts playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Capture exact-view screenshots
+        run: node tests/select-actual-preview.mjs
+      - name: Attach images for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cast-select-real-viewport-preview
+          path: visual-preview-review/*
+          if-no-files-found: ignore

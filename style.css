@@ -1004,6 +1004,7 @@ body.detail-open .hero-art-wrap{transition:transform 760ms cubic-bezier(.18,.73,
 #pickerStrip .person .person-thumb img[data-crop-render],
 #dossier .connection-avatar-frame img[data-crop-render],
 #worldDetailPanel .world-cast-visual img[data-crop-render],
+#worldDetailPanel .world-story-avatar-portrait img[data-crop-render],
 #admin .crop-canvas img[data-crop-render],
 #admin .crop-rail-frame img[data-crop-render],
 #admin .crop-gallery-frame img[data-crop-render]{

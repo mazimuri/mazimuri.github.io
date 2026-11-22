@@ -647,8 +647,8 @@
  #hero .hero-copy .title-stack h1{font-size:clamp(78px,8.35vw,172px)!important}
  #hero .hero-copy .title-outline{font-size:clamp(51px,5.08vw,107px)!important}
  #hero .hero-copy .hero-jp{font-size:clamp(21px,1.9vw,32px)!important}
- #hero.hero .hero-art-wrap,#hero.hero.theme-rov .hero-art-wrap,#hero.hero.theme-unnamed .hero-art-wrap{left:18.5%!important;width:min(78.3%,1570px)!important;height:97%!important;z-index:7!important}
- #hero.hero.theme-orphe .hero-art-wrap{left:18.5%!important;width:min(78.3%,1570px)!important;height:106%!important;z-index:7!important}
+ #hero.hero .hero-art-wrap,#hero.hero.theme-rov .hero-art-wrap,#hero.hero.theme-unnamed .hero-art-wrap{width:min(78.3%,1570px)!important;height:97%!important;z-index:7!important}
+ #hero.hero.theme-orphe .hero-art-wrap{width:min(78.3%,1570px)!important;height:106%!important;z-index:7!important}
  /* FILE badge: on open accent area to the right of the art, never beneath the cast rail. */
  #hero .hero-art-stamp{
    position:absolute!important;left:clamp(835px,62.5vw,1320px)!important;right:auto!important;
@@ -964,9 +964,9 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
  #hero.hero .hero-art-wrap,
  #hero.hero.theme-rov .hero-art-wrap,
  #hero.hero.theme-unnamed .hero-art-wrap{
-   left:17.3%!important;
+   left:var(--select-art-base-left,17.3%)!important;
  }
- #hero.hero.theme-orphe .hero-art-wrap{left:17.3%!important}
+ #hero.hero.theme-orphe .hero-art-wrap{left:var(--select-art-base-left,17.3%)!important}
  body.detail-open #hero.hero .hero-art-wrap{left:7%!important}
 
  /* The previous italic digits have a right-side optical overhang. Move just
@@ -1432,6 +1432,12 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
    Move copy toward portrait; enlarge Japanese name, voice, bio and CTA.
    Surname and Roman name remain behind the foreground illustration. */
 @media (min-width:1850px){
+  /* The tall 2K composition uses a slightly more central shared art base.
+     Full HD 1920x911 keeps the earlier alignment. Per-character artPosition
+     remains independent from this responsive base and is not overwritten. */
+  @media (min-height:1131px){
+    #hero.hero{--select-art-base-left:18.5%}
+  }
   #hero .hero-copy{
     left:clamp(120px,6.7vw,174px)!important;
     width:min(45%,710px)!important;
@@ -1472,5 +1478,49 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
   }
   #hero .hero-cta strong{
     font-size:clamp(15px,.8vw,18px)!important;
+  }
+
+  /* Measured short wide-screen viewport: Full HD 1920x911. 2K 2560x1271
+     intentionally retains the approved wide editorial composition.
+     Keep this size-specific treatment inside the V16 type module. */
+  @media (max-height:1130px){
+    #hero .hero-copy{
+      top:clamp(49px,6vh,60px)!important;
+    }
+    #hero .hero-copy .title-stack,
+    #hero .hero-copy:has(.hero-intel:not([hidden])) .title-stack{
+      margin-top:18px!important;
+    }
+    #hero .hero-copy .title-stack h1{
+      font-size:clamp(150px,8.5vw,164px)!important;
+    }
+    #hero .hero-copy .title-outline{
+      font-size:clamp(96px,5.45vw,105px)!important;
+      margin-top:10px!important;
+    }
+    #hero .hero-copy .hero-jp,
+    #hero .hero-copy:has(.hero-intel:not([hidden])) .hero-jp{
+      font-size:clamp(27px,1.65vw,31px)!important;
+      margin-top:16px!important;
+    }
+    #hero .hero-intel{
+      margin-top:16px!important;
+    }
+    #hero .hero-voice p{
+      font-size:clamp(16px,.94vw,17px)!important;
+      line-height:1.45!important;
+    }
+    #hero .hero-bio{
+      margin-top:9px!important;
+    }
+    #hero .hero-bio p{
+      font-size:13.5px!important;
+      line-height:1.55!important;
+    }
+    #hero .hero-copy .hero-cta,
+    #hero .hero-copy:has(.hero-intel:not([hidden])) .hero-cta{
+      margin-top:14px!important;
+      height:59px!important;
+    }
   }
 }
