@@ -1,0 +1,30 @@
+name: MAIN VISUAL STUDIO live geometry parity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - admin.js
+      - admin.html
+      - admin-v15-studio.css
+      - visual-engine.js
+      - tests/admin-art-geometry-parity.mjs
+      - .github/workflows/admin-art-geometry-parity.yml
+  workflow_dispatch:
+jobs:
+  visual-parity:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify JavaScript syntax
+        run: node --check admin.js && node --check visual-engine.js
+      - name: Install Chromium tests
+        run: npm install --no-save --ignore-scripts playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify live SELECT and editor parity across screen sizes
+        run: node tests/admin-art-geometry-parity.mjs
