@@ -250,7 +250,7 @@ function storyParticipants(t, group){
 function storyCastMarkup(t,group){
  const participants=storyParticipants(t,group);
  if(!participants.length)return '<span class="world-story-cast-unlinked mono">CAST / 登場キャラ未登録</span>';
- return `<span class="world-story-cast-caption mono">APPEARING CAST <b>/ ${String(participants.length).padStart(2,'0')}</b><small>登場キャラ</small></span><span class="world-story-cast-faces">${participants.map(c=>`<button class="world-story-avatar" type="button" data-world-character="${esc(c.id)}" aria-label="${esc(c.name)}のプロフィールを見る" title="${esc(c.name)}" style="--avatar-accent:${esc(c.colors?.accent||'#eaff58')}"><span class="world-story-avatar-portrait"><img src="${esc(icon(c))}" style="${cropStyle(c,'all')}" alt="" loading="lazy" data-crop-render></span><span class="world-story-avatar-name">${esc(c.name)}</span></button>`).join('')}</span>`;
+ return `<span class="world-story-cast-caption mono">登場キャラ <b>/ ${String(participants.length).padStart(2,'0')}</b><small>APPEARING CAST</small></span><span class="world-story-cast-faces">${participants.map(c=>`<button class="world-story-avatar" type="button" data-world-character="${esc(c.id)}" aria-label="${esc(c.name)}のプロフィールを見る" title="${esc(c.name)}" style="--avatar-accent:${esc(c.colors?.accent||'#eaff58')}"><span class="world-story-avatar-portrait"><img src="${esc(icon(c))}" style="${cropStyle(c,'all')}" alt="" loading="lazy" data-crop-render></span><span class="world-story-avatar-name">${esc(c.name)}</span></button>`).join('')}</span>`;
 }
 function renderWorldDetail(){
  const w=worldById(state.world);
