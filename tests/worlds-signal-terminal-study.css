@@ -35,7 +35,7 @@
     content:"";width:32px;height:4px;background:#eaff52;transform:skew(-25deg);
   }
   #worldsPanel .directory-content h2{
-    font:1000 clamp(75px,7.8vw,148px)/.82 var(--sans);
+    font:1000 clamp(75px,7.8vw,205px)/.82 var(--sans);
     letter-spacing:-.095em;
     margin:13px 0 15px;
     position:relative;z-index:1;
@@ -56,7 +56,7 @@
   }
   #worldsPanel .world-cards{
     margin:clamp(22px,2vw,36px) auto 0;
-    width:100%;max-width:1840px;
+    width:100%;max-width:2340px;
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:clamp(14px,1.4vw,26px);
@@ -67,7 +67,7 @@
     width:100%;
     min-width:0;
     height:auto;
-    min-height:clamp(370px,26vw,495px);
+    min-height:clamp(370px,26vw,605px);
     display:flex;
     flex-direction:column;
     justify-content:flex-start;
@@ -83,6 +83,9 @@
     transform:none;
     transition:border-color .2s,outline-color .2s,box-shadow .2s,transform .25s;
     cursor:pointer;
+  }
+  #worldsPanel .world-card.has-cover{
+    min-height:clamp(385px,26vw,605px);
   }
   #worldsPanel .world-card:only-child{
     grid-column:1/-1;
@@ -153,7 +156,7 @@
     order:1;position:relative;z-index:3;
     width:66%;max-width:66%;
     margin:0;
-    font:1000 clamp(40px,3.8vw,74px)/1.06 var(--jpn);
+    font:1000 clamp(40px,3.8vw,100px)/1.06 var(--jpn);
     letter-spacing:-.06em;
     color:#fff;
     overflow-wrap:anywhere;
@@ -188,18 +191,18 @@
     position:absolute;right:clamp(15px,2.5vw,45px);bottom:clamp(19px,2.8vw,50px);
     z-index:5;
     display:flex;align-items:center;justify-content:space-between;gap:15px;
-    width:auto;min-width:clamp(170px,12.4vw,238px);
+    width:auto;min-width:clamp(170px,12.4vw,330px);
     height:clamp(48px,3.7vw,67px);
     padding:0 clamp(14px,1.25vw,24px);
     color:#101517!important;
     background:#eaff52!important;
     clip-path:polygon(0 0,100% 0,100% 82%,94% 100%,0 100%)!important;
-    font:1000 clamp(23px,1.8vw,34px)/1 var(--sans)!important;
+    font:1000 clamp(23px,1.8vw,45px)/1 var(--sans)!important;
     box-shadow:none;
   }
   #worldsPanel .world-arrow:before{
     content:"ENTER WORLD";
-    font:1000 clamp(11px,.82vw,16px)/1 var(--sans);
+    font:1000 clamp(11px,.82vw,22px)/1 var(--sans);
     letter-spacing:.03em;
   }
   #worldsPanel .world-card:hover .world-arrow{background:#fff!important}
@@ -412,6 +415,11 @@
     padding:27px 18px 65px;
   }
   #worldsPanel .directory-content h2{font-size:clamp(54px,10vw,85px);margin:12px 0 16px}
+  #worldsPanel .world-card.has-cover:before{
+    content:"";left:0;right:auto;top:auto;bottom:0;
+    width:35%;height:5px;transform:none;opacity:1;
+    background:#eaff52;z-index:3;
+  }
   #worldsPanel .world-card.has-cover{
     min-height:370px;max-height:none;padding:22px 23px 52px;
     border:2px solid #546064;border-radius:12px 2px 13px 2px;
