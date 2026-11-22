@@ -15,7 +15,29 @@ async function pageFor(w,h,{moreCast=false}={}){
   await page.route('**/'+name+'*',r=>r.fulfill({status:200,contentType:name.endsWith('.css')?'text/css':'text/javascript',body:assets[name]}));
  }
  await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
- await page.waitForFunction(()=>window.CAST_PUBLIC&&document.querySelectorAll('#v5Stack .v5-item').length===4,null,{timeout:40000});
+ const appReady=()=>window.CAST_PUBLIC&&document.querySelectorAll('#v5Stack .v5-item:not(.v6-rail-ghost)').length===4;
+ try{await page.waitForFunction(appReady,null,{timeout:25000})}
+ catch{
+   // Published data is fetched from the public endpoint; one transient network
+   // error should not be confused with a JavaScript regression.
+   const diagnostic=await page.evaluate(()=>({
+     publicApi:!!window.CAST_PUBLIC,
+     dataBridge:!!window.CAST_DATA,
+     portraits:document.querySelectorAll('#v5Stack .v5-item').length,
+     alert:document.querySelector('[role="alert"]')?.textContent?.slice(0,150),
+     url:location.href
+   }));
+   console.warn('INITIAL LOAD RETRY',JSON.stringify({diagnostic,errors}));
+   await page.reload({waitUntil:'domcontentloaded',timeout:60000});
+   try{await page.waitForFunction(appReady,null,{timeout:25000})}
+   catch{
+     const diagnostics=await page.evaluate(()=>({
+       publicApi:!!window.CAST_PUBLIC,portraits:document.querySelectorAll('#v5Stack .v5-item').length,
+       alert:document.querySelector('[role="alert"]')?.textContent?.slice(0,150)
+     }));
+     throw Error('PUBLIC DATA OR APP FAILED TO INITIALIZE '+JSON.stringify({diagnostics,errors}));
+   }
+ }
  if(moreCast){
   await page.evaluate(()=>{
    const api=window.CAST_DATA, original=api.getPublished();
