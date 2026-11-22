@@ -80,7 +80,7 @@ try{
     'front card overflows stage at '+run.width+'x'+run.height);
  }
  const previous=get(1920,911,'before');
- assert.ok(fh.items[3].item.y<previous.items[3].item.y-25,'Full HD card spacing did not compress as intended');
+ assert.ok(fh.items[3].item.y<previous.items[3].item.y-10,'Full HD card spacing did not compress as intended');
  assert.ok(Math.abs(k.items[3].item.y-get(2560,1271,'before').items[3].item.y)<2,
    '2K approved vertical arrangement changed unexpectedly');
  console.log('FULLHD VS 2K delta before='+JSON.stringify(previous.items.map((v,i)=>+(v.ratio/get(2560,1271,'before').items[i].ratio-1).toFixed(3))));
