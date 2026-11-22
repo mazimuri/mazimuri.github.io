@@ -96,6 +96,7 @@ if(process.argv.includes('--browser')){
         origin:[normalized('#publicMobile'),normalized('#editMobile'),normalized('#liveMobile')],
         all:cs('.crop-canvas.crop-gallery-mode').aspectRatio};
     });
+    console.log('DEBUG mobile origin',JSON.stringify(mob));
     assert.equal(mob.pub,mob.edit,'MOBILE editor scale mismatch');
     assert.equal(mob.pub,mob.live,'MOBILE LIVE scale mismatch');
     for(const origin of mob.origin)for(const axis of origin)
