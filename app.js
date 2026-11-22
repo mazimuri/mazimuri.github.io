@@ -185,17 +185,34 @@ function renderDossier(){const c=cur();if(!c)return;
  $('copyLink').onclick=()=>{if(location.protocol==='file:'||location.hostname==='localhost'){toast('まだ公開用URLはありません。正式公開後に利用できます');return}const url=new URL(location.href);url.hash='char/'+c.id+'/profile';navigator.clipboard?.writeText(url.href).then(()=>toast('URLをコピーしました')).catch(()=>window.prompt('このURLをコピー',url.href))};
  }
 }
+/* ALL CAST / responsive cartridge roster.
+   Uses the EXISTING gallery cards and click actions, only reports scroll
+   progress when the current layout actually overflows. */
+function updateAllCastRosterFooter(){
+ const list=$('directoryItems'),footer=$('allcastRosterFooter');
+ if(!list||!footer)return;
+ const active=state.directoryView==='gallery'&&window.innerWidth>800&&$('directory').classList.contains('open');
+ const max=active?Math.max(0,list.scrollHeight-list.clientHeight):0;
+ footer.hidden=!(active&&max>2);
+ if(!footer.hidden){
+   const percent=Math.round(Math.max(0,Math.min(1,list.scrollTop/max))*100);
+   $('allcastScrollProgress').style.width=(20+percent*.8)+'%';
+   $('allcastScrollReadout').textContent='SCROLL '+String(percent).padStart(2,'0')+'%';
+ }
+}
 function renderDirectory({resetScroll=false}={}){
  const query=searchNormalize($('search').value),terms=query.split(' ').filter(Boolean);
  let items=state.people.filter(c=>(state.filter==='all'||(state.filter==='playable'?c.playable:!c.playable))&&(!state.world||c.worldIds?.includes(state.world)));
  if(terms.length)items=items.filter(c=>{const hay=searchNormalize([c.name,c.reading,c.aliases,c.roman,c.surname,c.world,c.roleJa,c.type,...(c.works||[]),...(c.tags||[])].join(' '));return terms.every(term=>hay.includes(term))});
  setText('directoryCount',`${String(items.length).padStart(2,'0')} FILES MATCH`);
  const el=$('directoryItems');el.classList.toggle('directory-gallery',state.directoryView==='gallery');el.classList.toggle('directory-detail',state.directoryView==='detail');
+ $('allcastRosterShell').classList.toggle('is-gallery',state.directoryView==='gallery');
  if(state.directoryView==='gallery')el.innerHTML=items.map(c=>`<button type="button" data-pick="${esc(c.id)}" class="cast-gallery-card" style="--item-color:${esc(c.colors.accent)}" aria-label="${esc(c.name)}のプロフィールを開く"><span class="cast-gallery-visual"><img data-crop-render src="${esc(icon(c))}" alt="" style="${cropStyle(c,'all')}" loading="lazy"><span class="cast-gallery-number mono">FILE / ${esc(c.no)}</span></span><span class="cast-gallery-caption"><span class="cast-gallery-name">${esc(c.name)}</span><span class="cast-gallery-badges">${label(c)} ${newBadge(c)}</span><small>${esc(c.roleJa||c.role||'CHARACTER')}</small><span class="cast-gallery-world mono">${esc(c.world)}</span><span class="cast-gallery-arrow" aria-hidden="true">↗</span></span></button>`).join('')||'<p class="empty">該当するキャラが見つかりません。</p>';
  else el.innerHTML=items.map(c=>`<button type="button" data-pick="${esc(c.id)}" class="directory-item" style="--item-color:${esc(c.colors.accent)}"><span class="d-thumb"><img data-crop-render class="index-face ${c.icon?'has-face':''}" style="${cropStyle(c,'all')}" src="${esc(icon(c))}" alt=""><span class="d-no">${c.no}</span></span><span class="d-main"><span class="d-top"><small class="mono">CHARACTER / ${c.no}</small><span class="d-badges">${label(c)} ${newBadge(c)}</span></span><strong>${esc(c.name)}</strong><span class="d-roman">${esc(c.roman||c.name)}${c.surname?' / '+esc(c.surname):''}</span><span class="d-role">${esc(c.roleJa||c.role||'CHARACTER')}</span><span class="d-group">WORLD <i>/</i> ${esc(c.world)}</span></span><span class="d-arrow">↗</span></button>`).join('')||'<p class="empty">該当するキャラが見つかりません。</p>';
  $$('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===state.filter)));
  $$('[data-directory-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.directoryView===state.directoryView)));
  if(resetScroll)el.scrollTop=0;
+ requestAnimationFrame(updateAllCastRosterFooter);
 }
 function renderWorlds(){const worlds=state.doc.worlds||[];
  $('worldCards').innerHTML=worlds.map((w,i)=>{const group=state.people.filter(c=>c.worldIds?.includes(w.id));return `<button type="button" class="world-card ${w.image?'has-cover':'no-cover'}" data-world="${esc(w.id)}" style="--world-accent:${esc(w.accent||'#e1fb42')}">${w.image?`<span class="world-card-image" aria-hidden="true"><img class="world-bg" src="${esc(w.image)}" alt="" loading="lazy"><img class="world-figure" src="${esc(w.image)}" alt="" loading="lazy"></span>`:''}<span class="world-top">WORLD / ${String(i+1).padStart(2,'0')} ${worldBadges(w)}</span><strong>${esc(w.title)}</strong><small>${esc(w.subtitle||w.category||'')} &nbsp; · &nbsp; ${group.length} CAST</small><p class="world-excerpt">${esc(w.summary||'')}</p><span class="world-arrow">↗</span></button>`}).join('');
@@ -307,6 +324,8 @@ $$('[data-close]').forEach(b=>b.onclick=()=>close());$('scrim').onclick=()=>clos
 $$('.dossier-tabs [data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));$('search').addEventListener('input',()=>renderDirectory({resetScroll:true}));
 $$('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;state.world='';renderDirectory()});
 $('directoryItems').addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(b)choose(b.dataset.pick)});
+$('directoryItems').addEventListener('scroll',updateAllCastRosterFooter,{passive:true});
+window.addEventListener('resize',updateAllCastRosterFooter,{passive:true});
 $$('[data-directory-view]').forEach(b=>b.addEventListener('click',()=>{state.directoryView=b.dataset.directoryView;renderDirectory({resetScroll:true})}));
 $('copyFa').addEventListener('click',()=>{const t=website().faTag||'';if(navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>toast('FAタグをコピーしたよ')).catch(()=>window.prompt('FAタグをコピー',t));else window.prompt('FAタグをコピー',t)});
 $('worldCards').addEventListener('click',e=>{const b=e.target.closest('[data-world]');if(b)openWorld(b.dataset.world)});

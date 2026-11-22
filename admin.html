@@ -12,12 +12,13 @@
 <link rel="stylesheet" href="cast-side-rail.css?v=16.1.1">
   <link rel="stylesheet" href="cast-view-adjustments.css?v=15.6.1">
   <link rel="stylesheet" href="cast-rail-current.css?v=16.0.2">
+<link rel="stylesheet" href="cast-allcast-current.css?v=1.0.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
   <script src="cloud-config.js" defer></script>
   <script src="cloud-data.js?v=5.9.10" defer></script>
   <link rel="stylesheet" href="cloud-admin.css">
   <link rel="stylesheet" href="admin-v15-studio.css?v=15.3.0">
-  <script src="app.js?v=15.2.0" defer></script>
+  <script src="app.js?v=15.2.1" defer></script>
 <script defer src="cast-side-rail.js?v=16.0.0"></script>
   <script src="publisher.js" defer></script>
   <script src="admin.js?v=16.0.1" defer></script>
@@ -182,7 +183,14 @@
         <div class="directory-heading-row"><div><span class="directory-kicker mono">LOOK UP A SIGNAL / CAST DATABASE</span><h2>ALL <i>CHARACTERS</i><span>.</span></h2></div><span class="directory-fixed-note mono">SCROLL THE CAST / KEEP YOUR FILTERS</span></div>
         <div class="directory-control" id="mobileFilters"><label class="directory-search-label"><span class="mono">SEARCH /</span><input id="search" placeholder="キャラ名・作品・タグで検索" type="search" autocomplete="off"></label><div class="directory-filters" role="group" aria-label="キャラクター表示範囲"><button type="button" data-filter="all" aria-pressed="true">すべて</button><button type="button" data-filter="playable" aria-pressed="false">zetaで遊べる</button><button type="button" data-filter="showcase" aria-pressed="false" title="zetaで遊ぶリンクがないキャラクター">紹介のみ</button></div></div>
         <div class="directory-subtools"><div class="directory-count mono" id="directoryCount" role="status" aria-live="polite">03 FILES MATCH</div><div class="directory-view" role="group" aria-label="一覧の表示切り替え"><span class="mono">VIEW MODE /</span><button type="button" data-directory-view="gallery" aria-pressed="true">▦ GALLERY</button><button type="button" data-directory-view="detail" aria-pressed="false">≡ DETAIL</button></div></div>
-      </div><div class="directory-items directory-gallery" id="directoryItems" tabindex="0" role="region" aria-label="検索結果・キャラクター一覧"></div>
+      </div><div class="allcast-roster-shell is-gallery" id="allcastRosterShell">
+<div class="directory-items directory-gallery" id="directoryItems" tabindex="0" role="region" aria-label="検索結果・キャラクター一覧"></div>
+<div class="allcast-roster-footer" id="allcastRosterFooter" hidden aria-hidden="true">
+<span>SCROLL FOR MORE FILES ▼</span>
+<span class="allcast-scroll-track"><span class="allcast-scroll-progress" id="allcastScrollProgress"></span></span>
+<span class="allcast-scroll-readout" id="allcastScrollReadout">SCROLL 00%</span>
+</div>
+</div>
     </div>
   </aside>
 

@@ -1,0 +1,36 @@
+name: ALL CAST ZZZ fluid roster visual verification
+on:
+  push:
+    branches: [feat/allcast-zzz-proportional-roster]
+    paths:
+      - app.js
+      - index.html
+      - admin.html
+      - cast-allcast-current.css
+      - cast-side-rail.css
+      - tests/allcast-zzz-implementation.mjs
+      - .github/workflows/allcast-zzz-implementation.yml
+  workflow_dispatch:
+jobs:
+  visual:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify JS syntax
+        run: node --check app.js && node --check tests/allcast-zzz-implementation.mjs
+      - name: Install browser
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Capture responsive ALL CAST and test interactions
+        run: node tests/allcast-zzz-implementation.mjs
+      - name: Save visuals
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allcast-zzz-fluid-actual-site
+          path: allcast-zzz-implementation-review/*
+          if-no-files-found: ignore
