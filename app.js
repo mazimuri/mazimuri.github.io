@@ -327,10 +327,16 @@ function renderWorldDetail(){
   </div>`;
 }
 
+const communityTag=()=>String(website().faTag||'').trim()||'#まじむり受信中';
 function renderAbout(){
  const t=website();
- for(const [id,val] of [['aboutTitle',t.title],['aboutIntro',t.intro],['aboutImages',t.imagePolicy],['aboutFans',t.fanPolicy],['aboutScreens',t.screenshotPolicy]])setText(id,val||'');
- const fa=(t.faTag||'').trim();$('aboutFa').hidden=!fa;setText('aboutFaValue',fa);
+ for(const [id,val] of [['aboutTitle',t.title],['aboutIntro',t.intro],['aboutImages',t.imagePolicy],['aboutScreens',t.screenshotPolicy]])setText(id,val||'');
+ // Legacy FA-only tag guidance is superseded by the shared community channel above.
+ const legacyFaHint='投稿するときは専用FAタグ（設定している場合）を使ってもらえると嬉しいです。';
+ setText('aboutFans',String(t.fanPolicy||'').replace(legacyFaHint,'').trim());
+ const tag=communityTag();
+ setText('aboutSignalTag',tag);
+ $('aboutSignalSearch').href='https://x.com/search?q='+encodeURIComponent(tag)+'&f=live';
  const links=[{label:'X / TWITTER',url:t.xUrl,icon:'X'},{label:'ZETA / CREATOR',url:t.zetaUrl,icon:'zeta'}].filter(l=>validUrl(l.url));
  $('aboutLinks').innerHTML=links.length?links.map(l=>`<a href="${esc(l.url)}" rel="noopener noreferrer" target="_blank"><b>${esc(l.icon)}</b><span>${esc(l.label)}</span><em>↗</em></a>`).join(''):'<span class="about-link-pending">CREATOR LINKS / 準備中</span>';
  $('footerSocial').innerHTML=links.map(l=>`<a href="${esc(l.url)}" rel="noopener noreferrer" target="_blank" aria-label="${esc(l.label)}を開く">${esc(l.icon)} ↗</a>`).join('');
@@ -462,7 +468,7 @@ $('directoryItems').addEventListener('click',e=>{const b=e.target.closest('[data
 $('directoryItems').addEventListener('scroll',updateAllCastRosterFooter,{passive:true});
 window.addEventListener('resize',updateAllCastRosterFooter,{passive:true});
 $$('[data-directory-view]').forEach(b=>b.addEventListener('click',()=>{state.directoryView=b.dataset.directoryView;renderDirectory({resetScroll:true})}));
-$('copyFa').addEventListener('click',()=>{const t=website().faTag||'';if(navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>toast('FAタグをコピーしたよ')).catch(()=>window.prompt('FAタグをコピー',t));else window.prompt('FAタグをコピー',t)});
+$('copySignalTag').addEventListener('click',()=>{const tag=communityTag();if(navigator.clipboard?.writeText)navigator.clipboard.writeText(tag).then(()=>toast('投稿用タグをコピーしたよ')).catch(()=>window.prompt('投稿用タグをコピー',tag));else window.prompt('投稿用タグをコピー',tag)});
 $('worldCards').addEventListener('click',e=>{const b=e.target.closest('[data-world]');if(b)openWorld(b.dataset.world)});
 $('worldDetailBack').onclick=()=>open('worldsPanel');
 $('worldDetailContent').addEventListener('click',e=>{

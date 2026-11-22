@@ -1146,3 +1146,23 @@ body.detail-open .hero-art-wrap{transition:transform 760ms cubic-bezier(.18,.73,
   /* PROFILE opens a side dossier; preserve the artwork's leftward transition. */
   body.detail-open #hero.hero .hero-art-wrap{right:40%;}
 }
+
+
+/* ABOUT / SHARE YOUR SIGNAL — compact community channel (approved B layout). */
+.about-signal{margin:22px 0 0;border:1px solid #697467;background:#1d2223;position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;min-height:118px;gap:19px;padding:19px 22px 20px 27px;overflow:hidden}
+.about-signal:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--acid)}
+.about-signal:after{content:"";position:absolute;right:0;top:0;bottom:0;width:90px;background:repeating-linear-gradient(-45deg,transparent 0 10px,#e7ff540b 10px 12px);pointer-events:none}
+.about-signal-copy,.about-signal-actions{position:relative;z-index:1;min-width:0}
+.about-signal-label{display:flex;align-items:center;gap:8px;color:var(--acid);font-size:10px;font-weight:850}
+.about-signal-live{display:inline-block;flex:none;width:7px;height:7px;border-radius:50%;background:var(--acid);box-shadow:0 0 0 3px #e7ff5426}
+.about-signal-main{display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;margin-top:10px}
+.about-signal-main strong{font:1000 clamp(22px,3.5vw,33px) var(--jpn);color:var(--acid);letter-spacing:-.05em;overflow-wrap:anywhere}
+.about-signal-main p{margin:0;font-size:12px;color:#d0d7d6;line-height:1.8;flex:1 1 210px;min-width:0}
+.about-signal-actions{display:flex;gap:6px;flex-shrink:0}
+.about-signal-actions button,.about-signal-actions a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #758274;background:#252b2d;color:#fff;text-decoration:none;padding:12px 13px;font:850 10px var(--mono);white-space:nowrap;min-height:40px;transition:background .2s,border-color .2s}
+.about-signal-actions button{background:var(--acid);border-color:var(--acid);color:#161819}
+.about-signal-actions button:hover{background:#fff;border-color:#fff}
+.about-signal-actions a:hover{background:#3b4540;border-color:var(--acid)}
+.about-signal-actions button:focus-visible,.about-signal-actions a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:940px){.about-signal{grid-template-columns:minmax(0,1fr);gap:14px}.about-signal-actions{justify-content:flex-start}}
+@media(max-width:620px){.about-signal{padding:20px 16px 19px 22px;gap:17px}.about-signal-label{font-size:9px}.about-signal-main{gap:6px}.about-signal-main strong{font-size:clamp(23px,6vw,29px)}.about-signal-main p{flex-basis:100%}.about-signal-actions{flex-wrap:wrap}.about-signal-actions button,.about-signal-actions a{padding:11px 12px}}
