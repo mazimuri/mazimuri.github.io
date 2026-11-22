@@ -35,6 +35,10 @@ async function inspect(width,height){
  }else await page.locator('#nav-index').click();
  await page.waitForFunction(()=>document.querySelector('#directory.open .cast-gallery-card')!==null,null,{timeout:14000});
  await page.evaluate(async()=>await Promise.all([...document.querySelectorAll('#directoryItems img')].map(el=>el.decode().catch(()=>{}))));
+ await page.waitForFunction(()=>{
+   const img=document.querySelector('#directoryItems .cast-gallery-card img');
+   return img?.naturalWidth>0;
+ },null,{timeout:20000});
  const tag=width+'x'+height;
  const read=()=>page.evaluate(()=>{
    const gallery=document.getElementById('directoryItems');
@@ -100,6 +104,7 @@ async function inspect(width,height){
  await page.locator('[data-directory-view="gallery"]').click();
  await page.waitForTimeout(100);
  // Search and filters remain active.
+ if(width<=800)await page.locator('#mobileFilterToggle').click();
  await page.locator('#search').fill('オルフェ');
  await page.waitForTimeout(90);
  assert.equal(await page.locator('#directoryItems .cast-gallery-card').count(),1,'Search stopped working');
@@ -117,11 +122,13 @@ async function inspect(width,height){
      el.classList.remove('is-current-cast');
      el.querySelector('.cast-gallery-current')?.remove();
      el.querySelector('.cast-gallery-number').textContent='FILE / '+String(i+1).padStart(3,'0');
+     el.querySelectorAll('img').forEach(img=>img.loading='eager');
      gallery.appendChild(el);
    }
    document.getElementById('allcastDeckTotal').textContent='48 / CHARACTER FILES (LAYOUT TEST)';
    document.getElementById('directoryCount').textContent='48 FILES MATCH';
  });
+  await page.evaluate(async()=>await Promise.all([...document.querySelectorAll('#directoryItems img')].slice(0,14).map(el=>el.decode().catch(()=>{}))));
   const many=await read();
   assert.equal(many.count,48,'48 file stress fixture failed');
   assert.ok(many.cols===6,'Density changed with more files');
