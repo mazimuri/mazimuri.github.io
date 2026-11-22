@@ -81,23 +81,33 @@
   transform:none!important;background:var(--accent,#f22)!important;
   clip-path:polygon(69% 0,90% 0,61% 100%,40% 100%)!important;
 }
+/* Geometry comes from the real #hero at this exact viewport/theme.
+   No second independently-maintained "72%" approximation. */
 #admin #artPreviewScene .hero-art-wrap{
-  position:absolute!important;left:18%!important;right:auto!important;bottom:-1.7%!important;
-  top:auto!important;width:72%!important;height:94%!important;z-index:6!important;
-  max-width:none!important;filter:none!important;pointer-events:none!important;
+  position:absolute!important;
+  left:var(--vstudio-art-left,17.3%)!important;
+  top:var(--vstudio-art-top,0px)!important;
+  right:auto!important;bottom:auto!important;
+  width:var(--vstudio-art-width,78.3%)!important;
+  height:var(--vstudio-art-height,97%)!important;
+  transform:var(--vstudio-art-transform,none)!important;
+  z-index:6!important;max-width:none!important;
+  filter:none!important;pointer-events:none!important;
 }
-#admin #artPreviewScene.theme-orphe .hero-art-wrap{height:106%!important;left:17.3%!important}
 #admin #artPreviewScene .hero-art{
-  display:block;width:100%!important;height:100%!important;object-fit:contain!important;
-  object-position:center bottom!important;
+  display:block;width:100%!important;height:100%!important;
+  object-fit:var(--vstudio-art-fit,contain)!important;
+  object-position:var(--vstudio-art-position,center bottom)!important;
   transform:translate(var(--art-x,0%),var(--art-y,0%)) scale(var(--art-zoom,1))!important;
-  transform-origin:center bottom!important;
+  transform-origin:var(--vstudio-art-origin,50% 80%)!important;
 }
 #admin #artStage #artPreviewBadge{
   display:block!important;position:absolute!important;z-index:20!important;
-  width:clamp(83px,7.8vw,151px)!important;height:clamp(83px,7.8vw,151px)!important;
-  left:auto!important;right:calc(var(--badge-right,17%) + 14%)!important;
-  top:calc(var(--badge-top,10%) - 2%)!important;
+  left:var(--vstudio-badge-left,0px)!important;
+  top:var(--vstudio-badge-top,0px)!important;
+  right:auto!important;bottom:auto!important;
+  width:var(--vstudio-badge-width,clamp(83px,7.8vw,151px))!important;
+  height:var(--vstudio-badge-height,clamp(83px,7.8vw,151px))!important;
   background:transparent!important;border:0!important;border-radius:0!important;
   color:white!important;box-shadow:none!important;transform:none!important;
   cursor:grab!important;touch-action:none!important;pointer-events:auto!important;
@@ -131,24 +141,18 @@
 #admin #artPreviewBadge .v7-stamp-corner.bl{bottom:1%;left:1%;border-bottom-width:2px;border-left-width:2px}
 #admin #artPreviewBadge .v7-stamp-corner.br{bottom:1%;right:1%;border-bottom-width:2px;border-right-width:2px}
 #admin #artStage .art-stage-top{z-index:30}
-@media (min-width:1660px){
- #admin #artStage #artPreviewBadge{top:calc(var(--badge-top,10%) - 3.5%)!important}
-}
+/* In public MOBILE SELECT, artPosition transform is disabled and
+   the FILE badge is hidden. The editor must not imply otherwise. */
+#admin .vstudio-mobile-note{display:none}
 @media(max-width:800px){
  #admin .v15-crop-rail-visual{flex-wrap:wrap}
- #admin #artPreviewScene .hero-art-wrap{
-  left:0!important;width:100%!important;height:calc(100% - 153px)!important;
-  bottom:125px!important;
- }
- #admin #artStage #artPreviewBadge{
-  right:var(--badge-mobile-right,8%)!important;top:var(--badge-mobile-top,66%)!important;
-  left:auto!important;width:90px!important;height:90px!important;
- }
- #admin #artPreviewBadge .v7-stamp-detail{display:none!important}
- #admin #artPreviewBadge .v7-stamp-original{display:block!important}
- #admin #artStage #artPreviewBadge{
-  background:var(--accent)!important;border:2px solid var(--deep)!important;
-  border-radius:50%!important;color:var(--deep)!important;
+ #admin #artPreviewScene .hero-art{transform:none!important}
+ #admin #artStage #artPreviewBadge{display:none!important;pointer-events:none!important}
+ #admin .art-badge-control{display:none!important}
+ #admin .vstudio-mobile-note{
+  display:block;margin:9px 0 14px;padding:10px 12px;
+  background:#252a2d;border-left:3px solid #eaff54;
+  color:#e2e7dc;font:700 11px/1.65 var(--jpn);
  }
 }
 
