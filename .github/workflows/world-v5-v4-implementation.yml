@@ -1,0 +1,35 @@
+name: WORLD V5 + V4 implementation check
+on:
+  push:
+    branches: [feat/world-v5-select-v4-detail-integration]
+    paths:
+      - index.html
+      - admin.html
+      - app.js
+      - cast-worlds-current.css
+      - tests/world-v5-v4-implementation.mjs
+      - .github/workflows/world-v5-v4-implementation.yml
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: node --check app.js && node --check tests/world-v5-v4-implementation.mjs
+      - name: Install Chromium and Playwright
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Verify published WORLD data and navigation in desktop/mobile
+        run: node tests/world-v5-v4-implementation.mjs
+      - name: Attach screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-v5-v4-real-site-screenshots
+          path: worlds-v5-v4-implementation-review/*
+          if-no-files-found: ignore
