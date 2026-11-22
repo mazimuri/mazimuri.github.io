@@ -650,6 +650,7 @@
   #worldDetailPanel .world-detail-section-title p{color:#b9c6c3}
   #worldDetailPanel .world-story-list{grid-template-columns:1fr;gap:14px}
   #worldDetailPanel .world-story-entry{
+    display:flex;flex-direction:column;
     background:#e5e6df;border:2px solid #151d20;border-bottom:5px solid #151d20;
     box-shadow:3px 4px 0 #05090a;
   }
