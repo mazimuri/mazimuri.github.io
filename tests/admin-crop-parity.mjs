@@ -9,13 +9,13 @@ const js=read('admin.js'),css=read('admin-v15-studio.css'),html=read('admin.html
 const prod=read('cast-rail-current.css'),mobile=read('mobile.css'),all=read('cast-allcast-current.css');
 new Function(js); // Syntax only; do not execute browser code in Node.
 assert.match(js,/mode==='choose'\?frame\.querySelector\('\.v15-rail-inner'\):frame/);
-assert.match(js,/centerOrigin=mode==='mobile'/);
+assert.match(js,/fixedOrigin=mode==='mobile'/);
 assert.match(js,/--v15-live-card-ratio/);
 assert.match(css,/\.crop-canvas\.crop-picker-mode \.v15-rail-inner img\[data-crop-render\]/);
 assert.match(css,/\.crop-rail-frame \.v15-rail-inner img\[data-crop-render\]/);
 assert.match(css,/transform:skewX\(11deg\) scale\(1\.15\) scale\(var\(--crop-zoom,1\)\)!important/);
 assert.match(prod,/transform:skewX\(11deg\) scale\(1\.15\) scale\(var\(--crop-zoom,1\)\)!important/);
-assert.match(css,/transform-origin:50% 50%!important/);
+assert.match(css,/transform-origin:0 0!important/);
 assert.match(mobile,/\.mobile-portrait img\{/);
 assert.match(css,/\.crop-gallery-frame\{aspect-ratio:1!important\}/);
 assert.match(all,/--allcast-portrait-h:/);
@@ -105,7 +105,7 @@ if(process.argv.includes('--browser')){
     for(const entry of mob.origin){
       if(!entry.normalized)continue; // Browser fixture may hide the mobile-only public rail.
       for(const axis of entry.normalized)
-        assert.ok(Math.abs(axis-.5)<.002,'MOBILE centered zoom origin mismatch: '+JSON.stringify(mob.origin));
+        assert.ok(Math.abs(axis)<.002,'MOBILE top-left zoom origin mismatch: '+JSON.stringify(mob.origin));
     }
     assert.ok(mob.origin.slice(1).every(entry=>entry.normalized),
       'Both editor mobile previews must remain measurable');
