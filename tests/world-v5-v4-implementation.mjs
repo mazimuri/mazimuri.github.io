@@ -6,6 +6,7 @@ const assets={
   'index.html':readFileSync('index.html','utf8'),
   'app.js':readFileSync('app.js','utf8'),
   'cast-worlds-current.css':readFileSync('cast-worlds-current.css','utf8'),
+  'cast-view-adjustments.css':readFileSync('cast-view-adjustments.css','utf8'),
 };
 const out='worlds-v5-v4-implementation-review';
 mkdirSync(out,{recursive:true});
@@ -17,7 +18,7 @@ async function prepare(width,height){
  const errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.route(SITE,r=>r.fulfill({status:200,contentType:'text/html; charset=utf-8',body:assets['index.html']}));
- for(const name of ['app.js','cast-worlds-current.css']){
+ for(const name of ['app.js','cast-worlds-current.css','cast-view-adjustments.css']){
    await page.route('**/'+name+'*',r=>r.fulfill({status:200,contentType:name.endsWith('.css')?'text/css':'text/javascript',body:assets[name]}));
  }
  await page.goto(SITE,{waitUntil:'domcontentloaded',timeout:60000});
