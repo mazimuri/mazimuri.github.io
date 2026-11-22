@@ -1,0 +1,513 @@
+/* CAST // SIGNAL | WORLD SYSTEM V2 — COMPACT + ZZZ
+   Proposal only; only Playwright study loads this file. Not in index/admin.
+   Principle: scan 3 WORLD choices in 1st viewport, understand WORLD first,
+   then explore MAIN/SIDE stories and character network. No data model changes. */
+
+@media(min-width:801px) {
+  #worldsPanel .directory-head,
+  #worldDetailPanel .directory-head {
+    min-height:54px;height:54px;
+    background:#101315;border-bottom:2px solid #485255;
+  }
+
+  /* WORLD SELECT: dense 3-column grid. Character art supplies palette;
+     system UI uses black / graphite / white / lime-yellow. */
+  #worldsPanel .directory-content {
+    position:relative;isolation:isolate;
+    padding:clamp(20px,1.85vw,35px) clamp(28px,4.15vw,100px) 70px;
+    background:
+      repeating-linear-gradient(90deg,transparent 0 79px,#ffffff08 79px 80px),
+      repeating-linear-gradient(0deg,transparent 0 79px,#ffffff07 79px 80px),
+      radial-gradient(ellipse at 90% 0%,#42525830,transparent 50%),
+      #11171a;
+  }
+  #worldsPanel .directory-content::before {
+    content:"03";z-index:-1;position:absolute;
+    top:10px;right:4vw;
+    font:1000 clamp(160px,17vw,330px)/.8 var(--sans);
+    color:#eaf4ed;opacity:.024;pointer-events:none;
+  }
+  #worldsPanel .directory-kicker {
+    display:flex;align-items:center;gap:10px;
+    font:900 clamp(9px,.65vw,12px)/1 var(--mono);
+    letter-spacing:.12em;color:#ebff57;
+  }
+  #worldsPanel .directory-kicker::before {
+    content:"";width:28px;height:4px;
+    background:#ebff57;transform:skew(-23deg);
+  }
+  #worldsPanel .directory-content h2 {
+    font:1000 clamp(68px,5.35vw,137px)/.86 var(--sans);
+    letter-spacing:-.085em;margin:10px 0 11px;
+  }
+  #worldsPanel .directory-content h2 i {
+    color:transparent;-webkit-text-stroke:1.7px #fafdf6;
+  }
+  #worldsPanel .worlds-intro {
+    margin:0;color:#c7d2d0;font-weight:700;
+    font-size:clamp(12px,.8vw,15px);line-height:1.5;
+    border-bottom:1px solid #566164;
+    padding-bottom:11px;max-width:750px;
+  }
+  #worldsPanel .world-cards {
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    align-items:stretch;gap:clamp(10px,.9vw,22px);
+    width:100%;max-width:2360px;
+    margin:clamp(19px,1.45vw,32px) auto 0;
+  }
+  #worldsPanel .world-card,
+  #worldsPanel .world-card.has-cover {
+    position:relative;isolation:isolate;box-sizing:border-box;
+    display:flex;flex-direction:column;justify-content:flex-start;
+    width:100%;height:auto;
+    min-height:clamp(286px,18.8vw,470px);
+    padding:clamp(19px,1.55vw,38px);
+    border:3px solid #0c1115;
+    outline:2px solid #526066;outline-offset:-7px;
+    border-radius:13px 3px 16px 3px;
+    background:linear-gradient(130deg,#20292e,#111619);
+    box-shadow:7px 8px 0 #05090b;
+    color:#f9faf8;
+    text-align:left;
+    transform:none;overflow:hidden;
+    transition:transform .18s,border-color .18s,outline-color .18s,box-shadow .18s;
+  }
+  #worldsPanel .world-card:only-child {
+    grid-column:auto;min-height:clamp(286px,18.8vw,470px);
+    padding:clamp(19px,1.55vw,38px);
+  }
+  #worldsPanel .world-card:hover,#worldsPanel .world-card:focus-visible {
+    z-index:2;transform:translateY(-3px);
+    border-color:#eaff54;outline-color:#eaff54;
+    box-shadow:7px 8px 0 #06090b,0 0 0 2px #eaff54;
+  }
+  #worldsPanel .world-card::before {
+    content:"";position:absolute;z-index:3;
+    left:0;top:auto;bottom:0;right:auto;
+    width:clamp(88px,10vw,190px);height:5px;
+    background:#edff56;opacity:1;transform:none;pointer-events:none;
+  }
+  #worldsPanel .world-card::after {
+    content:"SIGNAL // READY";
+    position:absolute;left:clamp(19px,1.55vw,38px);bottom:13px;
+    font:850 clamp(8px,.52vw,11px)/1 var(--mono);
+    letter-spacing:.12em;color:#b0c1be;pointer-events:none;
+  }
+  #worldsPanel .world-card-image {
+    z-index:-1;inset:0;
+    background:#222b2e;
+  }
+  #worldsPanel .world-card-image::after {
+    background:linear-gradient(90deg,
+      #11171afc 0%,#11171af4 28%,#11171ad1 52%,#11171a70 77%,#11171a22 100%),
+      linear-gradient(0deg,#090c0ea6 0%,transparent 48%);
+  }
+  #worldsPanel .world-card-image .world-bg {
+    width:100%;height:100%;opacity:.56;
+    filter:blur(16px) saturate(.65) brightness(.62);
+    transform:scale(1.1);
+  }
+  #worldsPanel .world-card-image .world-figure {
+    height:103%;width:81%;right:-15%;left:auto;bottom:-1%;
+    object-fit:contain;object-position:right bottom;
+    transform:none;filter:drop-shadow(4px 12px 14px #0007);
+    transition:transform .28s;
+  }
+  #worldsPanel .world-card.has-cover:hover .world-figure {
+    transform:translateX(-2%) scale(1.04);
+  }
+  #worldsPanel .world-card.no-cover {
+    background:
+      linear-gradient(120deg,#111a1e 0%,#1d282c 55%,#273339 100%);
+  }
+  #worldsPanel .world-card.no-cover::after {
+    content:"FILE // NO VISUAL REGISTERED";
+  }
+  #worldsPanel .world-top {
+    position:relative;z-index:3;
+    order:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+    margin:0 0 clamp(27px,3.25vw,76px);
+    width:100%;
+    color:#eaff54!important;
+    font:900 clamp(10px,.67vw,15px)/1.4 var(--mono)!important;
+    letter-spacing:.06em;text-shadow:0 2px 5px #0007;
+  }
+  #worldsPanel .world-top::before {
+    content:"◆";font-size:clamp(8px,.48vw,10px);
+  }
+  #worldsPanel .world-card strong,
+  #worldsPanel .world-card.has-cover strong,
+  #worldsPanel .world-card:only-child strong {
+    position:relative;z-index:3;order:1;
+    display:block;width:72%;max-width:72%;
+    margin:0;overflow-wrap:anywhere;
+    font:1000 clamp(30px,2.25vw,58px)/1.12 var(--jpn);
+    letter-spacing:-.055em;color:#fff;
+    text-shadow:0 2px 13px #000a;
+  }
+  #worldsPanel .world-card small,
+  #worldsPanel .world-card.has-cover small {
+    order:2;position:relative;z-index:3;
+    display:block;width:72%;max-width:72%;
+    margin:clamp(11px,.95vw,20px) 0 0;
+    font:900 clamp(9px,.61vw,13px)/1.55 var(--mono);
+    color:#e2eeea;letter-spacing:0;
+    text-shadow:0 2px 6px #0008;
+  }
+  #worldsPanel .world-excerpt,
+  #worldsPanel .world-card.has-cover .world-excerpt {
+    position:relative;z-index:3;order:3;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+    overflow:hidden;
+    width:67%;max-width:67%;
+    margin:clamp(9px,.85vw,17px) 0 0;
+    color:#d0d9d6;
+    font:650 clamp(10px,.72vw,14px)/1.55 var(--jpn);
+    text-shadow:0 2px 6px #0008;
+  }
+  #worldsPanel .world-arrow,
+  #worldsPanel .world-card.has-cover .world-arrow {
+    position:absolute;z-index:5;
+    right:clamp(11px,1vw,25px);bottom:clamp(17px,1.3vw,30px);
+    display:flex;align-items:center;justify-content:space-between;
+    gap:11px;
+    width:auto;min-width:clamp(132px,9vw,210px);
+    height:clamp(35px,2.6vw,53px);
+    padding:0 clamp(11px,.85vw,19px);
+    border:0;
+    color:#101516!important;background:#edff55!important;
+    clip-path:polygon(0 0,100% 0,100% 80%,93% 100%,0 100%)!important;
+    font:1000 clamp(20px,1.4vw,30px)/1 var(--sans)!important;
+  }
+  #worldsPanel .world-arrow::before {
+    content:"EXPLORE";font:1000 clamp(10px,.68vw,15px)/1 var(--sans);
+    letter-spacing:.025em;
+  }
+  #worldsPanel .world-card:hover .world-arrow{background:#fff!important}
+  #worldsPanel .world-badges .zeta-badge,
+  #worldsPanel .world-badges .cast-new {
+    font-size:clamp(8px,.51vw,11px);padding:3px 6px;
+    text-shadow:none;border:0;color:#12191a;background:#eaff55;
+  }
+  #worldsPanel .world-badges .cast-new{background:#ff6378}
+
+  /* WORLD DETAIL: world introduction first, then featured PLAY paths. */
+  #worldDetailPanel .world-detail-content{
+    color:#f1f5ef;background:
+      repeating-linear-gradient(90deg,#ffffff06 0 1px,transparent 1px 85px),
+      #151b1f;
+  }
+  #worldDetailPanel .world-detail-hero {
+    min-height:clamp(255px,14.2vw,365px);
+    background:#10181b;border-bottom:5px solid #eaff56;
+  }
+  #worldDetailPanel .world-detail-hero::before{
+    background:linear-gradient(90deg,
+      #101519 0%,#101519fb 28%,#101519ea 50%,#1015198c 72%,#10151940 100%);
+  }
+  #worldDetailPanel .world-detail-hero::after{
+    top:-40%;right:26%;width:10vw;height:180%;
+    transform:skewX(-25deg);opacity:.16;background:#eaff55;
+  }
+  #worldDetailPanel .world-detail-backdrop img{
+    right:-2%;bottom:-9%;
+    width:clamp(330px,42vw,950px);height:120%;
+    object-fit:contain;object-position:right bottom;
+    filter:drop-shadow(8px 12px 15px #0007);
+  }
+  #worldDetailPanel .world-detail-hero-content{
+    max-width:70%;
+    padding:clamp(22px,1.75vw,44px) clamp(32px,4.3vw,100px);
+    display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  }
+  #worldDetailPanel .world-detail-kicker{
+    font:900 clamp(9px,.62vw,13px)/1.4 var(--mono);
+    letter-spacing:.08em;color:#eaff55;
+  }
+  #worldDetailPanel .world-detail-badges{min-height:0;margin:5px 0 0}
+  #worldDetailPanel .world-detail-hero h2{
+    font:1000 clamp(46px,4.05vw,98px)/1 var(--jpn);
+    letter-spacing:-.07em;color:white;
+    margin:clamp(9px,.8vw,16px) 0 clamp(8px,.75vw,17px);
+  }
+  #worldDetailPanel .world-detail-subtitle{
+    display:inline-block;transform:skew(-5deg);
+    padding:clamp(4px,.39vw,9px) 12px;
+    background:#edff56;color:#131b1d;
+    font:950 clamp(11px,.75vw,16px)/1.2 var(--jpn);
+  }
+  #worldDetailPanel .world-detail-hero p{
+    max-width:680px;
+    margin:clamp(12px,.85vw,19px) 0 0;
+    padding:clamp(9px,.65vw,16px) clamp(12px,1vw,22px);
+    border-left:4px solid #eaff55;
+    background:#050c0ea1;
+    color:#f0f5ee;
+    font:750 clamp(11px,.81vw,17px)/1.62 var(--jpn);
+  }
+  #worldDetailPanel .world-detail-stats{
+    display:flex;gap:16px;margin-top:clamp(11px,1vw,22px);
+    color:#e5eeeb;font-size:clamp(10px,.67vw,14px);
+  }
+  #worldDetailPanel .world-detail-stats span::before{color:#eaff56}
+  #worldDetailPanel .world-detail-main {
+    max-width:1900px;
+    padding:clamp(20px,1.7vw,43px) clamp(30px,4.2vw,100px) 90px;
+    color:#f2f4ee;background:transparent;
+    margin:auto;
+  }
+  #worldDetailPanel .world-detail-section-title {
+    margin-bottom:clamp(11px,1.05vw,23px);
+    padding-bottom:clamp(10px,.7vw,18px);
+    gap:4px;border-bottom:2px solid #5a696b;
+    flex-direction:column;
+  }
+  #worldDetailPanel .world-detail-section-title>.mono{
+    font:900 clamp(9px,.55vw,13px)/1.3 var(--mono);
+    color:#dff256;
+  }
+  #worldDetailPanel .world-detail-section-title h3{
+    color:#fff;margin:0;
+    font:1000 clamp(33px,3vw,68px)/1 var(--sans);
+    letter-spacing:-.07em;
+  }
+  #worldDetailPanel .world-detail-section-title h3 i {
+    color:transparent;-webkit-text-stroke:1.5px #f4faf2;
+  }
+  #worldDetailPanel .world-detail-section-title p{
+    color:#aebcb9;font-weight:700;font-size:clamp(11px,.72vw,14px);
+  }
+  #worldDetailPanel .world-story-list{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(11px,.9vw,20px);align-items:stretch;
+  }
+  #worldDetailPanel .world-story-entry{
+    min-width:0;display:flex;flex-direction:column;
+    border:2px solid #2e3b40;
+    border-left:0;border-bottom:4px solid #606d71;
+    background:#192226;
+    box-shadow:4px 5px 0 #02050780;
+    transition:transform .18s,border-bottom-color .18s;
+  }
+  #worldDetailPanel .world-story-entry:hover{transform:translateY(-2px)}
+  #worldDetailPanel .world-story-entry:first-child{
+    grid-column:1/-1;
+    display:grid;grid-template-columns:minmax(0,1.24fr) minmax(0,.76fr);
+    border-bottom-color:#eaff55;min-height:150px;
+    background:#1b2528;
+  }
+  #worldDetailPanel .world-story-entry:first-child .world-story-item {
+    grid-column:1;grid-row:1;
+  }
+  #worldDetailPanel .world-story-entry:first-child .world-story-cast {
+    grid-column:2;grid-row:1;
+    border-bottom:0;border-left:1px solid #4b5b5e;
+  }
+  #worldDetailPanel .world-story-cast{
+    flex:0 0 auto;
+    padding:9px clamp(11px,.8vw,20px);
+    min-height:76px;display:flex;align-items:center;gap:11px;
+    background:#263035;border-bottom:1px solid #46555a;
+  }
+  #worldDetailPanel .world-story-cast-caption{
+    display:flex;flex-direction:column;
+    flex:0 0 clamp(100px,7.8vw,155px);gap:4px;
+    color:#eaff55;font:900 clamp(9px,.57vw,13px)/1.2 var(--mono);
+  }
+  #worldDetailPanel .world-story-cast-caption small{
+    color:#b9c5c2;font-size:10px;
+  }
+  #worldDetailPanel .world-story-cast-faces{gap:clamp(6px,.55vw,12px)}
+  #worldDetailPanel .world-story-avatar{
+    width:clamp(56px,4.5vw,84px);flex-basis:clamp(56px,4.5vw,84px);
+    height:auto;min-height:63px;background:none;border:0;box-shadow:none;
+    padding:0;overflow:visible;
+  }
+  #worldDetailPanel .world-story-avatar-portrait{
+    width:clamp(43px,3.2vw,65px);
+    height:clamp(43px,3.2vw,65px);
+    flex-basis:clamp(43px,3.2vw,65px);
+    border:2px solid #fff;box-shadow:0 0 0 1px #7b8b89;
+  }
+  #worldDetailPanel .world-story-avatar-name{
+    color:#edf3ed;font-size:clamp(9px,.58vw,12px);
+    line-height:1.25;
+  }
+  #worldDetailPanel .world-story-item{
+    min-width:0;flex:1;min-height:clamp(79px,6vw,126px);
+    margin:0;padding:clamp(12px,.95vw,22px);
+    display:flex;align-items:center;gap:clamp(11px,.9vw,20px);
+    color:#fff;background:#192226;border:0;
+    text-decoration:none;
+  }
+  #worldDetailPanel .world-story-item.clickable:hover{
+    background:#29363a;transform:none;
+  }
+  #worldDetailPanel .world-story-num{
+    color:#eaff55;
+    font:1000 clamp(26px,2.05vw,46px)/1 var(--sans);
+  }
+  #worldDetailPanel .world-story-info small{
+    font:900 clamp(9px,.62vw,13px)/1 var(--mono);
+    color:#eaff55;letter-spacing:.07em;margin-bottom:6px;
+  }
+  #worldDetailPanel .world-story-info b{
+    color:#f5f6f1;
+    font:950 clamp(13px,.93vw,20px)/1.42 var(--jpn);
+  }
+  #worldDetailPanel .world-story-entry:first-child .world-story-info b{
+    font-size:clamp(16px,1.2vw,26px);
+  }
+  #worldDetailPanel .world-story-info p{color:#c0cdca}
+  #worldDetailPanel .world-story-arrow{
+    display:flex;align-items:center;gap:8px;flex:0 0 auto;
+    color:#eaff55;font:900 clamp(20px,1.4vw,32px)/1 var(--sans);
+  }
+  #worldDetailPanel .world-story-item.clickable .world-story-arrow::before{
+    content:"OPEN STORY";
+    font:950 clamp(8px,.56vw,12px)/1 var(--mono);
+    color:#f2f9e9;letter-spacing:.06em;
+  }
+  #worldDetailPanel .world-story-entry:first-child .world-story-item.clickable .world-story-arrow::before{
+    content:"PLAY MAIN STORY";
+    color:#eaff55;
+  }
+  #worldDetailPanel .world-detail-section-title.cast-section{
+    margin-top:clamp(24px,2.6vw,55px);
+  }
+  #worldDetailPanel .world-cast-grid {
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:clamp(10px,.85vw,18px);
+  }
+  #worldDetailPanel .world-cast-card {
+    min-width:0;min-height:116px;
+    color:#eaf1ec;background:#232d31;
+    border:1px solid #566367;border-bottom:3px solid #627073;
+    gap:10px;box-shadow:3px 4px 0 #0008;
+    transition:transform .2s,border-color .2s;
+  }
+  #worldDetailPanel .world-cast-card:hover,#worldDetailPanel .world-cast-card:focus-visible{
+    transform:translateY(-3px);border-color:#eaff55;
+    border-bottom-color:#eaff55;outline:0;
+  }
+  #worldDetailPanel .world-cast-visual{
+    flex:0 0 clamp(82px,7vw,135px);width:clamp(82px,7vw,135px);
+    height:auto;min-height:116px;border-right:2px solid #445256;
+  }
+  #worldDetailPanel .world-cast-info{gap:8px;min-width:0;padding:8px}
+  #worldDetailPanel .world-cast-info small{color:#eaff55;font-size:9px}
+  #worldDetailPanel .world-cast-info strong{color:white;font-size:clamp(12px,.84vw,17px)}
+  #worldDetailPanel .world-cast-info em{color:#b9c6c2}
+  #worldDetailPanel .world-primary-link{
+    color:#131719;background:#eaff55;box-shadow:4px 4px 0 #000;
+  }
+  #worldDetailPanel .world-detail-foot{color:#aab7b5;border-color:#556265}
+}
+@media(min-width:801px) and (max-width:1200px){
+  #worldsPanel .world-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #worldsPanel .world-card,
+  #worldsPanel .world-card.has-cover{min-height:320px}
+  #worldDetailPanel .world-story-list{grid-template-columns:1fr}
+  #worldDetailPanel .world-cast-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #worldDetailPanel .world-detail-hero-content{max-width:75%}
+}
+/* Mobile retains familiar 1-column navigation with new compact hierarchy */
+@media(max-width:800px) {
+  #worldsPanel .directory-content{
+    padding:24px 17px 60px;
+    background:radial-gradient(ellipse at 90% 0%,#48596030,transparent 45%),#101619;
+  }
+  #worldsPanel .directory-content h2{
+    font-size:clamp(55px,11.5vw,87px);margin:10px 0 13px;
+  }
+  #worldsPanel .world-cards{gap:12px;margin-top:19px}
+  #worldsPanel .world-card,
+  #worldsPanel .world-card.has-cover{
+    min-height:270px;max-height:none;
+    padding:19px 18px 49px;
+    border:2px solid #48565a;border-radius:11px 2px 13px 2px;
+    background:#171e21;box-shadow:4px 5px 0 #060a0c;
+  }
+  #worldsPanel .world-card::before{
+    content:"";position:absolute;top:auto;bottom:0;left:0;right:auto;
+    width:40%;height:5px;background:#eaff55;
+    opacity:1;transform:none;z-index:3;
+  }
+  #worldsPanel .world-card-image::after{
+    background:linear-gradient(90deg,#111619f5,#111619a0 74%,#11161944),linear-gradient(0deg,#090d1099,transparent 75%);
+  }
+  #worldsPanel .world-card-image .world-figure{
+    width:76%;height:100%;right:-11%;left:auto;bottom:0;
+    object-fit:contain;object-position:right bottom;opacity:.88;
+  }
+  #worldsPanel .world-top{color:#eaff55!important;margin-bottom:24px}
+  #worldsPanel .world-card strong,
+  #worldsPanel .world-card.has-cover strong{font-size:clamp(31px,7vw,48px);max-width:73%;line-height:1.13}
+  #worldsPanel .world-card small,
+  #worldsPanel .world-card.has-cover small{
+    font-size:10px;max-width:72%;margin-top:10px;
+  }
+  #worldsPanel .world-excerpt,
+  #worldsPanel .world-card.has-cover .world-excerpt{
+    font-size:10px;line-height:1.6;max-width:70%;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  #worldsPanel .world-arrow,#worldsPanel .world-card.has-cover .world-arrow{
+    display:flex;align-items:center;gap:9px;
+    min-width:0;right:12px;bottom:12px;
+    padding:6px 12px;
+    color:#13191a!important;background:#eaff55!important;
+    font-size:24px!important;
+  }
+  #worldsPanel .world-arrow::before{
+    content:"EXPLORE";font:950 10px/1 var(--sans);
+  }
+  #worldDetailPanel .world-detail-content{background:#151d21}
+  #worldDetailPanel .world-detail-hero{
+    min-height:290px;border-bottom:5px solid #eaff55;
+    background:#10191c;
+  }
+  #worldDetailPanel .world-detail-hero:before{
+    background:linear-gradient(90deg,#111719fc,#111719e5 60%,#11171960 100%);
+  }
+  #worldDetailPanel .world-detail-backdrop img{
+    width:75%;height:100%;right:-26%;bottom:0;opacity:.52;
+  }
+  #worldDetailPanel .world-detail-hero-content{max-width:100%;padding:20px 20px 22px}
+  #worldDetailPanel .world-detail-hero h2{
+    font-size:clamp(39px,10vw,65px);
+    line-height:1.02;margin:11px 0 10px;max-width:78%;
+  }
+  #worldDetailPanel .world-detail-subtitle{
+    color:#111b1b;background:#eaff55;
+    font-size:11px;padding:5px 9px;
+  }
+  #worldDetailPanel .world-detail-hero p{
+    font-size:11px;line-height:1.65;
+    border-left:3px solid #eaff55;
+    padding:7px 10px;background:#0a1014c9;
+    max-width:79%;margin-top:12px;
+  }
+  #worldDetailPanel .world-detail-stats{gap:12px;margin-top:12px}
+  #worldDetailPanel .world-detail-main{color:#f2f6f3;background:#151d21;padding:21px 17px 65px}
+  #worldDetailPanel .world-detail-section-title{border-bottom:2px solid #566367}
+  #worldDetailPanel .world-detail-section-title h3{font-size:clamp(32px,9vw,45px);color:#fff}
+  #worldDetailPanel .world-detail-section-title h3 i{-webkit-text-stroke:1px white}
+  #worldDetailPanel .world-detail-section-title>.mono{color:#eaff55}
+  #worldDetailPanel .world-detail-section-title p{color:#b4c1bf}
+  #worldDetailPanel .world-story-entry{border:1px solid #3b494b;border-bottom:4px solid #657274;background:#1d2629;margin-bottom:10px}
+  #worldDetailPanel .world-story-entry:first-child{border-bottom-color:#eaff55}
+  #worldDetailPanel .world-story-cast{background:#253034;padding:9px 12px}
+  #worldDetailPanel .world-story-item{background:#1a2226;min-height:82px}
+  #worldDetailPanel .world-story-num{color:#eaff55}
+  #worldDetailPanel .world-story-info small{color:#eaff55}
+  #worldDetailPanel .world-story-info b{color:white}
+  #worldDetailPanel .world-story-arrow{color:#eaff55}
+  #worldDetailPanel .world-cast-card{color:white;background:#253034;border:1px solid #566468;border-bottom:3px solid #657274}
+  #worldDetailPanel .world-cast-card:hover{border-color:#eaff55}
+  #worldDetailPanel .world-cast-info small{color:#eaff55}
+  #worldDetailPanel .world-cast-info strong{color:white}
+  #worldDetailPanel .world-cast-info em{color:#bdcbc6}
+  #worldDetailPanel .world-detail-foot{color:#a6b5b0}
+}
