@@ -543,7 +543,7 @@
  .mobile-portrait-track{display:flex;align-items:center;gap:7px;height:57px;width:max-content;margin:0 auto}
  .mobile-portrait{position:relative;flex:0 0 53px;width:53px;height:54px;cursor:pointer;border:0;padding:3px;background:#090a0c;clip-path:polygon(13% 0,100% 0,87% 100%,0 100%);scroll-snap-align:center;transition:transform .18s}
  .mobile-portrait>span{display:block;width:100%;height:100%;position:relative;overflow:hidden;clip-path:polygon(13% 0,100% 0,87% 100%,0 100%);background:#26292c}
- .mobile-portrait img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:var(--crop-x,50%) var(--crop-y,30%)!important;transform:scale(var(--crop-zoom,1))!important;display:block}
+ .mobile-portrait img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:var(--crop-x,50%) var(--crop-y,30%)!important;transform:scale(var(--crop-zoom,1))!important;transform-origin:var(--crop-x,50%) var(--crop-y,50%)!important;display:block}
  .mobile-portrait[aria-selected=true]{background:var(--portrait-accent);transform:translateY(-1px);height:56px}
  .mobile-portrait:not([aria-selected=true]) img{filter:saturate(.8) brightness(.78)}
  .mobile-portrait:focus-visible{outline:2px solid var(--acid);outline-offset:2px}
