@@ -78,7 +78,7 @@
   box-shadow:8px 9px 0 #05080a,0 0 0 3px var(--ws-lime);
 }
 #worldsPanel .ws5-visual{
-  position:relative;flex:0 0 58%;height:58%;
+  position:relative;flex:0 0 52%;height:52%;
   overflow:hidden;background:#1c2529;color:white;
 }
 #worldsPanel .ws5-visual:before{
@@ -180,6 +180,7 @@
   font:1000 clamp(26px,1.95vw,48px)/1.1 var(--jpn);
   letter-spacing:-.05em;color:#13191c;
   overflow-wrap:anywhere;max-width:100%;
+  text-shadow:none!important;
 }
 #worldsPanel .ws5-summary{
   margin:clamp(8px,.55vw,14px) 0 0;
@@ -241,9 +242,9 @@
   background:var(--ws-coral);opacity:.93;transform:skewX(-22deg);
 }
 #worldDetailPanel .wd4-hero .world-detail-backdrop img{
-  position:absolute;right:10%;bottom:-15%;
-  height:135%;width:clamp(150px,18vw,440px);
-  object-fit:cover;object-position:center;
+  position:absolute;right:10%;bottom:-83%;
+  height:200%;width:auto;max-width:none;
+  object-fit:contain;object-position:center;
   mask-image:linear-gradient(90deg,transparent 0%,#000 22%,#000 80%,transparent 100%);
   opacity:.74;
 }
@@ -488,9 +489,9 @@
 
 #worldDetailPanel .world-story-entry.wd4-side-story .world-story-item{
   display:grid;grid-template-columns:auto minmax(0,1fr);
-  min-height:clamp(135px,8.5vw,204px);
+  min-height:clamp(94px,5.2vw,132px);
   align-items:start;
-  padding-bottom:clamp(49px,3.5vw,72px);
+  padding-bottom:clamp(14px,.96vw,24px);
 }
 #worldDetailPanel .world-story-entry.wd4-side-story .world-story-num{
   min-width:42px;width:42px;height:47px;
@@ -513,7 +514,7 @@
 }
 #worldDetailPanel .world-story-entry.wd4-side-story .world-story-cast{
   position:relative;
-  min-height:56px;padding:8px 12px;
+  flex:0 0 auto;min-height:60px;padding:7px 12px;
   gap:10px;
 }
 #worldDetailPanel .world-story-cast-caption{
