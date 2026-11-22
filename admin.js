@@ -53,7 +53,7 @@ function renderDashboard(){const d=doc(),active=d.characters.filter(c=>c.publish
 function renderRows(reorder=true){const d=doc();return d.characters.map((c,i)=>`<div class="admin-row" draggable="${reorder}" data-drag-id="${esc(c.id)}"><span class="drag-handle" title="ドラッグして移動">⠿</span><span class="row-number">${String(i+1).padStart(3,'0')}</span><img class="row-art" src="${esc(c.icon||c.artwork||'')}" alt=""><div class="row-desc"><strong>${esc(c.name||'名前未定')}${c.playable?'<b class="tiny-zeta">zeta</b>':''}</strong><small>${esc(c.roman||'UNNAMED')} / ${c.published===false?'DRAFT ONLY':'公開対象'}</small></div><div class="row-actions">${btn('move-up','↑','small',`data-id="${esc(c.id)}" title="上へ"`)}${btn('move-down','↓','small',`data-id="${esc(c.id)}" title="下へ"`)}${btn('edit-char','EDIT ↗','small',`data-id="${esc(c.id)}"`)}</div></div>`).join('')||'<div class="empty-visual">まだキャラは登録されていません。</div>'}
 function renderCharacters(){return `${headline('01 / SORT & EDIT','CHARACTERS','番号は表示順で自動生成。途中に挿入しても個別ページのIDは変わりません。',btn('new-char','＋ NEW CHARACTER','accent'))}
  <div class="admin-card"><div class="admin-kicker">DISPLAY ORDER / DRAG OR ARROWS</div><p>ドラッグして並び替え。スマホでは ↑↓ ボタンを使ってね。新規登録時には挿入位置を選べます。</p>${renderRows(true)}</div>`}
-const cropVals=(c,mode='choose')=>{const p={x:50,y:Number.isFinite(Number(c.iconPosition))?Number(c.iconPosition):30,zoom:c.icon?1:2.05,...(c.iconCrop||{})};return mode==='all'?{...p,...(c.allCastCrop||{})}:mode==='mobile'?{...p,...(c.mobileIconCrop||{})}:p};
+const cropVals=(c,mode='choose')=>{const p={x:50,y:30,zoom:c.icon?1:2.05,...(c.iconCrop||{y:Number.isFinite(Number(c.iconPosition))?Number(c.iconPosition):30})};return mode==='all'?{...p,...(c.allCastCrop||{})}:mode==='mobile'?{...p,...(c.mobileIconCrop||{})}:p};
 const cropAttrs=(c,mode='choose')=>{const p=cropVals(c,mode);return `--crop-x:${Number(p.x)}%;--crop-y:${Number(p.y)}%;--crop-zoom:${Number(p.zoom)}`};
 const cropMode=()=>state.cropMode;
 const setCrop=(c,p)=>{if(cropMode()==='all')c.allCastCrop=p;else if(cropMode()==='mobile')c.mobileIconCrop=p;else c.iconCrop=p};
@@ -174,9 +174,32 @@ function showCrop(){const c=selected();if(!c)return;const p=cropVals(c,cropMode(
  if($('cropZoom'))$('cropZoom').value=p.zoom;if($('cropZoomLabel'))$('cropZoomLabel').textContent=Number(p.zoom).toFixed(2)+'×';window.CAST_CROP?.renderAll();}
 function resetCrop(){const c=selected();if(!c)return;setCrop(c,{x:50,y:50,zoom:1});showCrop();persist('現在のアイコン枠をリセットしたよ')}
 let cropDrag=null;
-function startCrop(e){const frame=e.target.closest('#cropCanvas');if(!frame||!selected())return;e.preventDefault();const c=selected(),p=cropVals(c,cropMode());setCrop(c,{...p});const img=$('cropMainImg');const fw=frame.clientWidth,fh=frame.clientHeight,ratio=img?.naturalWidth/img?.naturalHeight||1,zoom=p.zoom||1;const effectiveZoom=zoom*(cropMode()==='choose'?1.15:1),w=Math.max(fw,fh*ratio)*effectiveZoom,h=Math.max(fh,fw/ratio)*effectiveZoom;
- cropDrag={id:e.pointerId,x:e.clientX,y:e.clientY,cx:p.x,cy:p.y,overflowX:Math.max(0,w-fw),overflowY:Math.max(0,h-fh)};frame.setPointerCapture(e.pointerId);frame.classList.add('dragging')}
-function dragCrop(e){if(!cropDrag||e.pointerId!==cropDrag.id||!selected())return;const c=selected(),p=cropVals(c,cropMode());const x=cropDrag.overflowX>1?limit(cropDrag.cx-(e.clientX-cropDrag.x)*100/cropDrag.overflowX,0,100):p.x;const y=cropDrag.overflowY>1?limit(cropDrag.cy-(e.clientY-cropDrag.y)*100/cropDrag.overflowY,0,100):p.y;setCrop(c,{...p,x,y});showCrop()}
+/* Pixel movement is mapped to the same actual picture bay rendered in SELECT.
+   Mobile has a centered transform origin; PC/ALL CAST use focal origins. */
+function startCrop(e){
+  const frame=e.target.closest('#cropCanvas');if(!frame||!selected())return;
+  e.preventDefault();
+  const c=selected(),mode=cropMode(),p=cropVals(c,mode);setCrop(c,{...p});
+  const photo=mode==='choose'?frame.querySelector('.v15-rail-inner'):frame;
+  const img=$('cropMainImg'),fw=photo?.clientWidth||frame.clientWidth,fh=photo?.clientHeight||frame.clientHeight;
+  const ratio=img?.naturalWidth&&img.naturalHeight?img.naturalWidth/img.naturalHeight:1;
+  const coverW=Math.max(fw,fh*ratio),coverH=Math.max(fh,fw/ratio);
+  const scale=(p.zoom||1)*(mode==='choose'?1.15:1),centerOrigin=mode==='mobile';
+  cropDrag={id:e.pointerId,mode,x:e.clientX,y:e.clientY,cx:p.x,cy:p.y,h:fh,
+    overflowX:Math.max(0,centerOrigin?scale*(coverW-fw):scale*coverW-fw),
+    overflowY:Math.max(0,centerOrigin?scale*(coverH-fh):scale*coverH-fh)};
+  frame.setPointerCapture(e.pointerId);frame.classList.add('dragging');
+}
+function dragCrop(e){
+  if(!cropDrag||e.pointerId!==cropDrag.id||!selected())return;
+  const c=selected(),p=cropVals(c,cropMode()),d=cropDrag;
+  const dy=e.clientY-d.y,dx=e.clientX-d.x;
+  const y=d.overflowY>1?limit(d.cy-dy*100/d.overflowY,0,100):p.y;
+  // The -11/+11 degree rail skew creates a small x shift when focal y moves.
+  const shear=d.mode==='choose'?Math.tan(11*Math.PI/180)*d.h*(y-d.cy)/100:0;
+  const x=d.overflowX>1?limit(d.cx-(dx+shear)*100/d.overflowX,0,100):p.x;
+  setCrop(c,{...p,x,y});showCrop();
+}
 function endCrop(e){if(!cropDrag||e.pointerId!==cropDrag.id)return;cropDrag=null;$('cropCanvas')?.classList.remove('dragging');persist('アイコン位置を保存したよ')}
 function refreshArtEditor(){const c=selected();if(!c)return;const p=artVals(c),b=badgeVals(c);for(const id of ['artStageImg','liveImg']){const img=$(id);if(img){for(const [k,v] of Object.entries({x:p.x+'%',y:p.y+'%',zoom:p.zoom}))img.style.setProperty('--art-'+k,v)}}for(const k of ['zoom','x','y']){const el=$('art'+k.toUpperCase()+'Label');if(el)el.textContent=k==='zoom'?Number(p[k]).toFixed(2)+'×':Math.round(p[k])+'%'}
  const badge=$('artPreviewBadge');if(badge){badge.style.setProperty('--badge-right',(c.fileBadgePosition?.right??BADGE_DESKTOP_DEFAULT.right)+'%');badge.style.setProperty('--badge-top',(c.fileBadgePosition?.top??BADGE_DESKTOP_DEFAULT.top)+'%');badge.style.setProperty('--badge-mobile-right',(c.fileBadgePositionMobile?.right??8)+'%');badge.style.setProperty('--badge-mobile-top',(c.fileBadgePositionMobile?.top??66)+'%')};for(const k of ['right','top']){const lbl=$('badge'+k[0].toUpperCase()+k.slice(1)+'Label');if(lbl)lbl.textContent=Math.round(b[k])+'%'}window.CAST_VISUAL?.layout()}
