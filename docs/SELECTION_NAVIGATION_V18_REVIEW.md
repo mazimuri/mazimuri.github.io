@@ -18,9 +18,9 @@
 
 ## ページ間回遊
 
-- WORLD DETAILのCONNECTED CASTからPROFILEへ移動した際、上部に**「↶ ロジエ邸へ戻る」**のようなボタンを表示する。
-- ボタンを押すとWORLD DETAILの**元のスクロール位置**へ戻る。
-- SELECTやALL CASTから直接開いたPROFILEではこのボタンは出さない。
+- WORLD DETAILのCONNECTED CASTからPROFILEへ移動した際、**右上の既存「BACK TO SELECT」を「↶ ロジエ邸へ戻る」に切り替える**。競合する戻りボタンを2つ並べない。
+- ボタンまたはEscapeキーでWORLD DETAILの**元のスクロール位置**へ戻る。WORLDを起点に関連キャラへ移動しても元のWORLDへ戻れる。
+- SELECTやALL CASTから直接開いたPROFILEでは、既存の「BACK TO SELECT」を維持する。
 - WORLD名やキャラの所属は、現在公開されているデータのIDを利用する。新たなデータ構造を管理者に要求しない。
 
 ## ALL CAST内の現在位置
