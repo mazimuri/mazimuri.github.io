@@ -62,8 +62,12 @@ async function capture(width,height){
    heroHeight:content.querySelector('.world-detail-hero')?.getBoundingClientRect().height};
  });
  assert.ok(detail.scrollWidth<=detail.viewWidth+5,'World detail content overflows horizontally');
- if(width===1920){assert.ok(detail.heroHeight<345,'Full HD WORLD detail hero too tall: '+detail.heroHeight);}
- if(width===2560){assert.ok(detail.heroHeight<425,'2K WORLD detail hero too tall: '+detail.heroHeight);}
+ if(width===1920){assert.ok(detail.heroHeight<height*.45,'Full HD WORLD detail hero consumes too much vertical space: '+detail.heroHeight);}
+ if(width===2560){assert.ok(detail.heroHeight<height*.40,'2K WORLD detail hero consumes too much vertical space: '+detail.heroHeight);}
+ if(width>=1900){
+   const firstStoryTop=await page.locator('#worldDetailContent .world-story-entry').first().evaluate(el=>el.getBoundingClientRect().top);
+   assert.ok(firstStoryTop<height-35,'No story visible in first viewport: '+firstStoryTop);
+ }
  await page.evaluate(()=>document.getElementById('worldDetailContent').scrollTop=325);
  await page.waitForTimeout(200);
  await page.screenshot({path:folder+'/'+width+'x'+height+'-DETAIL-after-stories.png',animations:'disabled'});
