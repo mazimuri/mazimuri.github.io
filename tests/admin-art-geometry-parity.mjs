@@ -81,7 +81,7 @@ try{
     // CSS resolves percentages with subpixel rounding (about 0.03px at 1024).
     const almostSame=(a,b,tolerance=.3)=>{
       if(a===b)return true;
-      const nums=v=>[...v.matchAll(/-?\\d+(?:\\.\\d+)?/g)].map(m=>Number(m[0]));
+      const nums=v=>[...v.matchAll(/-?\d+(?:\.\d+)?/g)].map(m=>Number(m[0]));
       const aa=nums(a),bb=nums(b);
       return aa.length>0&&aa.length===bb.length&&aa.every((v,i)=>Math.abs(v-bb[i])<=tolerance);
     };
