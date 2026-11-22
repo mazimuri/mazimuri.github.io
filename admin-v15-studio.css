@@ -150,7 +150,7 @@
  }
 }
 
-/* MOBILE SELECT: production uses CENTER transform origin, NOT crop focal point. */
+/* MOBILE SELECT: production inherits top-left transform origin from the generic\n   [data-crop-render] rule. Mirror it without changing published styles. */
 #admin .v15-icon-studio .crop-canvas.crop-mobile-mode{
   width:min(100%,200px)!important;aspect-ratio:1!important;
   min-height:0!important;max-height:none!important;
@@ -166,7 +166,7 @@
   width:100%!important;height:100%!important;object-fit:cover!important;
   object-position:var(--crop-x,50%) var(--crop-y,50%)!important;
   transform:scale(var(--crop-zoom,1))!important;
-  transform-origin:50% 50%!important;
+  transform-origin:0 0!important;
 }
 #admin .v15-icon-studio .crop-phone-preview{
   display:flex;align-items:center;gap:13px;min-height:84px;
