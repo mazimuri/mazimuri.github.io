@@ -96,10 +96,13 @@ async function capture(width,height){
  const storyOrder=await page.locator('.world-story-entry:first-child').evaluate(el=>{
    const title=el.querySelector('.world-story-item').getBoundingClientRect();
    const cast=el.querySelector('.world-story-cast').getBoundingClientRect();
-   return {titleBottom:title.bottom,castTop:cast.top};
+   const arrow=el.querySelector('.world-story-arrow').getBoundingClientRect();
+   return {titleBottom:title.bottom,castTop:cast.top,arrowBottom:arrow.bottom};
  });
  assert.ok(storyOrder.titleBottom<=storyOrder.castTop+4,
    'Title or play action must precede appearing cast: '+JSON.stringify(storyOrder));
+ assert.ok(storyOrder.arrowBottom<=storyOrder.castTop+4,
+   'Play button overlaps cast footer: '+JSON.stringify(storyOrder));
 
  if(width===1920){assert.ok(detail.heroHeight<height*.45,'Full HD WORLD detail hero consumes too much vertical space: '+detail.heroHeight);}
  if(width===2560){assert.ok(detail.heroHeight<height*.40,'2K WORLD detail hero consumes too much vertical space: '+detail.heroHeight);}
