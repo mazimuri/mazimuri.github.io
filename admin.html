@@ -7,7 +7,7 @@
   <meta name="description" content="CAST / SIGNAL — 創作キャラクターを巡る、ゲームUI風アーカイブ。">
   <title>CAST / SIGNAL — Private Control Room</title>
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <link rel="stylesheet" href="style.css?v=5.9.11">
+  <link rel="stylesheet" href="style.css?v=5.9.12">
 <link rel="stylesheet" href="mobile.css?v=15.4.0">
 <link rel="stylesheet" href="cast-side-rail.css?v=16.1.2">
   <link rel="stylesheet" href="cast-view-adjustments.css?v=15.6.2">
@@ -20,10 +20,10 @@
   <script src="cloud-data.js?v=5.9.10" defer></script>
   <link rel="stylesheet" href="cloud-admin.css">
   <link rel="stylesheet" href="admin-v15-studio.css?v=16.2.0">
-  <script src="app.js?v=15.2.7" defer></script>
+  <script src="app.js?v=15.2.8" defer></script>
 <script defer src="cast-side-rail.js?v=18.0.1"></script>
   <script src="publisher.js" defer></script>
-  <script src="admin.js?v=16.3.1" defer></script>
+  <script src="admin.js?v=16.3.2" defer></script>
   <script src="visual-engine.js?v=16.3.0" defer></script>
 </head>
 <body class="cloud-locked">
@@ -214,7 +214,14 @@
       <div class="about-topline mono"><span>INFORMATION FILE / 004</span><span>EST. YOUR UNIVERSE</span></div>
       <div class="about-heading"><div><span class="directory-kicker mono">THE WORLD BEHIND THE CHARACTERS</span><h2>ABOUT<span class="about-dot">.</span></h2><p class="about-subtitle">WELCOME TO THE SIGNAL.</p></div><div class="about-deco" aria-hidden="true"><b>CS</b><span>/// ARCHIVE INFORMATION</span></div></div>
       <div class="about-introduction"><span class="about-index mono">01 / THE ARCHIVE</span><h3 id="aboutTitle">キャラクターと、物語の保管庫。</h3><p id="aboutIntro"></p></div>
-      <div class="about-guides"><article class="about-guide"><span class="mono">02 / IMAGE POLICY</span><h3>画像について<span> ↗</span></h3><p id="aboutImages"></p></article><article class="about-guide"><span class="mono">03 / FAN WORKS</span><h3>二次創作・ファンアート<span> ↗</span></h3><p id="aboutFans"></p><div class="about-fa" id="aboutFa" hidden><span class="mono">FAN ART TAG /</span><strong id="aboutFaValue"></strong><button type="button" id="copyFa">COPY ⧉</button></div></article><article class="about-guide"><span class="mono">04 / TALK SCREENSHOTS</span><h3>zetaのトークスクショ<span> ↗</span></h3><p id="aboutScreens"></p><a class="about-terms" href="https://zeta-ai.io/ja/policy/terms" target="_blank" rel="noopener noreferrer">zetaの利用規約を確認する ↗</a></article></div>
+      <section class="about-signal" aria-label="作品の投稿共有用ハッシュタグ">
+  <div class="about-signal-copy">
+    <div class="about-signal-label mono"><span class="about-signal-live" aria-hidden="true"></span>OPEN CHANNEL / SHARE YOUR SIGNAL</div>
+    <div class="about-signal-main"><strong id="aboutSignalTag">#まじむり受信中</strong><p>ファンアート、zetaのトークスクショ、感想など、mazimuriの作品にまつわる投稿を受信中！</p></div>
+  </div>
+  <div class="about-signal-actions"><button type="button" id="copySignalTag" aria-label="共通投稿タグをコピー">⊞ COPY</button><a id="aboutSignalSearch" href="https://x.com/search?q=%23%E3%81%BE%E3%81%98%E3%82%80%E3%82%8A%E5%8F%97%E4%BF%A1%E4%B8%AD&amp;f=live" target="_blank" rel="noopener noreferrer" aria-label="Xで共通投稿タグを検索">VIEW ON X ↗</a></div>
+</section>
+<div class="about-guides"><article class="about-guide"><span class="mono">02 / IMAGE POLICY</span><h3>画像について<span> ↗</span></h3><p id="aboutImages"></p></article><article class="about-guide"><span class="mono">03 / FAN WORKS</span><h3>二次創作・ファンアート<span> ↗</span></h3><p id="aboutFans"></p></article><article class="about-guide"><span class="mono">04 / TALK SCREENSHOTS</span><h3>zetaのトークスクショ<span> ↗</span></h3><p id="aboutScreens"></p><a class="about-terms" href="https://zeta-ai.io/ja/policy/terms" target="_blank" rel="noopener noreferrer">zetaの利用規約を確認する ↗</a></article></div>
       <div class="about-connect"><div><span class="mono">05 / CREATOR CONNECTION</span><h3>FIND ME <i>ONLINE.</i></h3><p>作品の感想やファンアートも大歓迎。気軽に見せてね！</p></div><div class="about-connect-links" id="aboutLinks"></div></div>
       <div class="about-end mono">THANK YOU FOR VISITING / CAST SIGNAL <span>◆ ◆ ◆</span></div>
     </div>
