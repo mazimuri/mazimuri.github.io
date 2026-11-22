@@ -1,0 +1,19 @@
+name: Snapshot approved Orphe FILE badge coordinates
+on:
+  push:
+    branches: [feat/all-cast-character-deck-v2-20261122]
+    paths:
+      - tests/orphe-badge-snapshot.mjs
+      - .github/workflows/orphe-badge-snapshot.yml
+  workflow_dispatch:
+jobs:
+  inspect-public-only:
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-save --ignore-scripts playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/orphe-badge-snapshot.mjs

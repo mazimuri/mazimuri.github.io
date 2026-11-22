@@ -1,0 +1,34 @@
+name: ALL CAST V2 character deck & Orphe badge
+on:
+  push:
+    branches: [feat/all-cast-character-deck-v2-20261122]
+    paths:
+      - cast-allcast-current.css
+      - cast-rail-current.css
+      - app.js
+      - admin.js
+      - index.html
+      - admin.html
+      - tests/allcast-v2-character-deck.mjs
+      - .github/workflows/allcast-v2-character-deck.yml
+  workflow_dispatch:
+jobs:
+  visual:
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validate JavaScript
+        run: node --check app.js && node --check admin.js && node --check tests/allcast-v2-character-deck.mjs
+      - name: Install browser
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Render actual public data at Full HD, 2K and mobile
+        run: node tests/allcast-v2-character-deck.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allcast-character-deck-v2-visuals
+          path: allcast-v2-character-deck-review/*
+          if-no-files-found: ignore

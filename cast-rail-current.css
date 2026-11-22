@@ -11,13 +11,13 @@
     Map the old 17% default into the approved V15 visual placement. */
  #hero.hero .hero-art-stamp{
    left:auto!important;
-   right:calc(var(--badge-right,17%) + 14%)!important;
-   top:calc(var(--badge-top,10%) - 2%)!important;
+   right:calc(var(--badge-right,9.051756007393713%) + 14%)!important;
+   top:calc(var(--badge-top,14.186685998241362%) - 2%)!important;
  }
 
 }
 @media (min-width:1660px){
- #hero.hero .hero-art-stamp{top:calc(var(--badge-top,10%) - 3.5%)!important}
+ #hero.hero .hero-art-stamp{top:calc(var(--badge-top,14.186685998241362%) - 3.5%)!important}
 }
 
 /* V15.4 / APPROVED — Perspective-aligned navigation cap, +24px.
