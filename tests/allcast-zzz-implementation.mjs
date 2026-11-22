@@ -25,7 +25,12 @@ async function pageAt(width,height){
      && (document.getElementById('heroBio')?.textContent?.trim()?.length||0)>15
      && document.querySelector('#v5Stack .v5-item');
  },null,{timeout:35000});
- await page.locator('#nav-index').click();
+ if(width<=800){
+   await page.locator('#mobileMenuToggle').click();
+   await page.locator('#mobileNav [data-nav="index"]').click();
+ }else{
+   await page.locator('#nav-index').click();
+ }
  await page.waitForFunction(()=>document.querySelector('#directory.open .cast-gallery-card')!==null,null,{timeout:15000});
  await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.querySelectorAll('#directoryItems .cast-gallery-card img')].map(i=>i.decode().catch(()=>{})))});
  return page;
