@@ -19,15 +19,15 @@ async function pageFor(w,h,{moreCast=false}={}){
  if(moreCast){
   await page.evaluate(()=>{
    const api=window.CAST_DATA, original=api.getPublished();
-   if(original.characters.length<12){
+   if(original.characters.filter(c=>c.published!==false).length<32){
     const first=original.characters.find(c=>c.published!==false)||original.characters[0];
-    const clones=Array.from({length:12-original.characters.length},(_,i)=>({...first,id:'v18-fixture-'+i,name:'テスト選択 '+(i+1),roman:'TEST FILE '+i,published:true,firstPublishedAt:''}));
+    const clones=Array.from({length:32-original.characters.filter(c=>c.published!==false).length},(_,i)=>({...first,id:'v18-fixture-'+i,name:'テスト選択 '+(i+1),roman:'TEST FILE '+i,published:true,firstPublishedAt:''}));
     const augmented={...original,characters:[...original.characters,...clones]};
     api.getPublished=()=>JSON.parse(JSON.stringify(augmented));
     window.CAST_PUBLIC.refresh('published');
    }
   });
-  await page.waitForFunction(()=>document.querySelectorAll('#pickerStrip [data-person]').length>=12,null,{timeout:20000});
+  await page.waitForFunction(()=>document.querySelectorAll('#pickerStrip [data-person]').length>=32,null,{timeout:20000});
  }
  await page.evaluate(async()=>{await document.fonts.ready;});
  return {page,errors};
@@ -38,7 +38,7 @@ async function runRail(w,h){
  const {page,errors}=await pageFor(w,h,{moreCast:true});
  const tag=w+'x'+h;
  const count=await page.locator('#pickerStrip [data-person]').count();
- assert.ok(count>=12);
+ assert.ok(count>=32);
  const c0=await selected(page);
  await page.screenshot({path:dir+'/'+tag+'-RAIL-REST.png',animations:'disabled'});
  const allCast=page.locator('#v5Stack .v5-allcast');
@@ -48,6 +48,10 @@ async function runRail(w,h){
  const bgHover=await allCast.evaluate(el=>getComputedStyle(el).backgroundColor);
  assert.equal(bgHover,'rgb(20, 29, 33)','ALL CAST should invert to charcoal');
  assert.notEqual(bgHover,bgRest,'ALL CAST hover must change color');
+ const labelHover=await allCast.locator('.v155-action-text strong').evaluate(el=>getComputedStyle(el).color);
+ const smallHover=await allCast.locator('.v155-action-text small').evaluate(el=>getComputedStyle(el).color);
+ assert.equal(labelHover,'rgb(234, 255, 85)','ALL CAST hover label must be readable yellow');
+ assert.equal(smallHover,'rgb(234, 255, 85)','ALL CAST hover sublabel must be readable yellow');
  await page.screenshot({path:dir+'/'+tag+'-ALLCAST-HOVER.png',animations:'disabled'});
  await page.mouse.move(1,1);
  await page.locator('#v5BatchNext').click();
@@ -89,9 +93,15 @@ async function runRail(w,h){
  const beforeShift=await page.locator('#v5Count').textContent();
  await page.keyboard.press('Shift+ArrowUp');
  await page.waitForFunction(x=>document.querySelector('#v5Count')?.textContent!==x,beforeShift,{timeout:10000});
+ // Select a character near the bottom of a large roster to exercise automatic
+ // scrolling. Temporary test characters live only inside this browser.
+ const lastId=await page.locator('#pickerStrip [data-person]').last().getAttribute('data-person');
+ await page.evaluate(id=>window.CAST_PUBLIC.openCharacter(id),lastId);
+ await page.locator('#dossier.open').waitFor();
+ await page.locator('#dossier .panel-close').click();
  const marked=await selected(page);
- // Return to current SELECT, then open ALL CAST and locate the selected item.
- await page.waitForTimeout(420);
+ assert.equal(marked,lastId);
+ await page.waitForTimeout(450);
  await page.locator('#v5Stack .v5-allcast').click();
  await page.locator('#directory.open').waitFor();
  await page.waitForTimeout(150);
@@ -104,9 +114,11 @@ async function runRail(w,h){
   return r.top>=view.top-10&&r.bottom<=view.bottom+10;
  });
  assert.ok(visible,'Current ALL CAST card should be scrolled into view');
+ const rosterScroll=await page.locator('#directoryItems').evaluate(el=>el.scrollTop);
+ assert.ok(rosterScroll>100,'Large ALL CAST roster did not scroll to current character: '+rosterScroll);
  await page.screenshot({path:dir+'/'+tag+'-ALLCAST-CURRENT.png',animations:'disabled'});
  assert.deepEqual(errors,[],'Unexpected page JS exceptions');
- findings.push({tag,count,c0,bgRest,bgHover,stepMotion,jumpMotion,directMotion,directHistory:direct,activeId,visible,errors});
+ findings.push({tag,count,c0,bgRest,bgHover,stepMotion,jumpMotion,directMotion,directHistory:direct,activeId,visible,rosterScroll,errors});
  await page.close();
  console.log('PASS RAIL '+tag+' '+JSON.stringify({count,stepMotion,jumpMotion,directMotion,bgHover,activeId}));
 }
