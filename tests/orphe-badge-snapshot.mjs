@@ -8,7 +8,7 @@ const result=await page.evaluate(()=>{
  const orphe=all.find(c=>c.id==='orphe'||c.name?.includes('オルフェ'));
  return {
   orphe:{id:orphe?.id,fileBadgePosition:orphe?.fileBadgePosition??null,fileBadgePositionMobile:orphe?.fileBadgePositionMobile??null},
-  others:all.filter(c=>c!==orphe).slice(0,8).map(c=>({id:c.id,explicitDesktop:!!c.fileBadgePosition,explicitMobile:!!c.fileBadgePositionMobile})),
+  others:all.filter(c=>c!==orphe).slice(0,8).map(c=>({id:c.id,desktop:c.fileBadgePosition??null,mobile:c.fileBadgePositionMobile??null})),
   publishedCount:all.length
  };
 });
