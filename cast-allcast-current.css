@@ -7,7 +7,128 @@
    dark cartridge frame, character art as the color source, yellow hover /
    focus (not persistent selection), and independent scrolling when needed.
 */
+/* V2 / CHARACTER DECK — approved PAPER nameplate design.
+   This is the single current desktop ALL CAST module, not another Study layer.
+   Keep the six-column crop, fixed card size, status badge semantics, existing
+   search/view functionality and internal scrolling. */
 @media (min-width:801px){
+  #directory .cast-directory-content{
+    position:relative;isolation:isolate;
+    background:
+      repeating-linear-gradient(90deg,#ffffff04 0 1px,transparent 1px 60px),
+      repeating-linear-gradient(0deg,#ffffff04 0 1px,transparent 1px 60px),
+      radial-gradient(ellipse at 22% 30%,#24383b80,transparent 58%),#111b1f;
+  }
+  #directory .cast-directory-content:before{
+    content:"02";position:absolute;z-index:0;pointer-events:none;
+    left:clamp(30px,3.7vw,100px);top:clamp(315px,19vw,488px);
+    font:italic 1000 clamp(160px,16vw,370px)/.8 var(--sans);
+    letter-spacing:-.12em;color:transparent;
+    -webkit-text-stroke:2px #a7bab81e;transform:skewX(-9deg);
+  }
+  #directory .cast-directory-content:after{
+    content:"CHARACTER DATABASE / ORIGINAL SIGNAL";
+    position:absolute;z-index:0;pointer-events:none;
+    right:clamp(15px,2.6vw,65px);top:clamp(290px,18vw,480px);
+    writing-mode:vertical-rl;letter-spacing:.3em;
+    font:1000 clamp(11px,.82vw,19px)/1.2 var(--mono);color:#778e8e78;
+  }
+  #directory .directory-fixed{
+    position:relative;
+    grid-template-columns:minmax(0,1.03fr) minmax(500px,1fr)!important;
+    grid-template-areas:"heading controls" "sub sub"!important;
+    min-height:clamp(158px,9.1vw,232px);
+    gap:clamp(8px,.5vw,12px) clamp(20px,2.2vw,50px)!important;
+    padding:clamp(16px,1.3vw,33px) clamp(36px,4vw,104px) 10px!important;
+    background:radial-gradient(ellipse at 84% 0%,#33444880,transparent 67%),#151e21;
+    border-bottom:3px solid #d4e1dc;
+    overflow:hidden;box-shadow:none!important;
+  }
+  #directory .directory-fixed:before{
+    content:"";position:absolute;z-index:0;pointer-events:none;
+    top:-44%;right:41%;height:191%;width:clamp(40px,4.6vw,104px);
+    transform:skewX(-24deg);background:#eaff5517;
+  }
+  #directory .directory-heading-row{
+    position:relative;z-index:1;
+    align-items:center;min-width:0;
+    border-left:7px solid #f24c56;
+    padding-left:clamp(17px,1.3vw,30px);
+  }
+  #directory .directory-kicker{
+    color:#eaff55;font:1000 clamp(10px,.64vw,15px)/1.2 var(--mono);
+    letter-spacing:.055em;
+  }
+  #directory .directory-heading-row h2{
+    white-space:nowrap;
+    font:1000 clamp(57px,4.2vw,110px)/.94 var(--sans)!important;
+    letter-spacing:-.095em;
+    margin:clamp(6px,.5vw,14px) 0 5px!important;
+  }
+  #directory .directory-heading-row h2 i{
+    -webkit-text-stroke:clamp(1.3px,.11vw,2.2px) #f7f9f2;
+  }
+  #directory .directory-deck-subtitle{
+    display:block;
+    font:900 clamp(10px,.69vw,16px)/1.4 var(--mono);
+    color:#b4c5bf;white-space:nowrap;
+  }
+  #directory .directory-control{
+    position:relative;z-index:1;
+    display:flex;flex-direction:column;align-items:stretch;
+    gap:clamp(7px,.52vw,13px);grid-area:controls;
+  }
+  #directory .directory-search-label{
+    flex:0 0 auto;width:100%;max-width:none;min-width:0;
+    height:clamp(39px,2.45vw,58px);min-height:0!important;
+    background:#f0f0e9;border:3px solid #11191b;
+    box-shadow:4px 4px 0 #081014;
+  }
+  #directory .directory-search-label .mono{color:#e3424b;font-weight:1000}
+  #directory .directory-search-label input{
+    color:#151d20;font:800 clamp(11px,.83vw,17px)/1.2 var(--jpn);
+    padding:8px 0;
+  }
+  #directory .directory-search-label input::placeholder{color:#667471}
+  #directory .directory-filters{
+    align-self:flex-start;gap:5px;
+  }
+  #directory .directory-filters button{
+    min-height:clamp(28px,1.72vw,39px);
+    padding:5px clamp(9px,.68vw,16px)!important;
+    color:#d7e0dc;background:#263034;border-color:#5d696b;
+  }
+  #directory .directory-filters button[aria-pressed=true]{
+    color:#141b1e;background:#eaff55;border-color:#eaff55;
+  }
+  #directory .directory-subtools{
+    position:relative;z-index:2;grid-area:sub;
+    padding:clamp(7px,.54vw,12px) 0 0!important;
+    border-top:1px solid #697979;
+    min-height:0;
+  }
+  #directory .directory-count{
+    color:#c8d6ce;font-size:clamp(10px,.61vw,14px);
+  }
+  #directory .directory-online{
+    margin-left:auto;
+    font:1000 clamp(9px,.58vw,14px)/1 var(--mono);
+    color:#dae4dd;
+  }
+  #directory .directory-online b{color:#eaff55}
+  #directory .directory-view{
+    display:flex;align-items:center;gap:5px;
+  }
+  #directory .directory-view button{
+    font:900 clamp(9px,.62vw,13px)/1 var(--mono)!important;
+    background:#263135;color:#eaf0e9;
+    border:1px solid #667373;
+    min-height:clamp(26px,1.6vw,36px)!important;
+  }
+  #directory .directory-view button[aria-pressed=true]{
+    background:#eaff55;color:#101719;border-color:#eaff55;
+  }
+
   #directory .allcast-roster-shell{
     --allcast-card-w:clamp(151px,7.8646vw,202px);
     --allcast-card-h:clamp(222px,11.5625vw,296px);
@@ -16,6 +137,24 @@
     --allcast-cols:6;
     --allcast-panel-w:calc(6 * var(--allcast-card-w) + 5 * var(--allcast-gap) + 70px);
     --allcast-yellow:#edff55;
+  }
+  #directory .allcast-deck-top{
+    flex:0 0 auto;display:flex;
+    align-items:center;justify-content:space-between;gap:10px;
+    padding:clamp(7px,.53vw,14px) clamp(10px,.92vw,22px);
+    border-bottom:1px solid #798b8a;
+    background:#1b2428;color:#c7d9d2;
+    font:1000 clamp(9px,.51vw,13px)/1.2 var(--mono);
+    letter-spacing:.055em;
+  }
+  #directory .allcast-deck-top .deck-led{
+    display:inline-block;width:7px;height:7px;margin-right:6px;
+    border-radius:50%;background:#eaff55;box-shadow:0 0 0 3px #eaff5533;
+  }
+  #directory .allcast-deck-top b{color:#eaff55}
+  #directory .allcast-roster-shell.is-gallery:before{
+    content:"";position:absolute;z-index:3;pointer-events:none;
+    left:0;top:0;width:24%;height:4px;background:#eaff55;
   }
   #directory .allcast-roster-shell:not(.is-gallery){display:contents}
   #directory .allcast-roster-shell.is-gallery{
@@ -26,13 +165,13 @@
     min-height:0;
     max-height:calc(100% - 20px);
     width:min(var(--allcast-panel-w),calc(100vw - 46px));
-    margin:14px auto 14px;
+    margin:clamp(13px,1vw,25px) auto 14px;
     padding:8px 7px 5px;
-    border:4px solid #384044;
-    border-radius:17px;
-    background:#22272a;
-    box-shadow:0 4px 0 #090c0d,0 0 0 1px #0e1213,0 17px 28px #0006,
-      inset 0 0 0 2px #101417;
+    border:4px solid #5e7074;
+    border-radius:12px 12px 16px 12px;
+    background:#293338;
+    box-shadow:0 0 0 2px #0d1417,8px 9px 0 #070b0ebd,0 23px 45px #0009,
+      inset 0 0 0 2px #141e21;
     overflow:hidden;
     isolation:isolate;
   }
@@ -52,8 +191,8 @@
     margin:0!important;
     padding:clamp(10px,.625vw,16px)!important;
     border:0!important;
-    border-radius:11px;
-    background:#202528;
+    border:1px solid #0e191b!important;border-radius:2px;
+    background:linear-gradient(145deg,#263236,#20282c);
     overflow-y:auto!important;
     overflow-x:hidden!important;
     scrollbar-gutter:stable;
@@ -75,10 +214,10 @@
     min-height:0!important;
     max-height:none!important;
     align-self:start!important;
-    padding:clamp(5px,.2604vw,7px)!important;
+    padding:clamp(4px,.21vw,6px)!important;
     border:3px solid #111719!important;
-    border-radius:12px;
-    outline:2px solid #4c5659;
+    border-radius:7px 7px 9px 7px;
+    outline:2px solid #536267;
     outline-offset:-2px;
     background:#111719!important;
     box-shadow:inset 0 0 0 2px #323b3e,0 2px 0 #0b0e10!important;
@@ -106,7 +245,7 @@
     width:100%!important;
     aspect-ratio:auto!important;
     background:#2e3234;
-    border-bottom:2px solid #697376;
+    border-bottom:2px solid #6b7775;
     overflow:hidden!important;
   }
   /* Preserve the existing allCastCrop object-fit/position from style.css. */
@@ -127,52 +266,32 @@
     letter-spacing:0!important;
   }
   #directory #directoryItems.directory-gallery .cast-gallery-caption{
-    position:relative;
-    display:flex!important;
-    flex:1 1 auto!important;
-    flex-direction:column!important;
-    min-height:0!important;
-    height:auto!important;
-    width:100%;
-    padding:clamp(4px,.21vw,6px) 3px 2px!important;
-    gap:1px!important;
-    border:0!important;
-    background:transparent!important;
+    position:relative;display:flex!important;
+    flex:1 1 auto!important;flex-direction:column!important;
+    min-height:0!important;height:auto!important;width:100%;
+    padding:0!important;gap:0!important;
+    border:0!important;background:#111a1d!important;
     overflow:hidden;
+  }
+  #directory #directoryItems.directory-gallery .cast-gallery-nameplate{
+    flex:1 1 auto;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:1px;
+    width:100%;min-height:0;padding:2px 3px;
+    background:#f0f0e8;border-bottom:2px solid #ccd6ce;
   }
   #directory #directoryItems.directory-gallery .cast-gallery-name{
-    order:1;
-    display:block;
-    width:100%;
-    max-width:100%;
-    min-height:0;
-    font-size:clamp(10px,.521vw,13.3px)!important;
-    line-height:1.3!important;
-    font-weight:900!important;
-    text-align:center;
-    letter-spacing:-.03em!important;
-    color:#f8fbf8;
-    white-space:nowrap!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis;
-    grid-column:auto!important;
-    grid-row:auto!important;
+    display:block;width:100%;max-width:100%;min-height:0;
+    font:950 clamp(10px,.53vw,14px)/1.23 var(--jpn)!important;
+    color:#14191c!important;text-align:center;
+    letter-spacing:-.035em!important;white-space:nowrap!important;
+    overflow:hidden!important;text-overflow:ellipsis;
   }
-  #directory #directoryItems.directory-gallery .cast-gallery-caption>small{
-    order:2;
-    display:block;
-    width:100%;
-    min-height:0;
-    font-size:clamp(7px,.365vw,9.3px)!important;
-    font-weight:740;
-    line-height:1.25!important;
-    text-align:center;
-    color:#aebbbb!important;
-    white-space:nowrap;
-    overflow:hidden;
+  #directory #directoryItems.directory-gallery .cast-gallery-role{
+    display:block;width:100%;max-width:100%;min-height:0;
+    font:760 clamp(7px,.34vw,10px)/1.2 var(--jpn)!important;
+    color:#43534e!important;text-align:center;
+    overflow:hidden!important;white-space:nowrap;
     text-overflow:ellipsis;
-    grid-column:auto!important;
-    grid-row:auto!important;
   }
   #directory #directoryItems.directory-gallery .cast-gallery-badges{
     order:3;
@@ -183,13 +302,11 @@
     gap:clamp(3px,.18vw,5px)!important;
     width:100%;
     min-height:clamp(15px,.79vw,20px);
-    margin:auto 0 0!important;
-    padding:0!important;
-    background:transparent!important;
+    margin:0!important;
+    padding:0 4px 2px!important;
+    background:#111a1d!important;
     border:0!important;
     box-shadow:none!important;
-    grid-column:auto!important;
-    grid-row:auto!important;
   }
   #directory #directoryItems.directory-gallery .cast-gallery-badges .zeta-badge,
   #directory #directoryItems.directory-gallery .cast-gallery-badges .cast-new{
@@ -257,6 +374,26 @@
 }
 /* Smaller desktop windows: retain cartridge design without horizontal clipping.
    Mobile <=800px is intentionally not modified by this module. */
+@media (min-width:801px) and (max-width:1499px){
+  #directory .cast-directory-content:before,
+  #directory .cast-directory-content:after{display:none}
+  #directory .directory-fixed{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    padding-inline:clamp(22px,3vw,52px)!important;
+  }
+  #directory .directory-heading-row h2{
+    font-size:clamp(38px,3.6vw,63px)!important;
+  }
+}
+@media (min-width:801px) and (max-width:1199px){
+  #directory .directory-fixed{
+    grid-template-columns:1fr!important;
+    grid-template-areas:"heading" "controls" "sub"!important;
+  }
+  #directory .directory-heading-row h2{font-size:clamp(41px,4.2vw,59px)!important}
+  #directory .directory-control{gap:7px}
+  #directory .directory-search-label{height:39px}
+}
 @media (min-width:1200px) and (max-width:1499px){
   #directory .allcast-roster-shell{
     --allcast-cols:5;
@@ -271,7 +408,32 @@
 }
 @media (max-width:800px){
   #directory .allcast-roster-shell{display:contents!important}
+  #directory .allcast-deck-top,#directory .directory-deck-subtitle,#directory .directory-online{display:none!important}
   #directory .allcast-roster-footer{display:none!important}
+  #directory #directoryItems.directory-gallery .cast-gallery-caption{
+    display:flex!important;flex-direction:column!important;
+    gap:0!important;padding:0!important;min-height:58px!important;
+    background:#111a1d!important;
+  }
+  #directory #directoryItems.directory-gallery .cast-gallery-nameplate{
+    display:flex;flex:1 1 auto;flex-direction:column;
+    align-items:center;justify-content:center;min-height:0;
+    padding:3px 3px 2px;background:#f0f0e8;
+    border-bottom:2px solid #cbd4cd;
+  }
+  #directory #directoryItems.directory-gallery .cast-gallery-name{
+    color:#121b1d!important;font:950 11px/1.22 var(--jpn)!important;
+    text-align:center;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+    white-space:normal!important;overflow:hidden;
+  }
+  #directory #directoryItems.directory-gallery .cast-gallery-role{
+    color:#44524e!important;font:750 8px/1.16 var(--jpn)!important;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;text-align:center;
+  }
+  #directory #directoryItems.directory-gallery .cast-gallery-badges{display:none!important}
+  #directory #directoryItems.directory-gallery .cast-gallery-arrow{display:none!important}
 }
 @media (prefers-reduced-motion:reduce){
   #directory #directoryItems.directory-gallery .cast-gallery-card,
