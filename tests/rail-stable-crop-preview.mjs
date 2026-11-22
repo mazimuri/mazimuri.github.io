@@ -68,6 +68,17 @@ try{
   const gap=Math.abs(fh.items[i].ratio/k.items[i].ratio-1);
   assert.ok(gap<=.035,'ratio differs Full HD / 2K slot '+i+': '+gap);
  }
+ for(const run of [fh,k,get(1440,900,'after'),get(2560,911,'after')]){
+  for(let i=0;i<3;i++){
+   const end=run.items[i].item.y+run.items[i].item.height;
+   const space=run.items[i+1].item.y-end;
+   assert.ok(space>=5,'card '+i+' fascia is covered at '+run.width+'x'+run.height+': gap '+space);
+  }
+  const last=run.items[3];
+  const railBottom=run.rail.y+run.rail.height;
+  assert.ok(last.item.y+last.item.height<=railBottom+2,
+    'front card overflows stage at '+run.width+'x'+run.height);
+ }
  const previous=get(1920,911,'before');
  assert.ok(fh.items[3].item.y<previous.items[3].item.y-25,'Full HD card spacing did not compress as intended');
  assert.ok(Math.abs(k.items[3].item.y-get(2560,1271,'before').items[3].item.y)<2,
