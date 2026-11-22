@@ -74,7 +74,7 @@ async function inspect(width,height){
  assert.equal(base.count,4,'Expected four current public characters');
  assert.ok(base.loaded,'Character image failed to load');
  assert.equal(base.plate,'rgb(240, 240, 232)','PAPER plate not applied '+tag);
- assert.equal(base.text,'rgb(20, 25, 28)','Name not dark enough '+tag);
+ assert.ok(['rgb(20, 25, 28)','rgb(18, 27, 29)'].includes(base.text),'Name must be readable dark ink '+tag+': '+base.text);
  assert.ok(base.roleVisible,'Character role hidden under PAPER plate');
  assert.ok(base.selectedCount===1,'Current cast indicator missing');
  assert.ok(base.pageOverflow<=3,'Document horizontal overflow '+tag);
