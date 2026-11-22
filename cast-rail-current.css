@@ -424,6 +424,13 @@
  #main .v5-item[data-slot="3"] .v5-allcast:focus-visible{
    outline:2px solid #eaff55!important;outline-offset:4px!important;
  }
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-action-text,
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-action-text strong,
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-action-text small,
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-action-arrow{
+   color:#eaff55!important;
+   text-shadow:none!important;
+ }
  #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-grid i{
    border-color:#eaff55!important;
  }
