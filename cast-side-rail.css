@@ -633,7 +633,15 @@
    This desktop-only overlay intentionally leaves the mobile production UI untouched. */
 .v6-graphics{display:none}
 @media(min-width:801px){
- :root{--v6-rail-width:clamp(234px,22.9vw,480px)}
+ /* V16 / stable portrait crop: preserve the familiar card widths, and
+    derive their heights from ONE shared physical width/height ratio.
+    Only the spacing between the four cards compresses on shorter desktops.
+    At 2560×1271 the approved V16 geometry is pixel-identical. */
+ :root{
+   --v6-rail-width:min(clamp(234px,22.9vw,480px),calc((var(--v2-stage) - 140px) * .5875));
+   --v16-rail-stage:calc(var(--v6-rail-width) * 2.4229166667);
+   --v16-rail-condense:max(0px,calc(var(--v16-rail-stage) - var(--v2-stage)));
+ }
  #hero.hero{isolation:isolate}
  #hero .hero-pattern{opacity:.40!important;background-size:clamp(32px,3.2vw,48px) clamp(32px,3.2vw,48px)!important}
  #hero .hero-circles{left:24.7%!important;top:18%!important;opacity:.35!important;transform:rotate(-15deg)!important;width:min(69vw,1040px)!important}
