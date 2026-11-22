@@ -78,10 +78,18 @@ try{
       assert.ok(Math.abs(result.realArt[key]-result.previewArt[key])<=2,
         `Artwork ${key} mismatch at ${width}: ${JSON.stringify(result)}`);
     }
-    for(const key of ['transform','fit','position'])
-      assert.equal(result.realImage[key],result.previewImage[key],`Artwork image ${key} at ${width}`);
-    assert.equal(result.realArt.transform,result.previewArt.transform,`Artwork wrapper transform at ${width}`);
-    assert.equal(result.realImage.origin,result.previewImage.origin,`Artwork origin at ${width}`);
+    // CSS resolves percentages with subpixel rounding (about 0.03px at 1024).
+    const almostSame=(a,b,tolerance=.3)=>{
+      if(a===b)return true;
+      const nums=v=>[...v.matchAll(/-?\\d+(?:\\.\\d+)?/g)].map(m=>Number(m[0]));
+      const aa=nums(a),bb=nums(b);
+      return aa.length>0&&aa.length===bb.length&&aa.every((v,i)=>Math.abs(v-bb[i])<=tolerance);
+    };
+    assert.equal(result.realImage.fit,result.previewImage.fit,`Artwork fit at ${width}`);
+    assert.equal(result.realImage.position,result.previewImage.position,`Artwork position at ${width}`);
+    assert.ok(almostSame(result.realImage.transform,result.previewImage.transform),`Artwork image transform at ${width}: ${JSON.stringify(result)}`);
+    assert.ok(almostSame(result.realArt.transform,result.previewArt.transform),`Artwork wrapper transform at ${width}`);
+    assert.ok(almostSame(result.realImage.origin,result.previewImage.origin),`Artwork origin at ${width}`);
     assert.ok(result.realTheme.includes('theme-rov')&&!result.realTheme.includes('theme-orphe'),
       'Public character theme must be restored after measuring draft geometry');
     if(width>800){
