@@ -25,7 +25,7 @@ assert.match(mobile,/\.mobile-portrait img\{/);
 assert.match(css,/\.crop-gallery-frame\{aspect-ratio:1!important\}/);
 assert.match(all,/--allcast-portrait-h:/);
 assert.match(html,/admin-v15-studio\.css\?v=16\.2\.0/);
-assert.match(html,/admin\.js\?v=16\.3\.1/);
+assert.match(html,/admin\.js\?v=16\.3\.2/);
 assert.equal((css.match(/\{/g)||[]).length,(css.match(/\}/g)||[]).length);
 assert.doesNotMatch(css,/V15\.2: fix distorted editor crop/);
 console.log('PASS: static crop parity, code syntax and admin asset revisions');
