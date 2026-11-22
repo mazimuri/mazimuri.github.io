@@ -103,7 +103,12 @@ try{
   await page.waitForFunction(()=>document.querySelectorAll('#directoryItems .cast-gallery-card').length===4);
   const first=page.locator('#directoryItems .cast-gallery-card').first();
   await first.click();
-  await page.locator('#dossier.open').waitFor({timeout:15000});
+  // Original ALL CAST click chooses the character and returns to its SELECT
+  // page; it does not open the PROFILE drawer immediately.
+  await page.waitForFunction(()=>{
+    return !document.getElementById('directory').classList.contains('open')
+      && location.hash.startsWith('#char/');
+  },null,{timeout:15000});
   console.log('NAVIGATION PASS '+prefix);
   await page.close();
  }
