@@ -182,7 +182,7 @@
    filter:none!important;translate:none;outline:none!important;
    background-clip:padding-box;
    overflow:hidden!important;
-   transition:translate .22s cubic-bezier(.18,.82,.25,1)!important;
+   transition:translate .22s cubic-bezier(.18,.82,.25,1),border-color .18s ease,box-shadow .18s ease!important;
  }
  #main .v5-item[data-slot="3"] .v5-card-outer{
    box-shadow:inset 0 0 0 1px #5d6e712b!important;
@@ -233,11 +233,20 @@
  #main .v5-item[data-slot="3"] .v5-card-inner img{
    filter:saturate(1.01) contrast(1.03)!important;
  }
- /* No hover photo filter: retain crisp portraits while the shell lifts. */
+ /* Shared interaction language: yellow means this card is actionable.
+    The selected character's personal ACCENT stays in the diamond/status,
+    while the photograph, crop, depth and case dimensions remain unchanged. */
  #main .v5-item .v5-card:hover .v5-card-outer,
  #main .v5-item .v5-card:focus-visible .v5-card-outer{
-   filter:none!important;translate:-2px -2px!important; /* keep the exact resting shadow + inset bevel */
+   filter:none!important;translate:-2px -2px!important;
+   border-color:#eaff55!important;
+   box-shadow:inset 0 0 0 1px #faffb8aa,0 0 0 2px #eaff55,0 0 0 4px #0a1418c9!important;
  }
+ /* The skewed shell, not a rectangular button box, is the keyboard focus ring. */
+ #main .v5-item .v5-card:focus-visible{
+   outline:none!important;
+ }
+
 
  /* Integrated name fascia, one narrow readout at the base of each card. */
  #main .v5-rail .v5-item .v5-card-name,
@@ -403,6 +412,16 @@
  #main .v5-allcast .v155-action-arrow{
    font:1000 clamp(15px,1.28vw,21px)/1 var(--mono)!important;
    transform:skewX(11deg)!important;writing-mode:horizontal-tb!important;
+ }
+ /* Fascia retains its physical size; inner line is painted by shadow.
+    The selected card's existing top accent becomes yellow only while targeted. */
+ #main .v5-rail .v5-item .v5-card:hover .v5-card-name,
+ #main .v5-rail .v5-item .v5-card:focus-visible .v5-card-name{
+   box-shadow:inset 0 2px 0 #eaff55,inset 0 -2px 0 #000c!important;
+ }
+ #main .v5-rail .v5-item[data-slot="3"] .v5-card:hover .v5-card-name,
+ #main .v5-rail .v5-item[data-slot="3"] .v5-card:focus-visible .v5-card-name{
+   border-top:2px solid #eaff55!important;
  }
  /* No unused V15 zeta/NEW overlay. Statuses live inside the fascia. */
  #main .v5-item .v5-badges{display:none!important}

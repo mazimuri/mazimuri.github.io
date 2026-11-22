@@ -1,0 +1,31 @@
+name: RIGHT CAST RAIL yellow hover preview
+on:
+  push:
+    branches: [feat/right-cast-rail-yellow-hover-20261122]
+    paths:
+      - cast-rail-current.css
+      - tests/rail-yellow-hover-preview.mjs
+      - .github/workflows/rail-yellow-hover-preview.yml
+      - index.html
+      - admin.html
+  workflow_dispatch:
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check tests/rail-yellow-hover-preview.mjs
+      - run: npm install --no-save --ignore-scripts playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/rail-yellow-hover-preview.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rail-yellow-hover-real-site
+          path: rail-yellow-hover-review/*
+          if-no-files-found: ignore
