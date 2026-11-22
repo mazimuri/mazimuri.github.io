@@ -413,6 +413,26 @@
    font:1000 clamp(15px,1.28vw,21px)/1 var(--mono)!important;
    transform:skewX(11deg)!important;writing-mode:horizontal-tb!important;
  }
+ /* ALL CAST is already yellow at rest, so invert to ink + yellow when
+    hovered/focused. Keep its approved skew, bridge and screen position. */
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible){
+   background:#141d21!important;
+   color:#eaff55!important;
+   border-color:#eaff55!important;
+   box-shadow:3px 4px 0 #070e11b8,0 0 0 2px #eaff55!important;
+ }
+ #main .v5-item[data-slot="3"] .v5-allcast:focus-visible{
+   outline:2px solid #eaff55!important;outline-offset:4px!important;
+ }
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-grid i{
+   border-color:#eaff55!important;
+ }
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-grid i:first-child{
+   background:#eaff55!important;
+ }
+ #main .v5-item[data-slot="3"] .v5-allcast:is(:hover,:focus-visible) .v155-action-arrow{
+   transform:skewX(11deg) translate(2px,-2px)!important;
+ }
  /* Fascia retains its physical size; inner line is painted by shadow.
     The selected card's existing top accent becomes yellow only while targeted. */
  #main .v5-rail .v5-item .v5-card:hover .v5-card-name,
