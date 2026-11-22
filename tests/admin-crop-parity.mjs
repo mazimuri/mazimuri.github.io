@@ -92,7 +92,8 @@ if(process.argv.includes('--browser')){
       const cs=q=>getComputedStyle(document.querySelector(q));
       const normalized=q=>{
         const el=document.querySelector(q),raw=cs(q).transformOrigin.split(' ').map(parseFloat);
-        return [raw[0]/el.offsetWidth,raw[1]/el.offsetHeight];
+        return {width:el.offsetWidth,height:el.offsetHeight,computed:cs(q).transformOrigin,
+          normalized:el.offsetWidth&&el.offsetHeight?[raw[0]/el.offsetWidth,raw[1]/el.offsetHeight]:null};
       };
       return {pub:cs('#publicMobile').transform,edit:cs('#editMobile').transform,
         live:cs('#liveMobile').transform,
@@ -101,8 +102,13 @@ if(process.argv.includes('--browser')){
     });
     assert.equal(mob.pub,mob.edit,'MOBILE editor scale mismatch');
     assert.equal(mob.pub,mob.live,'MOBILE LIVE scale mismatch');
-    for(const origin of mob.origin)for(const axis of origin)
-      assert.ok(Math.abs(axis-.5)<.002,'MOBILE centered zoom origin mismatch');
+    for(const entry of mob.origin){
+      if(!entry.normalized)continue; // Browser fixture may hide the mobile-only public rail.
+      for(const axis of entry.normalized)
+        assert.ok(Math.abs(axis-.5)<.002,'MOBILE centered zoom origin mismatch: '+JSON.stringify(mob.origin));
+    }
+    assert.ok(mob.origin.slice(1).every(entry=>entry.normalized),
+      'Both editor mobile previews must remain measurable');
     assert.equal(mob.all,'1 / 1.08');
     await page.close();
     console.log('PASS: Chromium desktop V16 picture-bay transforms and mobile/gallery previews');
