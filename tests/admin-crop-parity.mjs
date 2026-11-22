@@ -9,18 +9,23 @@ const js=read('admin.js'),css=read('admin-v15-studio.css'),html=read('admin.html
 const prod=read('cast-rail-current.css'),mobile=read('mobile.css'),all=read('cast-allcast-current.css');
 new Function(js); // Syntax only; do not execute browser code in Node.
 assert.match(js,/mode==='choose'\?frame\.querySelector\('\.v15-rail-inner'\):frame/);
-assert.match(js,/fixedOrigin=mode==='mobile'/);
+assert.match(js,/function cropMetrics\(mode,zoom\)/);
+assert.match(js,/Math\.max\(1\.3,Number\(p\.zoom\)\|\|1\)/);
+assert.match(js,/edit-prev/);assert.match(js,/edit-next/);
+assert.match(js,/preview\(id=state\.section==='characters'/);
 assert.match(js,/--v15-live-card-ratio/);
 assert.match(css,/\.crop-canvas\.crop-picker-mode \.v15-rail-inner img\[data-crop-render\]/);
 assert.match(css,/\.crop-rail-frame \.v15-rail-inner img\[data-crop-render\]/);
 assert.match(css,/transform:skewX\(11deg\) scale\(1\.15\) scale\(var\(--crop-zoom,1\)\)!important/);
 assert.match(prod,/transform:skewX\(11deg\) scale\(1\.15\) scale\(var\(--crop-zoom,1\)\)!important/);
-assert.match(css,/transform-origin:0 0!important/);
+assert.match(css,/transform-origin:var\(--crop-x,50%\) var\(--crop-y,50%\)!important/);
+assert.match(css,/crop-guide-corner/);
+assert.match(mobile,/\.mobile-portrait img\{[^\n]*transform-origin:var\(--crop-x,50%\) var\(--crop-y,50%\)!important/);
 assert.match(mobile,/\.mobile-portrait img\{/);
 assert.match(css,/\.crop-gallery-frame\{aspect-ratio:1!important\}/);
 assert.match(all,/--allcast-portrait-h:/);
-assert.match(html,/admin-v15-studio\.css\?v=16\.0\.0/);
-assert.match(html,/admin\.js\?v=16\.1\.0/);
+assert.match(html,/admin-v15-studio\.css\?v=16\.1\.0/);
+assert.match(html,/admin\.js\?v=16\.2\.0/);
 assert.equal((css.match(/\{/g)||[]).length,(css.match(/\}/g)||[]).length);
 assert.doesNotMatch(css,/V15\.2: fix distorted editor crop/);
 console.log('PASS: static crop parity, code syntax and admin asset revisions');
@@ -103,12 +108,23 @@ if(process.argv.includes('--browser')){
     assert.equal(mob.pub,mob.edit,'MOBILE editor scale mismatch');
     assert.equal(mob.pub,mob.live,'MOBILE LIVE scale mismatch');
     for(const entry of mob.origin){
-      if(!entry.normalized)continue; // Browser fixture may hide the mobile-only public rail.
-      for(const axis of entry.normalized)
-        assert.ok(Math.abs(axis)<.002,'MOBILE top-left zoom origin mismatch: '+JSON.stringify(mob.origin));
+      assert.ok(entry.normalized,'Mobile preview must have measurable image dimensions');
+      assert.ok(Math.abs(entry.normalized[0]-.35)<.002&&Math.abs(entry.normalized[1]-.64)<.002,
+        'MOBILE focal-origin mismatch: '+JSON.stringify(mob.origin));
     }
-    assert.ok(mob.origin.slice(1).every(entry=>entry.normalized),
-      'Both editor mobile previews must remain measurable');
+    const motion=await page.evaluate(()=>{
+      const results=[];
+      for(const id of ['publicMobile','editMobile','liveMobile']){
+        const el=document.querySelector('#'+id);
+        el.style.setProperty('--crop-x','20%');
+        const left=el.getBoundingClientRect().left;
+        el.style.setProperty('--crop-x','80%');
+        results.push({id,dx:el.getBoundingClientRect().left-left});
+      }
+      return results;
+    });
+    for(const item of motion)assert.ok(Math.abs(item.dx)>5,
+      'X position must physically move square icons at zoom > 1: '+JSON.stringify(motion));
     assert.equal(mob.all,'1 / 1.08');
     await page.close();
     console.log('PASS: Chromium desktop V16 picture-bay transforms and mobile/gallery previews');
