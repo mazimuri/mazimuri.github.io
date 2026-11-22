@@ -9,7 +9,7 @@ const admin=readFileSync(new URL('../admin.js',import.meta.url),'utf8');
 const browser=await chromium.launch({headless:true});
 try{
  const page=await browser.newPage({viewport:{width:1280,height:900}});
- await page.setContent(`<!doctype html><html><body>
+ await page.setContent(`<!doctype html><html><head><style>#cropCanvas{display:block;width:200px;height:200px}#cropMainImg{display:block;width:200px;height:200px}</style></head><body>
   <button id="openAdmin"></button><button id="adminExit"></button><button id="adminPreview"></button>
   <button id="adminPublish"></button><button id="backToAdmin"></button><button id="cloudLogout"></button>
   <div id="admin" hidden><div id="adminStatus"></div><div id="adminPath"></div>
@@ -52,5 +52,16 @@ try{
  assert.equal(await page.locator('#adminContent [data-char-tab="visual"]').getAttribute('class'),'active');
  await page.locator('#adminContent [data-action="edit-prev"]').click();
  assert.match(await page.locator('#adminContent .edit-cast-navigation').innerText(),/001 \/ 002/);
- console.log('PASS: PREV/NEXT keep VISUAL tab; top draft preview targets current character; return keeps editor context');
+ await page.locator('#adminContent [data-action="crop-mode"][data-view="mobile"]').click();
+ const frame=await page.locator('#cropCanvas').boundingBox();
+ assert.ok(frame&&frame.width>100&&frame.height>100,'Square mobile drag surface must be sized');
+ await page.mouse.move(frame.x+frame.width/2,frame.y+frame.height/2);
+ await page.mouse.down();
+ await page.mouse.move(frame.x+frame.width/2-30,frame.y+frame.height/2,{steps:4});
+ await page.mouse.up();
+ assert.match(await page.locator('#cropZoomLabel').innerText(),/1\.30/,
+   'A 1x square crop should auto-zoom when the user drags horizontally');
+ assert.notEqual(await page.locator('#cropXLabel').innerText(),'50%',
+   'Dragging a square mobile icon must actually change the X position');
+ console.log('PASS: PREV/NEXT preserve editor tab, selected draft preview, and 1x square mobile drag pan');
 }finally{await browser.close()}
