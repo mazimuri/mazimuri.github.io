@@ -662,7 +662,7 @@
     background:#ff4b50;opacity:1;
   }
   #worldDetailPanel .world-story-item{
-    order:0;
+    order:0;position:relative;
     display:grid;grid-template-columns:auto minmax(0,1fr);
     min-height:136px;gap:11px;
     padding:14px 12px 53px;
