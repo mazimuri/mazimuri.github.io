@@ -157,7 +157,9 @@
     left:0;top:0;width:24%;height:4px;background:#eaff55;
   }
   #directory .allcast-roster-shell:not(.is-gallery){display:contents}
+  #directory .allcast-roster-shell:not(.is-gallery) .allcast-deck-top{display:none!important}
   #directory .allcast-roster-shell.is-gallery{
+    position:relative;z-index:1;
     display:flex;
     flex:0 1 auto;
     flex-direction:column;
