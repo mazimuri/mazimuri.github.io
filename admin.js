@@ -249,7 +249,7 @@ async function upload(el){const file=el.files?.[0];if(!file)return;const c=selec
  if(!(await api.saveDraft())){if(gidx!==undefined&&c)c.gallery[Number(gidx)].image=old;else target[key]=old;notify('画像の保存に失敗しました。BACKUPから書き出してね');return}render();notify('画像をクラウド下書きに保存したよ（公開までは非公開）')
  }catch(e){notify('画像を読み込めませんでした。PNG/JPG/WebPを試してね')}}
 // Admin controls and delegation
-$('openAdmin').onclick=enter;$('adminExit').onclick=exit;$('adminPreview').onclick=preview;$('adminPublish').onclick=publish;$('backToAdmin').onclick=enter;
+$('openAdmin').onclick=enter;$('adminExit').onclick=exit;$('adminPreview').onclick=()=>preview();$('adminPublish').onclick=publish;$('backToAdmin').onclick=enter;
 $$('[data-admin-section]').forEach(b=>b.onclick=()=>setSection(b.dataset.adminSection));
 $('cloudLogout').addEventListener('click', async()=>{if(confirm('ログアウトしますか？'))await api.signOut()});
 $('adminContent').addEventListener('click',e=>{const tab=e.target.closest('[data-char-tab]');if(tab){state.tab=tab.dataset.charTab;render();return}const b=e.target.closest('[data-action]');if(b)handleAction(b)});
