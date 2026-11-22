@@ -11,13 +11,14 @@
 <link href="mobile.css?v=15.3.0" rel="stylesheet"/>
 <link rel="stylesheet" href="cast-side-rail.css?v=16.1.2">
 <link rel="stylesheet" href="cast-view-adjustments.css?v=15.6.2">
-<link rel="stylesheet" href="cast-rail-current.css?v=16.0.4">
-<link rel="stylesheet" href="cast-allcast-current.css?v=1.0.0">
+<link rel="stylesheet" href="cast-rail-current.css?v=18.0.0">
+<link rel="stylesheet" href="cast-allcast-current.css?v=1.1.0">
 <link rel="stylesheet" href="cast-worlds-current.css?v=1.0.0">
+<link rel="stylesheet" href="cast-navigation-current.css?v=18.0.0">
 <script defer="" src="cloud-config.js"></script>
 <script defer="" src="data.js?v=5.9.10"></script>
-<script defer="" src="app.js?v=15.2.2"></script>
-<script defer src="cast-side-rail.js?v=16.0.0"></script>
+<script defer="" src="app.js?v=15.2.3"></script>
+<script defer src="cast-side-rail.js?v=18.0.0"></script>
 
 
 
@@ -124,9 +125,9 @@
 </section>
 
 <aside class="v5-rail" id="v5Rail" aria-label="キャラクター選択。奥から手前へ大きくなるセレクター">
-<div class="v5-control-head" role="group" aria-label="キャラクターのグループ移動"><div class="v5-batch-pair"><button type="button" class="v5-batch" id="v5BatchPrev" aria-label="4人前へ" title="4人前へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 17 L16 4 L28 17" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button><button type="button" class="v5-batch" id="v5BatchNext" aria-label="4人先へ" title="4人先へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 4 L16 17 L28 4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button></div><span class="v5-batch-label">JUMP ±04</span></div>
+<div class="v5-control-head" role="group" aria-label="キャラクターのグループ移動"><div class="v5-batch-pair"><button type="button" class="v5-batch" id="v5BatchPrev" aria-label="4人前へ" title="4人前へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 17 L16 4 L28 17" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button><button type="button" class="v5-batch" id="v5BatchNext" aria-label="4人先へ" title="4人先へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 4 L16 17 L28 4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button></div><span class="v5-batch-label">STEP ±01</span></div>
 <div class="v5-stack" id="v5Stack" role="tablist" aria-label="キャラクター切り替え。選択中のキャラクターは最下段に表示されます"></div>
-<div class="v5-readout" aria-live="polite"><span id="v5Count">01 / 04</span><span>SCROLL / SELECT</span></div>
+<div class="v5-readout" aria-live="polite"><span id="v5Count">01 / 04</span><span>WHEEL / ↑↓ · SHIFT ×04</span></div>
 </aside>
 <section aria-label="キャラクター切り替え" class="picker">
 <div class="picker-title"><span class="picker-label mono"><i></i> NOW BROWSING</span><strong>CHOOSE<br/><em>YOUR</em> CAST<span class="period">.</span></strong><span class="picker-count mono" id="pickerCount">03 SIGNALS DETECTED</span></div>
@@ -142,7 +143,7 @@
 </main>
 <div class="overlay-scrim" hidden="" id="scrim"></div>
 <aside aria-hidden="true" aria-label="キャラクター詳細" aria-modal="true" class="dossier" id="dossier" role="dialog">
-<div class="dossier-head"><span class="mono">/ / /   CHARACTER INTELLIGENCE   <b id="dossierNo">#001</b></span><button aria-label="プロフィールを閉じる" class="panel-close" data-close="" type="button">BACK TO SELECT   ×</button></div>
+<div class="dossier-head"><span class="mono">/ / /   CHARACTER INTELLIGENCE   <b id="dossierNo">#001</b></span><button type="button" id="dossierWorldReturn" class="dossier-world-return" hidden></button><button aria-label="プロフィールを閉じる" class="panel-close" data-close="" type="button">BACK TO SELECT   ×</button></div>
 <div class="dossier-scroll">
 <div class="dossier-feature"><img alt="" aria-hidden="true" class="dossier-mobile-art" id="dossierMobileArt" src="assets/orphe.png"/><span class="mono dossier-eyebrow" id="dossierEyebrow">PERSONNEL RECORD / ZETA</span><div class="dossier-super" id="dossierSuper">ORPHE</div><div class="dossier-name" id="dossierName">オルフェ・ロジエ</div><p class="dossier-lead" id="dossierLead">その才能は、たった一人を美しく飾るために。</p></div>
 <div aria-label="プロフィール項目" class="dossier-tabs" role="tablist">
