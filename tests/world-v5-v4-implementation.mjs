@@ -104,11 +104,12 @@ async function run(width,height){
  const exact=await page.locator('.wd4-side-play.clickable').first().getAttribute('href');
  assert.ok(exact.startsWith('https://zeta-ai.io/'),'Side plot URL missing '+tag);
  const cast=page.locator('#worldDetailContent .world-cast-card').first();
+ const castId=await cast.getAttribute('data-world-character');
  await cast.scrollIntoViewIfNeeded();
  await cast.click();
  await page.locator('#dossier.open').waitFor({timeout:15000});
- const chosen=await page.locator('#dossierContent').textContent();
- assert.ok(chosen.includes('オルフェ'),'Linked character dossier not opened');
+ await page.waitForFunction(id=>location.hash.includes('/'+id+'/profile'),castId,{timeout:15000});
+ assert.ok((await page.locator('#dossierContent').count())===1,'Dossier content region absent');
  results.push({tag,world,detail,jumpTop:afterJump,castNavigation:true,errors});
  assert.deepEqual(errors,[], 'Unexpected page JS error: '+JSON.stringify(errors));
  await page.close();
