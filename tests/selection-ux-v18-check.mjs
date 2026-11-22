@@ -53,13 +53,13 @@ async function runRail(w,h){
  await page.locator('#v5BatchNext').click();
  await waitIndex(page,2);
  await page.waitForTimeout(90);
- const stepMotion=await page.locator('#v5Stack .v5-item[data-slot="3"]').evaluate(el=>el.getAnimations().length);
+ const stepMotion=await page.locator('#v5Stack .v5-item[data-slot="3"]:not(.v6-rail-ghost)').evaluate(el=>el.getAnimations().length);
  assert.ok(stepMotion>0,'Single-step upper arrow did not animate');
  await page.waitForTimeout(460);
  await page.locator('#v5BatchNext').click({modifiers:['Shift']});
  await waitIndex(page,6);
  await page.waitForTimeout(90);
- const jumpMotion=await page.locator('#v5Stack .v5-item[data-slot="3"]').evaluate(el=>el.getAnimations().length);
+ const jumpMotion=await page.locator('#v5Stack .v5-item[data-slot="3"]:not(.v6-rail-ghost)').evaluate(el=>el.getAnimations().length);
  assert.ok(jumpMotion>0,'Shift+upper arrow (4 files) did not animate');
  await page.waitForTimeout(470);
  // Top card is 3 places ahead. A direct click must select it in one action.
@@ -77,7 +77,7 @@ async function runRail(w,h){
  await page.waitForTimeout(100);
  const direct=await page.evaluate(()=>window.__selectionHistory);
  assert.deepEqual([...new Set(direct)],[topId],'Top-card click must not tour intermediate portraits');
- const directMotion=await page.locator('#v5Stack .v5-item[data-slot="3"]').evaluate(el=>el.getAnimations().length);
+ const directMotion=await page.locator('#v5Stack .v5-item[data-slot="3"]:not(.v6-rail-ghost)').evaluate(el=>el.getAnimations().length);
  assert.ok(directMotion>0,'One-shot selected card animation missing');
  await page.screenshot({path:dir+'/'+tag+'-DIRECT-CLICK.png',animations:'disabled'});
  await page.waitForTimeout(470);
