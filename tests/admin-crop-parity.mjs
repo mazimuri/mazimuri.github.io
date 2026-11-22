@@ -8,7 +8,7 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const js=read('admin.js'),css=read('admin-v15-studio.css'),html=read('admin.html');
 const prod=read('cast-rail-current.css'),mobile=read('mobile.css'),all=read('cast-allcast-current.css');
 new Function(js); // Syntax only; do not execute browser code in Node.
-assert.match(js,/mode==='choose'\?frame\.querySelector\('\.v15-rail-inner'\):frame/);
+assert.match(js,/mode==='choose'\?frame\?\.querySelector\('\.v15-rail-inner'\):frame/);
 assert.match(js,/function cropMetrics\(mode,zoom\)/);
 assert.match(js,/Math\.max\(1\.3,Number\(p\.zoom\)\|\|1\)/);
 assert.match(js,/edit-prev/);assert.match(js,/edit-next/);
