@@ -87,16 +87,19 @@ if(process.argv.includes('--browser')){
     await page.setContent(fixture,{waitUntil:'load'});
     const mob=await page.evaluate(()=>{
       const cs=q=>getComputedStyle(document.querySelector(q));
+      const normalized=q=>{
+        const el=document.querySelector(q),raw=cs(q).transformOrigin.split(' ').map(parseFloat);
+        return [raw[0]/el.offsetWidth,raw[1]/el.offsetHeight];
+      };
       return {pub:cs('#publicMobile').transform,edit:cs('#editMobile').transform,
         live:cs('#liveMobile').transform,
-        origin:[cs('#publicMobile').transformOrigin,cs('#editMobile').transformOrigin,
-          cs('#liveMobile').transformOrigin],
+        origin:[normalized('#publicMobile'),normalized('#editMobile'),normalized('#liveMobile')],
         all:cs('.crop-canvas.crop-gallery-mode').aspectRatio};
     });
     assert.equal(mob.pub,mob.edit,'MOBILE editor scale mismatch');
     assert.equal(mob.pub,mob.live,'MOBILE LIVE scale mismatch');
-    assert.ok(mob.origin.every(p=>p==='50% 50%'||p===mob.origin[0]),
-      'MOBILE centered zoom origin mismatch');
+    for(const origin of mob.origin)for(const axis of origin)
+      assert.ok(Math.abs(axis-.5)<.002,'MOBILE centered zoom origin mismatch');
     assert.equal(mob.all,'1 / 1.08');
     await page.close();
     console.log('PASS: Chromium desktop V16 picture-bay transforms and mobile/gallery previews');
