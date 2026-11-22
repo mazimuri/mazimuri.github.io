@@ -144,6 +144,14 @@
   if(e.target.closest('.v5-allcast')){document.getElementById('openIndex')?.click();return;}
   const card=e.target.closest('[data-v5-target]');if(card)chooseCard(card.dataset.v5Target);
  });
+ // A second click on the already-selected portrait opens its profile.
+ // Clicking any other portrait still just selects it, as before.
+ stack.addEventListener('dblclick',e=>{
+  const card=e.target.closest('[data-v5-target]');
+  if(card?.getAttribute('aria-selected')==='true'&&card.dataset.v5Target===buttons()[selectedIx()]?.dataset.person){
+   document.getElementById('openDetail')?.click();
+  }
+ });
  batchPrev.addEventListener('click',e=>jumpGroup(-1,e.shiftKey));
  batchNext.addEventListener('click',e=>jumpGroup(1,e.shiftKey));
  rail.addEventListener('wheel',e=>{if(!desktop())return;

@@ -46,7 +46,7 @@ function setTheme(c){
 }
 function setText(id,value){$(id).textContent=String(value??'')}
 // Persistent visual scroll progress for the fixed-size INTRODUCTION window.
-// The scrolling remains native, so wheel, touch and keyboard continue to work.
+// Touch and keyboard scroll natively; wheel deltas are limited for easier reading.
 function updateIntroScrollIndicator(){
  const text=$('heroBio'),track=$('introScrollRail');if(!text||!track)return;
  const overflow=text.scrollHeight-text.clientHeight;
@@ -389,9 +389,33 @@ $('dossierContent').addEventListener('focusout',e=>{const button=e.target.closes
 $('dossierContent').addEventListener('scroll',hideConnectionTooltip,{passive:true});
 window.addEventListener('resize',hideConnectionTooltip);
 $('dossierContent').addEventListener('click',e=>{const rel=e.target.closest('[data-related-id]');if(rel){hideConnectionTooltip();choose(rel.dataset.relatedId,{detail:true,fromWorldId:state.returnWorldId});return}const w=e.target.closest('[data-related-world]');if(w){hideConnectionTooltip();openWorld(w.dataset.relatedWorld)}});
-$('pickerStrip').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)choose(b.dataset.person)});
+$('pickerStrip').addEventListener('click',e=>{
+ const b=e.target.closest('[data-person]');if(!b)return;
+ // Keep the active card in place so a second click can produce a native dblclick.
+ if(b.dataset.person!==cur()?.id)choose(b.dataset.person);
+});
+$('pickerStrip').addEventListener('dblclick',e=>{
+ const b=e.target.closest('[data-person]');
+ if(b&&b.dataset.person===cur()?.id)$('openDetail').click();
+});
 $('prev').onclick=()=>shift(-1);$('next').onclick=()=>shift(1);
-$('pickerStrip').addEventListener('scroll',updatePickerEdges,{passive:true});$('heroBio').addEventListener('scroll',updateIntroScrollIndicator,{passive:true});
+$('pickerStrip').addEventListener('scroll',updatePickerEdges,{passive:true});
+$('heroBio').addEventListener('scroll',updateIntroScrollIndicator,{passive:true});
+// A full wheel notch is usually ~100px, more than the four-line INTRODUCTION viewport.
+// Cap each event to roughly 1–2 lines, but preserve smaller touchpad deltas.
+// Touch and keyboard scrolling stay native; no scroll-snap or layout changes.
+function stepIntroWheel(e){
+ if(e.ctrlKey||e.metaKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+ const el=e.currentTarget,overflow=el.scrollHeight-el.clientHeight;
+ if(overflow<=2||!e.deltaY)return;
+ const pixels=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?el.clientHeight:1);
+ const limit=Math.min(36,el.clientHeight*.45);
+ const step=Math.sign(pixels)*Math.min(Math.abs(pixels),limit);
+ e.preventDefault();
+ el.scrollTop=Math.max(0,Math.min(overflow,el.scrollTop+step));
+}
+$('heroBio').addEventListener('wheel',stepIntroWheel,{passive:false});
+$('mobileIntroText').addEventListener('wheel',stepIntroWheel,{passive:false});
 window.addEventListener('resize',()=>{followSelected(false);updatePickerEdges();updateIntroScrollIndicator()});
 $('pickerEdgePrev').onclick=()=>shift(-1);$('pickerEdgeNext').onclick=()=>shift(1);
 $('openDetail').onclick=()=>{state.tab='profile';open('dossier')};
