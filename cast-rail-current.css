@@ -242,10 +242,6 @@
    border-color:#eaff55!important;
    box-shadow:inset 0 0 0 1px #faffb8aa,0 0 0 2px #eaff55,0 0 0 4px #0a1418c9!important;
  }
- #main .v5-item .v5-card:hover .v5-card-name,
- #main .v5-item .v5-card:focus-visible .v5-card-name{
-   border-top:2px solid #eaff55!important;
- }
  /* The skewed shell, not a rectangular button box, is the keyboard focus ring. */
  #main .v5-item .v5-card:focus-visible{
    outline:none!important;
@@ -416,6 +412,16 @@
  #main .v5-allcast .v155-action-arrow{
    font:1000 clamp(15px,1.28vw,21px)/1 var(--mono)!important;
    transform:skewX(11deg)!important;writing-mode:horizontal-tb!important;
+ }
+ /* Fascia retains its physical size; inner line is painted by shadow.
+    The selected card's existing top accent becomes yellow only while targeted. */
+ #main .v5-rail .v5-item .v5-card:hover .v5-card-name,
+ #main .v5-rail .v5-item .v5-card:focus-visible .v5-card-name{
+   box-shadow:inset 0 2px 0 #eaff55,inset 0 -2px 0 #000c!important;
+ }
+ #main .v5-rail .v5-item[data-slot="3"] .v5-card:hover .v5-card-name,
+ #main .v5-rail .v5-item[data-slot="3"] .v5-card:focus-visible .v5-card-name{
+   border-top:2px solid #eaff55!important;
  }
  /* No unused V15 zeta/NEW overlay. Statuses live inside the fascia. */
  #main .v5-item .v5-badges{display:none!important}
