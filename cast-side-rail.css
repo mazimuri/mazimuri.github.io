@@ -633,7 +633,15 @@
    This desktop-only overlay intentionally leaves the mobile production UI untouched. */
 .v6-graphics{display:none}
 @media(min-width:801px){
- :root{--v6-rail-width:clamp(234px,22.9vw,480px)}
+ /* V16 / stable crop geometry: derive BOTH rail dimensions from one stage.
+    The 2K (2560 x 1271) composition remains exactly 480 x 1163.
+    Full HD and tall/narrow desktop windows scale all four card faces together
+    instead of changing each portrait viewport's width/height ratio.
+    Constrain by available width, height, and the established 2K maximum. */
+ :root{
+   --v16-rail-stage:clamp(568px,min(var(--v2-stage),55.48vw),1163px);
+   --v6-rail-width:calc(var(--v16-rail-stage) * 0.4127257094);
+ }
  #hero.hero{isolation:isolate}
  #hero .hero-pattern{opacity:.40!important;background-size:clamp(32px,3.2vw,48px) clamp(32px,3.2vw,48px)!important}
  #hero .hero-circles{left:24.7%!important;top:18%!important;opacity:.35!important;transform:rotate(-15deg)!important;width:min(69vw,1040px)!important}
