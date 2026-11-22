@@ -1,0 +1,31 @@
+name: WORLD V3 Persona x ZZZ real-site visual prototype
+on:
+  push:
+    branches: [study/worlds-persona-zzz-v3-20261122]
+    paths:
+      - tests/worlds-persona-zzz-v3.css
+      - tests/worlds-persona-zzz-v3-preview.mjs
+      - .github/workflows/worlds-persona-zzz-v3.yml
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax validation
+        run: node --check tests/worlds-persona-zzz-v3-preview.mjs
+      - name: Install browser
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Capture three real viewport layouts
+        run: node tests/worlds-persona-zzz-v3-preview.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-persona-zzz-v3-real-site
+          path: worlds-persona-zzz-v3-review/*
+          if-no-files-found: ignore
