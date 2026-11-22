@@ -221,7 +221,7 @@ function renderWorlds(){
    const num=String(i+1).padStart(2,'0');
    const count=Array.isArray(w.stories)?w.stories.filter(s=>s.title?.trim()).length:0;
    const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
-   const art=w.image?`<img class="ws5-backdrop" src="${esc(w.image)}" alt="" loading="lazy"><img class="ws5-art" src="${esc(w.image)}" alt="" loading="lazy">`:'';
+   const art=w.image?`<img class="ws5-backdrop" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}"><img class="ws5-art" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}">`:'';
    const placeholder=motif==='research'?'<span class="ws5-motif" aria-hidden="true">R0</span><span class="ws5-warning" aria-hidden="true"></span>':motif==='unassigned'?'<span class="ws5-motif" aria-hidden="true"><b>+</b><small>UNASSIGNED</small></span>':'';
    return `<button type="button" class="world-card ws5-card ${w.image?'has-cover':'no-cover'}" data-world="${esc(w.id)}" aria-label="${esc(w.title||'WORLD')}の詳細を見る">
      <span class="ws5-visual" data-motif="${motif}" aria-hidden="true">${art}<span class="ws5-file-mark"><b>◆</b> FILE / ${num} &nbsp; ${esc(w.category||'WORLD ARCHIVE')}</span><span class="ws5-huge">${num}</span>${placeholder}</span>
