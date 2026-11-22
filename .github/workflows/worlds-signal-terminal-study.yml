@@ -1,0 +1,29 @@
+name: WORLD SIGNAL TERMINAL design study
+on:
+  push:
+    branches: [study/worlds-signal-terminal-20261122]
+    paths:
+      - tests/worlds-signal-terminal-study.css
+      - tests/worlds-signal-terminal-preview.mjs
+      - .github/workflows/worlds-signal-terminal-study.yml
+  workflow_dispatch:
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check tests/worlds-signal-terminal-preview.mjs
+      - run: npm install --no-save --ignore-scripts playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/worlds-signal-terminal-preview.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: worlds-signal-terminal-real-site-comparison
+          path: worlds-signal-terminal-review/*
+          if-no-files-found: ignore
