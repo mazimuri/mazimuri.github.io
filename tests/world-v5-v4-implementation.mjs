@@ -29,11 +29,20 @@ async function prepare(width,height){
  }
  await page.waitForFunction(()=>document.querySelector('#worldsPanel.open #worldCards .ws5-card')!==null,null,{timeout:20000});
  await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.querySelectorAll('#worldCards img')].map(img=>img.decode().catch(()=>{})))});
+ await page.waitForFunction(()=>{const img=document.querySelector('#worldCards .ws5-card img.ws5-art');return !img||img.naturalWidth>0},null,{timeout:20000});
  return {page,errors};
 }
 async function run(width,height){
  const {page,errors}=await prepare(width,height);
  const tag=width+'x'+height;
+ const firstVisual=await page.locator('#worldCards .ws5-card').first().evaluate(el=>{
+ const img=el.querySelector('.ws5-art');
+ if(!img)return null;
+ const cs=getComputedStyle(img),r=img.getBoundingClientRect();
+ return {loaded:img.naturalWidth>0,naturalWidth:img.naturalWidth,display:cs.display,visibility:cs.visibility,opacity:cs.opacity,rect:{x:r.x,y:r.y,w:r.width,h:r.height}};
+ });
+ console.log('WORLD IMAGE '+tag+' '+JSON.stringify(firstVisual));
+ assert.ok(!firstVisual||firstVisual.loaded,'Primary WORLD art not loaded '+tag);
  const world=await page.evaluate(()=>{
    const panel=document.querySelector('#worldsPanel .directory-content');
    const grid=document.getElementById('worldCards');
