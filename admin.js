@@ -90,17 +90,18 @@ const badgeIsMobile=()=>matchMedia('(max-width:800px)').matches;
 const badgeField=()=>badgeIsMobile()?'fileBadgePositionMobile':'fileBadgePosition';
 const badgeVals=c=>({... (badgeIsMobile()?{right:8,top:66}:{...BADGE_DESKTOP_DEFAULT}),...(c[badgeField()]||{})});
 function artStudio(c){const p=artVals(c),b=badgeVals(c),number=String(doc().characters.indexOf(c)+1).padStart(3,'0');return `<section class="form-section"><h3>MAIN VISUAL STUDIO / 立ち絵とFILE番号の表示調整</h3>
- <p class="crop-hint">新しい右サイドバー版SELECTの構図を縮小表示します。背景をドラッグすると立ち絵が移動、FILEバッジをドラッグするとバッジ位置が変わります。位置はキャラ別に保存されます。</p>
+ <p class="crop-hint">公開側のSELECT画面から立ち絵・FILE番号の配置を取得して縮小表示します。立ち絵や番号をドラッグして調整できます。位置はキャラ別に保存されます。</p>
+ <p class="vstudio-mobile-note">MOBILE SELECTではFILE番号は非表示で、立ち絵の位置・倍率も固定です。下の位置調整はPC SELECT用として保存されます。PC幅で操作すると実際の変化を確認できます。</p>
  <div class="art-editor v594-art-editor"><div class="art-stage" id="artStage" role="group" aria-label="立ち絵のライブプレビュー。画像ドラッグで立ち絵、丸い番号ドラッグでバッジを動かせます">
  <div class="art-preview-scene hero theme-${['orphe','rov','unnamed'].includes(c.id)?c.id:'generic'}" id="artPreviewScene" style="--accent:${cleanColor(c.colors?.accent)};--deep:${cleanColor(c.colors?.deep)};--soft:${cleanColor(c.colors?.soft)};--bright:${cleanColor(c.colors?.bright)}">
  <div class="hero-surface"></div><div class="hero-dark-panel"></div><div class="hero-accent-slab"></div><div class="hero-pattern"></div><div class="hero-art-wrap" id="artPreviewWrap"><img class="hero-art" id="artStageImg" src="${esc(c.artwork||'')}" style="${artAttrs(c)}" alt=""></div>
  <div class="hero-art-stamp" id="artPreviewBadge" style="--badge-right:${(c.fileBadgePosition||{}).right??BADGE_DESKTOP_DEFAULT.right}%;--badge-top:${(c.fileBadgePosition||{}).top??BADGE_DESKTOP_DEFAULT.top}%;--badge-mobile-right:${(c.fileBadgePositionMobile||{}).right??8}%;--badge-mobile-top:${(c.fileBadgePositionMobile||{}).top??66}%"><span class="v7-stamp-original">FILE<br><b>${number}</b></span><span class="v7-stamp-detail" aria-hidden="true"><span class="v7-stamp-corner tl"></span><span class="v7-stamp-corner tr"></span><span class="v7-stamp-corner bl"></span><span class="v7-stamp-corner br"></span><span class="v7-stamp-inner"><small>FILE</small><strong>${number}</strong><i></i></span></span></div></div>
- <span class="art-stage-top mono">V15 SELECT / DRAG ART OR FILE BADGE</span></div>
+ <span class="art-stage-top mono">LIVE SELECT / DRAG ART OR FILE BADGE</span></div>
  <div class="art-controls"><div class="form-field"><label>SIZE / 倍率 <b id="artZoomLabel">${Number(p.zoom).toFixed(2)}×</b></label><input type="range" data-art-control="zoom" min="0.5" max="2.5" step="0.05" value="${p.zoom}"></div>
  <div class="form-field"><label>HORIZONTAL / 左右 <b id="artXLabel">${Math.round(p.x)}%</b></label><input type="range" data-art-control="x" min="-65" max="65" step="1" value="${p.x}"></div>
  <div class="form-field"><label>VERTICAL / 上下 <b id="artYLabel">${Math.round(p.y)}%</b></label><input type="range" data-art-control="y" min="-65" max="65" step="1" value="${p.y}"></div>
- <div class="form-field"><label>FILE BADGE / 左右 <b id="badgeRightLabel">${Math.round(b.right)}%</b></label><input type="range" data-badge-control="right" min="0" max="75" step="1" value="${b.right}"></div>
- <div class="form-field"><label>FILE BADGE / 上下 <b id="badgeTopLabel">${Math.round(b.top)}%</b></label><input type="range" data-badge-control="top" min="0" max="75" step="1" value="${b.top}"></div>
+ <div class="form-field art-badge-control"><label>FILE BADGE / 左右 <b id="badgeRightLabel">${Math.round(b.right)}%</b></label><input type="range" data-badge-control="right" min="0" max="75" step="1" value="${b.right}"></div>
+ <div class="form-field art-badge-control"><label>FILE BADGE / 上下 <b id="badgeTopLabel">${Math.round(b.top)}%</b></label><input type="range" data-badge-control="top" min="0" max="75" step="1" value="${b.top}"></div>
  ${btn('art-reset','↺ 立ち絵位置をリセット','small')} ${btn('badge-reset','↺ FILE番号の位置をリセット','small')}
  <p class="crop-hint">ヒント：立ち絵は背景側をドラッグ、FILE番号は丸いバッジをドラッグ。画面比率を変えた場合も縮小プレビューが追従します。</p></div></div></section>`}
 
