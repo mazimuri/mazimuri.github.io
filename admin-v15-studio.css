@@ -5,7 +5,9 @@
   width:min(100%,470px)!important;
   aspect-ratio:var(--v15-live-card-ratio,2.25)!important;
   min-height:0!important;max-height:none!important;
-  border:0!important;outline:2px solid #eaff54!important;
+  border:0!important;outline:3px solid #eaff54!important;
+  outline-offset:6px!important;
+  box-shadow:0 0 0 4px #080d11,0 0 0 10px #eaff54!important;
   border-radius:0!important;clip-path:none!important;
   overflow:visible!important;background:transparent!important;box-shadow:none!important;
 }
@@ -150,7 +152,8 @@
  }
 }
 
-/* MOBILE SELECT: production inherits top-left transform origin from the generic\n   [data-crop-render] rule. Mirror it without changing published styles. */
+/* MOBILE SELECT: focal-origin image scaling makes X/Y work for square crops.
+   The matching production-only image rule lives in mobile.css. */
 #admin .v15-icon-studio .crop-canvas.crop-mobile-mode{
   width:min(100%,200px)!important;aspect-ratio:1!important;
   min-height:0!important;max-height:none!important;
@@ -166,7 +169,7 @@
   width:100%!important;height:100%!important;object-fit:cover!important;
   object-position:var(--crop-x,50%) var(--crop-y,50%)!important;
   transform:scale(var(--crop-zoom,1))!important;
-  transform-origin:0 0!important;
+  transform-origin:var(--crop-x,50%) var(--crop-y,50%)!important;
 }
 #admin .v15-icon-studio .crop-phone-preview{
   display:flex;align-items:center;gap:13px;min-height:84px;
@@ -188,4 +191,31 @@
   #admin .v15-crop-rail-visual{flex-wrap:wrap}
   #admin .v15-icon-studio .crop-canvas.crop-gallery-mode,
   #admin .v15-icon-studio .crop-gallery-frame{aspect-ratio:1 / 1.08!important}
+}
+
+/* High-contrast framing of the drag surface, independent of art brightness. */
+#admin .v15-icon-studio .crop-canvas.crop-picker-mode .crop-guide-corner{
+  position:absolute;z-index:12;display:block;width:23px;height:23px;
+  pointer-events:none;filter:drop-shadow(2px 2px 0 #05090d);
+}
+#admin .v15-icon-studio .crop-guide-corner.tl{left:-2px;top:-2px;border-top:5px solid #eaff54;border-left:5px solid #eaff54}
+#admin .v15-icon-studio .crop-guide-corner.tr{right:-2px;top:-2px;border-top:5px solid #eaff54;border-right:5px solid #eaff54}
+#admin .v15-icon-studio .crop-guide-corner.bl{left:-2px;bottom:-2px;border-bottom:5px solid #eaff54;border-left:5px solid #eaff54}
+#admin .v15-icon-studio .crop-guide-corner.br{right:-2px;bottom:-2px;border-bottom:5px solid #eaff54;border-right:5px solid #eaff54}
+
+/* CAST NAVIGATION — scoped to the private edit surface. */
+#admin .edit-cast-navigation{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:12px;padding:10px 15px;margin:-5px 0 20px;
+  background:#1d2428;border:1px solid #485257;border-left:4px solid #eaff54;
+}
+#admin .edit-cast-count{font-size:10px;letter-spacing:.09em;color:#aebdc0}
+#admin .edit-cast-count b{font-size:13px;color:#eaff54;margin-left:8px}
+#admin .edit-cast-actions{display:flex;align-items:center;gap:7px}
+#admin .edit-cast-actions .admin-btn{min-width:86px}
+#admin .edit-cast-actions .admin-btn:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:620px){
+  #admin .edit-cast-navigation{align-items:stretch}
+  #admin .edit-cast-actions{width:100%}
+  #admin .edit-cast-actions .admin-btn{flex:1}
 }

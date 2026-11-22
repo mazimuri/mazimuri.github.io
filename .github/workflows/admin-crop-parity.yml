@@ -7,6 +7,7 @@ on:
       - admin.html
       - admin-v15-studio.css
       - tests/admin-crop-parity.mjs
+      - tests/admin-cast-navigation.mjs
       - .github/workflows/admin-crop-parity.yml
   workflow_dispatch:
 jobs:
@@ -27,3 +28,5 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Compare actual CSS computed styles at desktop and mobile sizes
         run: node tests/admin-crop-parity.mjs --browser
+      - name: Verify draft preview and PREV / NEXT editor navigation
+        run: node tests/admin-cast-navigation.mjs
