@@ -1,22 +1,7 @@
-/* STUDY 14 • Compact WORLD / ABOUT / WORLD DETAIL and accessible story cast.
-   The already-approved SELECT and ALL CAST layouts are intentionally unchanged. */
+/* CAST // SIGNAL — ABOUT and PROFILE viewport refinements.
+   Old Study 14/15 WORLD rules now have exactly one active owner:
+   cast-worlds-current.css. Keep non-WORLD adjustments untouched. */
 @media (min-width: 801px) {
-  /* The world index inherits the oversized ALL-CHARACTERS heading without its
-     compact layout: constrain this header independently to show the cards. */
-  #worldsPanel .directory-content {
-    padding:clamp(18px,2vw,28px) max(30px,5.2vw) 56px;
-  }
-  #worldsPanel .directory-kicker {font-size:10px;letter-spacing:.12em;}
-  #worldsPanel .directory-content h2 {
-    font-size:clamp(51px,5.4vw,85px);
-    line-height:.92;
-    margin:9px 0 9px;
-    letter-spacing:-.085em;
-  }
-  #worldsPanel .worlds-intro {font-size:13px;line-height:1.55;margin:0;}
-  #worldsPanel .world-cards {margin-top:22px;gap:14px;}
-  #worldsPanel .world-card.has-cover {min-height:clamp(240px,22vw,310px);}
-
   /* ABOUT: don't shrink the body copy: gain space in the decorative masthead. */
   #aboutPanel .about-content {padding-top:18px;}
   #aboutPanel .about-topline {padding-bottom:7px;}
@@ -33,53 +18,6 @@
   #aboutPanel .about-guide h3 {margin:7px 0 7px;font-size:17px;}
   #aboutPanel .about-guide p {line-height:1.7;}
   #aboutPanel .about-connect {margin-top:20px;padding:22px 0;}
-
-  /* WORLD DETAIL: enough hero illustration to establish the world, but the
-     stories and their cast should be reachable in the first viewport. */
-  #worldDetailPanel .world-detail-hero {min-height:315px;}
-  #worldDetailPanel .world-detail-hero-content {
-    padding:24px max(30px,5.2vw) 24px;
-    max-width:720px;
-  }
-  #worldDetailPanel .world-detail-hero h2 {
-    font-size:clamp(48px,5.5vw,86px);
-    line-height:.95;
-    margin:12px 0 10px;
-  }
-  #worldDetailPanel .world-detail-hero p {font-size:13px;line-height:1.6;margin:13px 0 0;}
-  #worldDetailPanel .world-detail-badges {margin:5px 0 0;min-height:18px;}
-  #worldDetailPanel .world-detail-subtitle {padding:5px 11px;font-size:12px;}
-  #worldDetailPanel .world-detail-stats {margin-top:13px;gap:21px;}
-  #worldDetailPanel .world-detail-main {padding:26px max(26px,5vw) 55px;}
-  #worldDetailPanel .world-detail-section-title {padding-bottom:11px;margin-bottom:13px;}
-  #worldDetailPanel .world-detail-section-title h3 {font-size:clamp(35px,4vw,51px);margin:1px 0;}
-  #worldDetailPanel .world-story-list {gap:13px;}
-  #worldDetailPanel .world-story-entry {border:1px solid #40484b;border-left:4px solid #b6d24c;background:#272b2e;transition:border-color .2s;}
-  #worldDetailPanel .world-story-entry:has(.world-story-item:hover) {border-left-color:#e7fb57;}
-  #worldDetailPanel .world-story-cast {
-    min-height:50px;display:flex;align-items:center;gap:13px;
-    padding:8px 18px 7px;border-bottom:1px solid #3e4649;
-    background:linear-gradient(90deg,#1d2226,#24282b);
-  }
-  #worldDetailPanel .world-story-cast-caption {font-size:9px;letter-spacing:.085em;color:#d8ed6d;white-space:nowrap;}
-  #worldDetailPanel .world-story-cast-faces {display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-  #worldDetailPanel .world-story-avatar {
-    position:relative;width:33px;height:33px;flex:0 0 33px;padding:0;overflow:hidden;
-    border:2px solid #e8eee9;border-radius:50%;background:#1f2528;cursor:pointer;
-    box-shadow:0 0 0 1px #778081,0 2px 8px #0006;transition:transform .2s,border-color .2s;
-  }
-  #worldDetailPanel .world-story-avatar:hover,#worldDetailPanel .world-story-avatar:focus-visible {
-    transform:translateY(-3px) scale(1.07);border-color:var(--avatar-accent);outline:2px solid #eeff58;outline-offset:2px;
-  }
-  #worldDetailPanel .world-story-avatar img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--crop-x,50%) var(--crop-y,50%);transform:scale(var(--crop-zoom,1));transform-origin:center;}
-  #worldDetailPanel .world-story-cast-unlinked {font-size:9px;color:#a7b1b6;}
-  #worldDetailPanel .world-story-item {
-    min-height:67px;margin:0;padding:10px 17px;gap:15px;border:0;border-left:0;
-    background:#292e31;
-  }
-  #worldDetailPanel .world-story-item .world-story-num {font-size:21px;}
-  #worldDetailPanel .world-story-info b {font-size:16px;line-height:1.4;}
-  #worldDetailPanel .world-detail-section-title.cast-section {margin-top:35px;}
 
   /* PROFILE: recover vertical room in ordinary Full HD windows. Keep normal
      font sizes and native scrolling rather than squeeze the bio text. */
@@ -105,106 +43,4 @@
 @media (min-width:801px) and (max-width:1100px){
   #aboutPanel .about-heading {grid-template-columns:1fr 112px;}
   #aboutPanel .about-deco {height:84px;}
-  #worldDetailPanel .world-detail-hero {min-height:300px;}
 }
-@media (max-width:800px){
-  /* Retain mobile layouts; only style the story-cast rows added by this study. */
-  #worldDetailPanel .world-story-entry {background:#262a2d;border-left:3px solid #e5fb51;margin-bottom:10px;}
-  #worldDetailPanel .world-story-cast {display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px 8px;border-bottom:1px solid #42464a;}
-  #worldDetailPanel .world-story-cast-caption {font-size:9px;color:#e5fb51;}
-  #worldDetailPanel .world-story-cast-faces {display:flex;gap:6px;}
-  #worldDetailPanel .world-story-avatar {width:31px;height:31px;position:relative;overflow:hidden;border-radius:50%;border:2px solid white;padding:0;background:#212326;}
-  #worldDetailPanel .world-story-avatar img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--crop-x,50%) var(--crop-y,50%);transform:scale(var(--crop-zoom,1));}
-  #worldDetailPanel .world-story-item {margin:0;border-left:0;min-height:66px;}
-  #worldDetailPanel .world-story-cast-unlinked {font-size:9px;color:#a5b0b3;}
-}
-
-
-
-
-/* CAST // SIGNAL v15 — STORY FILES cast identification, without touching SELECT.
-   Character portraits and visible names are enlarged for real recognition. */
-@media (min-width:801px){
-  #worldDetailPanel .world-story-cast {
-    min-height:105px;
-    padding:10px 17px;
-    gap:17px;
-    align-items:center;
-  }
-  #worldDetailPanel .world-story-cast-caption {
-    flex:0 0 137px;
-    display:flex; flex-direction:column;
-    align-items:flex-start;gap:5px;
-    font-size:10px;line-height:1.25;
-    color:#dffa61;
-    font-weight:800;
-  }
-  #worldDetailPanel .world-story-cast-caption b {font-size:10px;font-weight:800;}
-  #worldDetailPanel .world-story-cast-caption small {font-size:10px;color:#abb8b7;font-weight:600;letter-spacing:.08em;}
-  #worldDetailPanel .world-story-cast-faces {gap:14px;align-items:flex-start;flex-wrap:wrap;}
-  #worldDetailPanel .world-story-avatar {
-    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-    position:relative;width:91px;height:auto;min-height:85px;flex:0 0 91px;
-    overflow:visible;border:0;border-radius:0;padding:0;background:transparent;
-    box-shadow:none;transition:transform .18s ease;cursor:pointer;
-  }
-  #worldDetailPanel .world-story-avatar:hover,
-  #worldDetailPanel .world-story-avatar:focus-visible {
-    transform:translateY(-4px);border:0;outline:none;
-  }
-  #worldDetailPanel .world-story-avatar-portrait {
-    position:relative;display:block;
-    width:66px;height:66px;flex:0 0 66px;
-    overflow:hidden;border-radius:50%;background:#182027;
-    border:3px solid #f1f3ef;
-    box-shadow:0 0 0 2px var(--avatar-accent),0 4px 11px #0009;
-    transition:border-color .18s ease,box-shadow .18s ease;
-  }
-  #worldDetailPanel .world-story-avatar:hover .world-story-avatar-portrait,
-  #worldDetailPanel .world-story-avatar:focus-visible .world-story-avatar-portrait {
-    box-shadow:0 0 0 3px #eaff55,0 5px 12px #000a;
-  }
-  #worldDetailPanel .world-story-avatar-portrait img {
-    position:absolute;inset:0;width:100%;height:100%;
-    object-fit:cover;object-position:var(--crop-x,50%) var(--crop-y,50%);
-    transform:scale(var(--crop-zoom,1));transform-origin:center;
-  }
-  #worldDetailPanel .world-story-avatar-name {
-    display:block;margin-top:6px;
-    max-width:100%;text-align:center;
-    font-size:11px;font-weight:800;line-height:1.3;
-    color:#f6f7f4;white-space:normal;overflow-wrap:anywhere;
-    transition:color .18s ease;
-  }
-  #worldDetailPanel .world-story-avatar:hover .world-story-avatar-name,
-  #worldDetailPanel .world-story-avatar:focus-visible .world-story-avatar-name {color:#eaff55;}
-}
-@media (max-width:800px){
-  #worldDetailPanel .world-story-cast {gap:10px;padding:11px 12px 12px;}
-  #worldDetailPanel .world-story-cast-caption {width:100%;font-size:10px;letter-spacing:.07em;}
-  #worldDetailPanel .world-story-cast-caption b {font-size:10px;}
-  #worldDetailPanel .world-story-cast-caption small {margin-left:6px;font-size:10px;color:#bac4bc;}
-  #worldDetailPanel .world-story-cast-faces {gap:8px;align-items:flex-start;flex-wrap:wrap;}
-  #worldDetailPanel .world-story-avatar {
-    display:flex;flex-direction:column;align-items:center;
-    position:relative;width:74px;height:auto;min-height:82px;flex:0 0 74px;
-    overflow:visible;background:transparent;border:0;border-radius:0;padding:0;box-shadow:none;
-  }
-  #worldDetailPanel .world-story-avatar-portrait {
-    position:relative;display:block;overflow:hidden;
-    width:56px;height:56px;flex:0 0 56px;
-    border-radius:50%;background:#182027;
-    border:2px solid #f2f4f0;box-shadow:0 0 0 2px var(--avatar-accent),0 3px 9px #0008;
-  }
-  #worldDetailPanel .world-story-avatar-portrait img {
-    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-    object-position:var(--crop-x,50%) var(--crop-y,50%);
-    transform:scale(var(--crop-zoom,1));transform-origin:center;
-  }
-  #worldDetailPanel .world-story-avatar-name {
-    display:block;margin-top:6px;max-width:100%;font-size:10px;font-weight:800;
-    line-height:1.3;text-align:center;color:#f6f7f4;overflow-wrap:anywhere;
-  }
-  #worldDetailPanel .world-story-avatar:focus-visible {outline:2px solid #eaff55;outline-offset:3px;}
-}
-

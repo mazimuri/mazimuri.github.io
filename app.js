@@ -214,8 +214,20 @@ function renderDirectory({resetScroll=false}={}){
  if(resetScroll)el.scrollTop=0;
  requestAnimationFrame(updateAllCastRosterFooter);
 }
-function renderWorlds(){const worlds=state.doc.worlds||[];
- $('worldCards').innerHTML=worlds.map((w,i)=>{const group=state.people.filter(c=>c.worldIds?.includes(w.id));return `<button type="button" class="world-card ${w.image?'has-cover':'no-cover'}" data-world="${esc(w.id)}" style="--world-accent:${esc(w.accent||'#e1fb42')}">${w.image?`<span class="world-card-image" aria-hidden="true"><img class="world-bg" src="${esc(w.image)}" alt="" loading="lazy"><img class="world-figure" src="${esc(w.image)}" alt="" loading="lazy"></span>`:''}<span class="world-top">WORLD / ${String(i+1).padStart(2,'0')} ${worldBadges(w)}</span><strong>${esc(w.title)}</strong><small>${esc(w.subtitle||w.category||'')} &nbsp; · &nbsp; ${group.length} CAST</small><p class="world-excerpt">${esc(w.summary||'')}</p><span class="world-arrow">↗</span></button>`}).join('');
+function renderWorlds(){
+ const worlds=state.doc.worlds||[];
+ $('worldCards').innerHTML=worlds.map((w,i)=>{
+   const group=state.people.filter(c=>c.worldIds?.includes(w.id));
+   const num=String(i+1).padStart(2,'0');
+   const count=Array.isArray(w.stories)?w.stories.filter(s=>s.title?.trim()).length:0;
+   const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
+   const art=w.image?`<img class="ws5-backdrop" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}"><img class="ws5-art" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}">`:'';
+   const placeholder=motif==='research'?'<span class="ws5-motif" aria-hidden="true">R0</span><span class="ws5-warning" aria-hidden="true"></span>':motif==='unassigned'?'<span class="ws5-motif" aria-hidden="true"><b>+</b><small>UNASSIGNED</small></span>':'';
+   return `<button type="button" class="world-card ws5-card ${w.image?'has-cover':'no-cover'}" data-world="${esc(w.id)}" aria-label="${esc(w.title||'WORLD')}の詳細を見る">
+     <span class="ws5-visual" data-motif="${motif}" aria-hidden="true">${art}<span class="ws5-file-mark"><b>◆</b> FILE / ${num} &nbsp; ${esc(w.category||'WORLD ARCHIVE')}</span><span class="ws5-huge">${num}</span>${placeholder}</span>
+     <span class="ws5-info"><span class="ws5-meta"><span>WORLD ID / ${num}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span><strong class="ws5-name">${esc(w.title||'UNNAMED WORLD')}</strong><span class="ws5-summary">${esc(w.summary||w.subtitle||'世界観の紹介は準備中です。')}</span><span class="ws5-action">OPEN WORLD FILE <span class="ws5-arrow" aria-hidden="true">↗</span></span></span>
+   </button>`;
+ }).join('');
 }
 
 function worldById(id){return state.doc?.worlds.find(w=>w.id===id)}
@@ -238,31 +250,63 @@ function storyParticipants(t, group){
 function storyCastMarkup(t,group){
  const participants=storyParticipants(t,group);
  if(!participants.length)return '<span class="world-story-cast-unlinked mono">CAST / 登場キャラ未登録</span>';
- return `<span class="world-story-cast-caption mono">APPEARING CAST <b>/ ${String(participants.length).padStart(2,'0')}</b><small>登場キャラ</small></span><span class="world-story-cast-faces">${participants.map(c=>`<button class="world-story-avatar" type="button" data-world-character="${esc(c.id)}" aria-label="${esc(c.name)}のプロフィールを見る" title="${esc(c.name)}" style="--avatar-accent:${esc(c.colors?.accent||'#eaff58')}"><span class="world-story-avatar-portrait"><img src="${esc(icon(c))}" style="${cropStyle(c,'all')}" alt="" loading="lazy" data-crop-render></span><span class="world-story-avatar-name">${esc(c.name)}</span></button>`).join('')}</span>`;
+ return `<span class="world-story-cast-caption mono">登場キャラ <b>/ ${String(participants.length).padStart(2,'0')}</b><small>APPEARING CAST</small></span><span class="world-story-cast-faces">${participants.map(c=>`<button class="world-story-avatar" type="button" data-world-character="${esc(c.id)}" aria-label="${esc(c.name)}のプロフィールを見る" title="${esc(c.name)}" style="--avatar-accent:${esc(c.colors?.accent||'#eaff58')}"><span class="world-story-avatar-portrait"><img src="${esc(icon(c))}" style="${cropStyle(c,'all')}" alt="" loading="lazy" data-crop-render></span><span class="world-story-avatar-name">${esc(c.name)}</span></button>`).join('')}</span>`;
 }
 function renderWorldDetail(){
- const w=worldById(state.world);if(!w){$('worldDetailContent').innerHTML='<p class="empty">WORLDが見つかりません</p>';return}
+ const w=worldById(state.world);
+ if(!w){$('worldDetailContent').innerHTML='<p class="empty">WORLDが見つかりません</p>';return}
  const idx=state.doc.worlds.indexOf(w)+1;
  const group=state.people.filter(c=>c.worldIds?.includes(w.id));
  const rawStories=Array.isArray(w.stories)?w.stories:[];
  const stories=rawStories.filter(t=>t.title?.trim());
  const mainLink=validUrl(w.link);
- const mainAlready=stories.some(t=>validUrl(t.url)===mainLink&&mainLink);
+ const mainAlready=stories.some(t=>Boolean(mainLink)&&((storyPlotId(mainLink)&&storyPlotId(t.url)===storyPlotId(mainLink))||validUrl(t.url)===mainLink));
  const linkBlock=mainLink&&!mainAlready?`<a class="world-primary-link" href="${esc(mainLink)}" target="_blank" rel="noopener noreferrer"><span>↗ MAIN / WORLD LINK</span><b>登録した作品URLへ進む</b></a>`:'';
  const heroImage=w.image?`<img src="${esc(w.image)}" alt="" class="world-detail-art">`:'';
  const safeAccent=/^#[0-9a-f]{6}$/i.test(w.accent)?w.accent:'#eafa42';
- $('worldDetailContent').innerHTML=`<section class="world-detail-hero" style="--wd-accent:${esc(safeAccent)}">
-    <div class="world-detail-backdrop">${heroImage}</div>
-    <div class="world-detail-hero-content"><div class="world-detail-kicker mono">FILE ${String(idx).padStart(2,'0')} / WORLD DATABASE / ${esc(w.category||'ARCHIVE')}</div>
-    <div class="world-detail-badges">${worldBadges(w)}</div><h2>${esc(w.title||'UNNAMED WORLD')}</h2><strong class="world-detail-subtitle">${esc(w.subtitle||'ORIGINAL WORLD')}</strong><p>${esc(w.summary||'世界観の詳細は準備中です。')}</p>
-    <div class="world-detail-stats mono"><span>${String(stories.length).padStart(2,'0')} STORIES</span><span>${String(group.length).padStart(2,'0')} CHARACTERS</span></div></div>
-  </section>
-  <div class="world-detail-main"><div class="world-detail-section-title"><span class="mono">01 / PLAYABLE STORIES</span><h3>STORY <i>FILES.</i></h3><p>気になる物語を選んで、作品ページへ。</p></div>
-   <div class="world-story-list">${stories.length?stories.map((t,i)=>{const href=validUrl(t.url);const tag=href?'a':'div';return `<div class="world-story-entry"><div class="world-story-cast">${storyCastMarkup(t,group)}</div><${tag} class="world-story-item ${href?'clickable':'pending'}" ${href?`href="${esc(href)}" target="_blank" rel="noopener noreferrer"`:''}><span class="world-story-num mono">${String(i+1).padStart(2,'0')}</span><div class="world-story-info"><small class="mono">${esc(t.label||'STORY')}</small><b>${esc(t.title)}</b>${t.description?`<p>${esc(t.description)}</p>`:''}</div><span class="world-story-arrow">${href?'↗':'—'}</span></${tag}></div>`}).join(''):'<p class="world-detail-empty">作品の登録はまだありません。</p>'}</div>
-   ${linkBlock}
-   <div class="world-detail-section-title cast-section"><span class="mono">02 / CHARACTER NETWORK</span><h3>CONNECTED <i>CAST.</i></h3><p>この世界に登場するキャラクター</p></div>
-   <div class="world-cast-grid">${group.length?group.map(c=>`<button type="button" class="world-cast-card" data-world-character="${esc(c.id)}" style="--cast-accent:${esc(c.colors.accent)}"><span class="world-cast-visual"><img data-crop-render src="${esc(icon(c))}" alt="" style="${cropStyle(c,'all')}"></span><span class="world-cast-info"><small class="mono">FILE #${esc(c.no)} ${c.playable?' / zeta':''}</small><strong>${esc(c.name)}</strong><em>VIEW PROFILE ↗</em></span></button>`).join(''):'<p class="world-detail-empty">キャラクターはまだ登録されていません。</p>'}</div>
-   <div class="world-detail-foot mono">© CAST / SIGNAL — CONNECTED WORLDS</div>
+ const realMain=stories.some(t=>/\bMAIN\b/i.test(t.label||''));
+ const storyCards=stories.map((t,i)=>{
+   const href=validUrl(t.url);
+   const external=href?`href="${esc(href)}" target="_blank" rel="noopener noreferrer"`:'';
+   const isMain=/\bMAIN\b/i.test(t.label||'')||(!realMain&&i===0);
+   const action=href?(/zeta-ai\.io/i.test(href)?'zetaで遊ぶ':'作品を見る'):'準備中';
+   const name=`<span class="world-story-num mono">${String(i+1).padStart(2,'0')}</span><span class="world-story-info"><small class="mono">${esc(t.label||'STORY')}</small><b>${esc(t.title)}</b>${t.description?`<p>${esc(t.description)}</p>`:''}</span>`;
+   if(isMain){
+     return `<article class="world-story-entry wd4-main-story"><${href?'a':'div'} class="world-story-item ${href?'clickable':'pending'}" ${external}>${name}<span class="world-story-arrow"><span class="world-story-arrow-label">${action}</span><span aria-hidden="true">${href?'↗':'—'}</span></span></${href?'a':'div'}><div class="world-story-cast">${storyCastMarkup(t,group)}</div></article>`;
+   }
+   return `<article class="world-story-entry wd4-side-story"><div class="world-story-item">${name}</div><div class="world-story-cast">${storyCastMarkup(t,group)}</div><div class="wd4-side-footer"><${href?'a':'span'} class="wd4-side-play ${href?'clickable':'pending'}" ${external}>${action}<span aria-hidden="true">${href?'↗':'—'}</span></${href?'a':'span'}></div></article>`;
+ }).join('');
+ $('worldDetailContent').innerHTML=`<div class="wd4-center">
+   <section class="wd4-dossier">
+    <div class="world-detail-hero wd4-hero" style="--wd-accent:${esc(safeAccent)}">
+     <div class="world-detail-backdrop">${heroImage}</div>
+     <div class="world-detail-hero-content">
+      <div class="world-detail-kicker mono">WORLD DOSSIER / ${String(idx).padStart(2,'0')} &nbsp; · &nbsp; ${esc(w.category||'ARCHIVE')}</div>
+      <h2>${esc(w.title||'UNNAMED WORLD')}</h2>
+      <span class="world-detail-subtitle">${esc(w.subtitle||w.category||'ORIGINAL WORLD')}</span>
+     </div>
+    </div>
+    <div class="wd4-brief">
+      <div class="wd4-brief-kicker mono">WORLD INTELLIGENCE / 世界観の説明</div>
+      <div class="wd4-description" data-short="${String((w.summary||'').length<110)}">${esc(w.summary||'世界観の詳細は準備中です。')}</div>
+      <div class="wd4-stats mono"><span><b>${String(stories.length).padStart(2,'0')}</b> STORY FILES</span><span><b>${String(group.length).padStart(2,'0')}</b> CONNECTED CAST</span></div>
+    </div>
+   </section>
+   <button type="button" class="wd4-story-jump" data-world-story-jump>VIEW STORY FILES ▼</button>
+   <div class="world-detail-main wd4-main">
+    <div id="wd4Stories" class="world-detail-section-title">
+      <div><span class="mono">01 / PLAYABLE STORIES</span><h3>STORY <i>FILES.</i></h3></div>
+      <p>${String(stories.length).padStart(2,'0')} AVAILABLE FILES<br>PLAY A STORY / EXPLORE THE CAST</p>
+    </div>
+    <div class="world-story-list">${stories.length?storyCards:'<p class="world-detail-empty">作品の登録はまだありません。</p>'}</div>
+    ${linkBlock}
+    <div class="world-detail-section-title cast-section">
+      <div><span class="mono">02 / CHARACTER NETWORK</span><h3>CONNECTED <i>CAST.</i></h3></div>
+      <p>${String(group.length).padStart(2,'0')} REGISTERED CAST<br>DISCOVER CHARACTER PROFILES</p>
+    </div>
+    <div class="world-cast-grid">${group.length?group.map(c=>`<button type="button" class="world-cast-card" data-world-character="${esc(c.id)}" style="--cast-accent:${esc(c.colors.accent)}"><span class="world-cast-visual"><img data-crop-render src="${esc(icon(c))}" alt="" style="${cropStyle(c,'all')}"></span><span class="world-cast-info"><small class="mono">FILE #${esc(c.no)} ${c.playable?' / zeta':''}</small><strong>${esc(c.name)}</strong><em>VIEW PROFILE ↗</em></span></button>`).join(''):'<p class="world-detail-empty">キャラクターはまだ登録されていません。</p>'}</div>
+    <div class="world-detail-foot mono">© CAST / SIGNAL — WORLD DATA / CONNECTED STORY NETWORK</div>
+   </div>
   </div>`;
 }
 
@@ -330,7 +374,12 @@ $$('[data-directory-view]').forEach(b=>b.addEventListener('click',()=>{state.dir
 $('copyFa').addEventListener('click',()=>{const t=website().faTag||'';if(navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>toast('FAタグをコピーしたよ')).catch(()=>window.prompt('FAタグをコピー',t));else window.prompt('FAタグをコピー',t)});
 $('worldCards').addEventListener('click',e=>{const b=e.target.closest('[data-world]');if(b)openWorld(b.dataset.world)});
 $('worldDetailBack').onclick=()=>open('worldsPanel');
-$('worldDetailContent').addEventListener('click',e=>{const b=e.target.closest('[data-world-character]');if(b)choose(b.dataset.worldCharacter,{detail:true})});
+$('worldDetailContent').addEventListener('click',e=>{
+ const jump=e.target.closest('[data-world-story-jump]');
+ if(jump){$('wd4Stories')?.scrollIntoView({behavior:state.animations?'smooth':'auto',block:'start'});return}
+ const b=e.target.closest('[data-world-character]');
+ if(b)choose(b.dataset.worldCharacter,{detail:true});
+});
 $('dossierContent').addEventListener('click',e=>{const mode=e.target.closest('[data-gallery-mode]'),pick=e.target.closest('[data-gallery-select]');if(mode){galleryState.view=mode.dataset.galleryMode;renderDossier()}else if(pick){galleryState.focus=Number(pick.dataset.gallerySelect);renderDossier()}});
 $('motionToggle').onclick=()=>{state.animations=!state.animations;document.body.classList.toggle('no-motion',!state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
 $('motionToggle').setAttribute('aria-pressed',String(state.animations))};
