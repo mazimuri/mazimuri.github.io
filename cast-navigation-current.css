@@ -3,23 +3,20 @@
    These styles are deliberately scoped, not appended as another Study stack. */
 #dossier .dossier-head{display:flex;align-items:center;gap:clamp(6px,.7vw,15px)}
 #dossier .dossier-head>.mono{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#dossier .dossier-world-return{
-  flex:0 1 auto;min-width:0;
-  margin-left:auto;padding:clamp(9px,.7vw,13px) clamp(11px,1vw,23px);
-  border:2px solid #eaff55;border-radius:3px;
-  background:#1d282c;color:#eaff55;
-  font:950 clamp(10px,.75vw,15px)/1.2 var(--jpn);
+/* Single contextual back action: no competing BACK destinations. */
+#dossier .dossier-head .panel-close{
+  flex:0 1 auto;min-width:0;max-width:min(60%,450px);
+  margin-left:auto;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  box-shadow:3px 3px 0 #06090b;
-  transition:background .15s,color .15s,transform .15s;
 }
-#dossier .dossier-world-return:hover,
-#dossier .dossier-world-return:focus-visible{
-  background:#eaff55;color:#121b1d;transform:translateY(-1px);
-  outline:2px solid #eaff55;outline-offset:2px;
+#dossier .dossier-head .panel-close.context-world-return{
+  background:#eaff55!important;color:#141c1f!important;
+  box-shadow:3px 3px 0 #080c0e;
 }
-#dossier .dossier-world-return[hidden]{display:none!important}
-#dossier .dossier-head .panel-close{flex:0 0 auto}
+#dossier .dossier-head .panel-close.context-world-return:hover,
+#dossier .dossier-head .panel-close.context-world-return:focus-visible{
+  background:#fff!important;color:#14191b!important;
+}
 #directory #directoryItems .is-current-cast{position:relative}
 #directory #directoryItems.directory-gallery .cast-gallery-card.is-current-cast:not(:hover):not(:focus-visible){
   outline-color:#eaff55!important;
@@ -56,9 +53,8 @@
 @media(max-width:800px){
  #dossier .dossier-head{gap:6px;padding-inline:12px}
  #dossier .dossier-head>.mono{display:none}
- #dossier .dossier-world-return{margin-left:0;max-width:calc(100% - 118px);font-size:11px;padding:9px 10px}
- #dossier .dossier-head .panel-close{margin-left:auto;padding:9px 11px;font-size:10px}
+ #dossier .dossier-head .panel-close{margin-left:auto;max-width:min(87vw,390px);padding:9px 11px;font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){
- #dossier .dossier-world-return{transition:none}
+ #dossier .dossier-head .panel-close{transition:none}
 }
