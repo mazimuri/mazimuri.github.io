@@ -4,7 +4,7 @@ const $=id=>document.getElementById(id), $$=q=>[...document.querySelectorAll(q)]
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const validUrl=x=>/^https?:\/\/[^\s]+$/i.test(x||'')?x:'';
 const api=window.CAST_DATA;
-const state={people:[],doc:null,index:0,panel:null,tab:'profile',filter:'all',world:'',mode:'published',animations:!matchMedia('(prefers-reduced-motion: reduce)').matches,timer:null,enterTimer:null,enterNonce:0,directoryView:'gallery'};
+const state={people:[],doc:null,index:0,panel:null,tab:'profile',filter:'all',world:'',mode:'published',animations:!matchMedia('(prefers-reduced-motion: reduce)').matches,timer:null,enterTimer:null,enterNonce:0,directoryView:'gallery',returnWorldId:'',returnWorldScroll:0};
 const stage=$('hero'), cur=()=>state.people[state.index];
 const cropOf=(c,view='choose')=>{const legacy={x:50,y:30,zoom:c?.icon?1:2.05,...(c?.iconCrop||{y:Number.isFinite(Number(c?.iconPosition))?Number(c.iconPosition):30})};return view==='all'?{...legacy,...(c?.allCastCrop||{})}:view==='mobile'?{...legacy,...(c?.mobileIconCrop||{})}:legacy};
 const cropStyle=(c,view='choose')=>{const p=cropOf(c,view);return `--crop-x:${Number(p.x)||0}%;--crop-y:${Number(p.y)||0}%;--crop-zoom:${Number(p.zoom)||1}`};
@@ -117,7 +117,11 @@ function updatePickerEdges(){
  $('pickerEdgeNext').hidden=!canCycle;
 }
 function route(path){const h='#'+path;if(location.hash!==h)history.pushState(null,'',h)}
-function choose(id,{routing=true,detail=false}={}){const i=state.people.findIndex(p=>p.id===id);if(i<0)return;state.index=i;close(false);load();if(detail){state.tab='profile';open('dossier',false)}if(routing)route('char/'+id+(detail?'/profile':''))}
+function choose(id,{routing=true,detail=false,fromWorldId=''}={}){const i=state.people.findIndex(p=>p.id===id);if(i<0)return;
+ // A return-to-WORLD control belongs to journeys that actually began in a WORLD.
+ state.returnWorldId=fromWorldId&&worldById(fromWorldId)?fromWorldId:'';
+ state.index=i;close(false);load();if(detail){state.tab='profile';open('dossier',false)}if(routing)route('char/'+id+(detail?'/profile':''));
+}
 function shift(n){if(state.people.length)choose(state.people[(state.index+n+state.people.length)%state.people.length].id)}
 function relationPanel(c){
  // Connections are explicitly registered in the editor. Being in the same WORLD alone
@@ -188,6 +192,15 @@ function renderDossier(){const c=cur();if(!c)return;
 /* ALL CAST / responsive cartridge roster.
    Uses the EXISTING gallery cards and click actions, only reports scroll
    progress when the current layout actually overflows. */
+function showSelectedAllCast(){
+ const list=$('directoryItems');
+ const selected=list.querySelector('[data-pick][aria-current="true"]');
+ if(!selected||!list.clientHeight)return;
+ const card=selected.getBoundingClientRect(),area=list.getBoundingClientRect();
+ const desired=list.scrollTop+card.top-area.top-(area.height-card.height)/2;
+ list.scrollTop=Math.max(0,Math.min(list.scrollHeight-list.clientHeight,desired));
+ updateAllCastRosterFooter();
+}
 function updateAllCastRosterFooter(){
  const list=$('directoryItems'),footer=$('allcastRosterFooter');
  if(!list||!footer)return;
@@ -207,8 +220,8 @@ function renderDirectory({resetScroll=false}={}){
  setText('directoryCount',`${String(items.length).padStart(2,'0')} FILES MATCH`);
  const el=$('directoryItems');el.classList.toggle('directory-gallery',state.directoryView==='gallery');el.classList.toggle('directory-detail',state.directoryView==='detail');
  $('allcastRosterShell').classList.toggle('is-gallery',state.directoryView==='gallery');
- if(state.directoryView==='gallery')el.innerHTML=items.map(c=>`<button type="button" data-pick="${esc(c.id)}" class="cast-gallery-card" style="--item-color:${esc(c.colors.accent)}" aria-label="${esc(c.name)}のプロフィールを開く"><span class="cast-gallery-visual"><img data-crop-render src="${esc(icon(c))}" alt="" style="${cropStyle(c,'all')}" loading="lazy"><span class="cast-gallery-number mono">FILE / ${esc(c.no)}</span></span><span class="cast-gallery-caption"><span class="cast-gallery-name">${esc(c.name)}</span><span class="cast-gallery-badges">${label(c)} ${newBadge(c)}</span><small>${esc(c.roleJa||c.role||'CHARACTER')}</small><span class="cast-gallery-world mono">${esc(c.world)}</span><span class="cast-gallery-arrow" aria-hidden="true">↗</span></span></button>`).join('')||'<p class="empty">該当するキャラが見つかりません。</p>';
- else el.innerHTML=items.map(c=>`<button type="button" data-pick="${esc(c.id)}" class="directory-item" style="--item-color:${esc(c.colors.accent)}"><span class="d-thumb"><img data-crop-render class="index-face ${c.icon?'has-face':''}" style="${cropStyle(c,'all')}" src="${esc(icon(c))}" alt=""><span class="d-no">${c.no}</span></span><span class="d-main"><span class="d-top"><small class="mono">CHARACTER / ${c.no}</small><span class="d-badges">${label(c)} ${newBadge(c)}</span></span><strong>${esc(c.name)}</strong><span class="d-roman">${esc(c.roman||c.name)}${c.surname?' / '+esc(c.surname):''}</span><span class="d-role">${esc(c.roleJa||c.role||'CHARACTER')}</span><span class="d-group">WORLD <i>/</i> ${esc(c.world)}</span></span><span class="d-arrow">↗</span></button>`).join('')||'<p class="empty">該当するキャラが見つかりません。</p>';
+ if(state.directoryView==='gallery')el.innerHTML=items.map(c=>`<button type="button" data-pick="${esc(c.id)}" class="cast-gallery-card ${c.id===cur()?.id?'is-current-cast':''}" aria-current="${c.id===cur()?.id}" style="--item-color:${esc(c.colors.accent)}" aria-label="${esc(c.name)}のプロフィールを開く${c.id===cur()?.id?'（現在選択中）':''}"><span class="cast-gallery-visual"><img data-crop-render src="${esc(icon(c))}" alt="" style="${cropStyle(c,'all')}" loading="lazy"><span class="cast-gallery-number mono">FILE / ${esc(c.no)}</span>${c.id===cur()?.id?'<span class="cast-gallery-current mono">◈ SELECTED</span>':''}</span><span class="cast-gallery-caption"><span class="cast-gallery-name">${esc(c.name)}</span><span class="cast-gallery-badges">${label(c)} ${newBadge(c)}</span><small>${esc(c.roleJa||c.role||'CHARACTER')}</small><span class="cast-gallery-world mono">${esc(c.world)}</span><span class="cast-gallery-arrow" aria-hidden="true">↗</span></span></button>`).join('')||'<p class="empty">該当するキャラが見つかりません。</p>';
+ else el.innerHTML=items.map(c=>`<button type="button" data-pick="${esc(c.id)}" class="directory-item ${c.id===cur()?.id?'is-current-cast':''}" aria-current="${c.id===cur()?.id}" style="--item-color:${esc(c.colors.accent)}"><span class="d-thumb"><img data-crop-render class="index-face ${c.icon?'has-face':''}" style="${cropStyle(c,'all')}" src="${esc(icon(c))}" alt=""><span class="d-no">${c.no}</span>${c.id===cur()?.id?'<span class="d-current">◈ SELECTED</span>':''}</span><span class="d-main"><span class="d-top"><small class="mono">CHARACTER / ${c.no}</small><span class="d-badges">${label(c)} ${newBadge(c)}</span></span><strong>${esc(c.name)}</strong><span class="d-roman">${esc(c.roman||c.name)}${c.surname?' / '+esc(c.surname):''}</span><span class="d-role">${esc(c.roleJa||c.role||'CHARACTER')}</span><span class="d-group">WORLD <i>/</i> ${esc(c.world)}</span></span><span class="d-arrow">↗</span></button>`).join('')||'<p class="empty">該当するキャラが見つかりません。</p>';
  $$('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===state.filter)));
  $$('[data-directory-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.directoryView===state.directoryView)));
  if(resetScroll)el.scrollTop=0;
@@ -320,8 +333,25 @@ function renderAbout(){
  $('mobileSocialLinks').innerHTML=links.length?links.map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(l.label)}を開く"><b>${esc(l.icon)}</b></a>`).join(''):'<small>LINKS / 準備中</small>';
 }
 function setNav(){$$('[data-nav]').forEach(b=>b.classList.toggle('active',state.panel==='directory'?b.dataset.nav==='index':(state.panel==='worldsPanel'||state.panel==='worldDetailPanel')?b.dataset.nav==='worlds':state.panel==='aboutPanel'?b.dataset.nav==='about':b.dataset.nav==='select'))}
-function open(which,routing=true){close(false);state.panel=which;const el=$(which);el.setAttribute('aria-hidden','false');el.classList.add('open');$('scrim').hidden=false;requestAnimationFrame(()=>$('scrim').classList.add('visible'));document.body.style.overflow='hidden';document.body.classList.toggle('detail-open',which==='dossier');if(which==='dossier'){renderDossier();$('dossierContent').scrollTop=0}if(which==='directory')renderDirectory();if(which==='worldsPanel')renderWorlds();if(which==='worldDetailPanel')renderWorldDetail();if(which==='aboutPanel')renderAbout();setNav();if(routing)route(which==='dossier'?'char/'+cur().id+'/'+state.tab:which==='directory'?'index':which==='aboutPanel'?'about':which==='worldDetailPanel'?'world/'+state.world:'worlds');el.querySelector('[data-close]')?.focus({preventScroll:true})}
+function open(which,routing=true){close(false);state.panel=which;const el=$(which);el.setAttribute('aria-hidden','false');el.classList.add('open');$('scrim').hidden=false;requestAnimationFrame(()=>$('scrim').classList.add('visible'));document.body.style.overflow='hidden';document.body.classList.toggle('detail-open',which==='dossier');if(which==='dossier'){renderDossier();$('dossierContent').scrollTop=0;syncWorldReturn()}if(which==='directory'){renderDirectory();requestAnimationFrame(showSelectedAllCast)}if(which==='worldsPanel')renderWorlds();if(which==='worldDetailPanel')renderWorldDetail();if(which==='aboutPanel')renderAbout();setNav();if(routing)route(which==='dossier'?'char/'+cur().id+'/'+state.tab:which==='directory'?'index':which==='aboutPanel'?'about':which==='worldDetailPanel'?'world/'+state.world:'worlds');el.querySelector('[data-close]')?.focus({preventScroll:true})}
 function close(routing=true){hideConnectionTooltip();$$('.dossier,.directory').forEach(el=>{el.classList.remove('open');el.setAttribute('aria-hidden','true')});$('scrim').classList.remove('visible');$('scrim').hidden=true;document.body.style.overflow='';document.body.classList.remove('detail-open');const before=state.panel;state.panel=null;setNav();if(before&&routing&&cur())route('char/'+cur().id)}
+function syncWorldReturn(){
+ // One obvious BACK action: never offer conflicting destinations in the header.
+ const button=$('dossier')?.querySelector('.dossier-head [data-close]');if(!button)return;
+ const w=worldById(state.returnWorldId);
+ button.textContent=w?'↶ '+w.title+'へ戻る':'BACK TO SELECT ×';
+ button.setAttribute('aria-label',w?w.title+'の世界観詳細に戻る':'キャラ選択に戻る');
+ button.classList.toggle('context-world-return',!!w);
+}
+function returnToOriginWorld(){
+ const id=state.returnWorldId;
+ if(!worldById(id))return false;
+ const scroll=state.returnWorldScroll;
+ state.returnWorldId='';
+ openWorld(id);
+ requestAnimationFrame(()=>$('worldDetailContent').scrollTop=scroll);
+ return true;
+}
 function openWorld(id){if(!worldById(id))return;state.world=id;state.filter='all';$('search').value='';open('worldDetailPanel')}
 function tab(k){hideConnectionTooltip();state.tab=k;renderDossier();$('dossierContent').scrollTop=0;route('char/'+cur().id+'/'+k)}
 function onRoute(){if(document.body.classList.contains('admin-open'))return;const path=decodeURIComponent(location.hash.replace(/^#/,'')),parts=path.split('/');if(parts[0]==='char'){
@@ -354,7 +384,7 @@ $('dossierContent').addEventListener('focusin',e=>{const button=e.target.closest
 $('dossierContent').addEventListener('focusout',e=>{const button=e.target.closest('.connection-avatar');if(button===activeConnection)hideConnectionTooltip()});
 $('dossierContent').addEventListener('scroll',hideConnectionTooltip,{passive:true});
 window.addEventListener('resize',hideConnectionTooltip);
-$('dossierContent').addEventListener('click',e=>{const rel=e.target.closest('[data-related-id]');if(rel){hideConnectionTooltip();choose(rel.dataset.relatedId,{detail:true});return}const w=e.target.closest('[data-related-world]');if(w){hideConnectionTooltip();openWorld(w.dataset.relatedWorld)}});
+$('dossierContent').addEventListener('click',e=>{const rel=e.target.closest('[data-related-id]');if(rel){hideConnectionTooltip();choose(rel.dataset.relatedId,{detail:true,fromWorldId:state.returnWorldId});return}const w=e.target.closest('[data-related-world]');if(w){hideConnectionTooltip();openWorld(w.dataset.relatedWorld)}});
 $('pickerStrip').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)choose(b.dataset.person)});
 $('prev').onclick=()=>shift(-1);$('next').onclick=()=>shift(1);
 $('pickerStrip').addEventListener('scroll',updatePickerEdges,{passive:true});$('heroBio').addEventListener('scroll',updateIntroScrollIndicator,{passive:true});
@@ -364,7 +394,7 @@ $('openDetail').onclick=()=>{state.tab='profile';open('dossier')};
 $('openIndex').onclick=()=>{state.world='';state.filter='all';$('search').value='';open('directory')};
 $$('[data-nav]').forEach(b=>b.onclick=()=>{if(b.dataset.nav==='select')close();else if(b.dataset.nav==='index'){state.world='';state.filter='all';$('search').value='';open('directory')}else if(b.dataset.nav==='worlds')open('worldsPanel');else open('aboutPanel')});
 $('brandHome').onclick=e=>{e.preventDefault();if(state.people.length)choose(state.people[0].id)};
-$$('[data-close]').forEach(b=>b.onclick=()=>close());$('scrim').onclick=()=>close();
+$$('[data-close]').forEach(b=>b.onclick=()=>{if(b.closest('#dossier')&&state.panel==='dossier'&&returnToOriginWorld())return;close()});$('scrim').onclick=()=>close();
 $$('.dossier-tabs [data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));$('search').addEventListener('input',()=>renderDirectory({resetScroll:true}));
 $$('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;state.world='';renderDirectory()});
 $('directoryItems').addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(b)choose(b.dataset.pick)});
@@ -378,7 +408,7 @@ $('worldDetailContent').addEventListener('click',e=>{
  const jump=e.target.closest('[data-world-story-jump]');
  if(jump){$('wd4Stories')?.scrollIntoView({behavior:state.animations?'smooth':'auto',block:'start'});return}
  const b=e.target.closest('[data-world-character]');
- if(b)choose(b.dataset.worldCharacter,{detail:true});
+ if(b){state.returnWorldScroll=$('worldDetailContent').scrollTop;choose(b.dataset.worldCharacter,{detail:true,fromWorldId:state.world})}
 });
 $('dossierContent').addEventListener('click',e=>{const mode=e.target.closest('[data-gallery-mode]'),pick=e.target.closest('[data-gallery-select]');if(mode){galleryState.view=mode.dataset.galleryMode;renderDossier()}else if(pick){galleryState.focus=Number(pick.dataset.gallerySelect);renderDossier()}});
 $('motionToggle').onclick=()=>{state.animations=!state.animations;document.body.classList.toggle('no-motion',!state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
@@ -440,7 +470,17 @@ stage.addEventListener('touchend',e=>{
  mobileSwipe=null;
 },{passive:true});
 stage.addEventListener('touchcancel',()=>{mobileSwipe=null},{passive:true});
-document.addEventListener('keydown',e=>{if(document.body.classList.contains('admin-open'))return;if(e.key==='Escape'&&state.panel){close();return}if(['ArrowLeft','ArrowRight'].includes(e.key)&&!state.panel&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();shift(e.key==='ArrowRight'?1:-1)}});
+document.addEventListener('keydown',e=>{
+ if(document.body.classList.contains('admin-open'))return;
+ if(e.key==='Escape'&&state.panel){if(state.panel!=='dossier'||!returnToOriginWorld())close();return}
+ if(!['ArrowUp','ArrowDown'].includes(e.key)||state.panel||!$('galleryLightbox').hidden)return;
+ const active=document.activeElement;
+ if(active?.isContentEditable||active?.closest('input,textarea,select,[role="textbox"],[contenteditable="true"]'))return;
+ e.preventDefault();
+ const direction=e.key==='ArrowDown'?1:-1;
+ if(window.CAST_SIDE_RAIL?.step)window.CAST_SIDE_RAIL.step(direction,{jump:e.shiftKey});
+ else shift(direction*(e.shiftKey&&state.people.length>4?4:1));
+});
 let frame=0;stage.addEventListener('pointermove',e=>{if(!state.animations||state.panel||e.pointerType==='touch')return;if(frame)return;const r=stage.getBoundingClientRect(),x=((e.clientX-r.left)/r.width-.5)*14,y=((e.clientY-r.top)/r.height-.5)*10;frame=requestAnimationFrame(()=>{stage.style.setProperty('--par-x',x.toFixed(1)+'px');stage.style.setProperty('--par-y',y.toFixed(1)+'px');frame=0})});stage.addEventListener('pointerleave',()=>{stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px')});
 window.addEventListener('hashchange',onRoute);window.addEventListener('popstate',onRoute);
 refresh('published');

@@ -1,0 +1,37 @@
+name: CAST selection wayfinding and animation V18
+on:
+  push:
+    branches: [feat/selection-ux-wayfinding-v18-20261122]
+    paths:
+      - app.js
+      - cast-side-rail.js
+      - cast-rail-current.css
+      - cast-allcast-current.css
+      - cast-navigation-current.css
+      - index.html
+      - admin.html
+      - tests/selection-ux-v18-check.mjs
+      - .github/workflows/selection-ux-v18.yml
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate syntax
+        run: node --check app.js && node --check cast-side-rail.js && node --check tests/selection-ux-v18-check.mjs
+      - name: Install test browser
+        run: npm install --no-save --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Test real UX and extra fictional characters only in browser
+        run: node tests/selection-ux-v18-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selection-ux-v18-real-site
+          path: selection-ux-v18-review/*
+          if-no-files-found: ignore

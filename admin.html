@@ -11,16 +11,17 @@
 <link rel="stylesheet" href="mobile.css?v=15.3.0">
 <link rel="stylesheet" href="cast-side-rail.css?v=16.1.2">
   <link rel="stylesheet" href="cast-view-adjustments.css?v=15.6.2">
-  <link rel="stylesheet" href="cast-rail-current.css?v=16.0.4">
-<link rel="stylesheet" href="cast-allcast-current.css?v=1.0.0">
+  <link rel="stylesheet" href="cast-rail-current.css?v=18.0.0">
+<link rel="stylesheet" href="cast-allcast-current.css?v=1.1.0">
 <link rel="stylesheet" href="cast-worlds-current.css?v=1.0.0">
+<link rel="stylesheet" href="cast-navigation-current.css?v=18.0.1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
   <script src="cloud-config.js" defer></script>
   <script src="cloud-data.js?v=5.9.10" defer></script>
   <link rel="stylesheet" href="cloud-admin.css">
   <link rel="stylesheet" href="admin-v15-studio.css?v=15.3.0">
-  <script src="app.js?v=15.2.2" defer></script>
-<script defer src="cast-side-rail.js?v=16.0.0"></script>
+  <script src="app.js?v=15.2.4" defer></script>
+<script defer src="cast-side-rail.js?v=18.0.0"></script>
   <script src="publisher.js" defer></script>
   <script src="admin.js?v=16.0.1" defer></script>
   <script src="visual-engine.js" defer></script>
@@ -144,9 +145,9 @@
 </section>
     
 <aside class="v5-rail" id="v5Rail" aria-label="キャラクター選択。奥から手前へ大きくなるセレクター">
-<div class="v5-control-head" role="group" aria-label="キャラクターのグループ移動"><div class="v5-batch-pair"><button type="button" class="v5-batch" id="v5BatchPrev" aria-label="4人前へ" title="4人前へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 17 L16 4 L28 17" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button><button type="button" class="v5-batch" id="v5BatchNext" aria-label="4人先へ" title="4人先へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 4 L16 17 L28 4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button></div><span class="v5-batch-label">JUMP ±04</span></div>
+<div class="v5-control-head" role="group" aria-label="キャラクターのグループ移動"><div class="v5-batch-pair"><button type="button" class="v5-batch" id="v5BatchPrev" aria-label="4人前へ" title="4人前へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 17 L16 4 L28 17" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button><button type="button" class="v5-batch" id="v5BatchNext" aria-label="4人先へ" title="4人先へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 4 L16 17 L28 4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button></div><span class="v5-batch-label">STEP ±01</span></div>
 <div class="v5-stack" id="v5Stack" role="tablist" aria-label="キャラクター切り替え。選択中のキャラクターは最下段に表示されます"></div>
-<div class="v5-readout" aria-live="polite"><span id="v5Count">01 / 04</span><span>SCROLL / SELECT</span></div>
+<div class="v5-readout" aria-live="polite"><span id="v5Count">01 / 04</span><span>WHEEL / ↑↓ · SHIFT ×04</span></div>
 </aside>
 <section class="picker" aria-label="キャラクター切り替え">
       <div class="picker-title"><span class="picker-label mono"><i></i> NOW BROWSING</span><strong>CHOOSE<br><em>YOUR</em> CAST<span class="period">.</span></strong><span class="picker-count mono" id="pickerCount">03 SIGNALS DETECTED</span></div>
