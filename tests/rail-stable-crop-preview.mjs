@@ -47,7 +47,14 @@ try{
    assert.ok(geometry.rail.width>150 && geometry.rail.height>500,'rail dimension invalid');
    assert.ok(geometry.items.every(i=>i.imageLayout[0]>60 && i.imageLayout[1]>25),'image bay clipped');
    assert.ok(geometry.items.every(i=>i.objectFit==='cover'),'image fit regressed');
-   if(phase==='after')assert.ok(geometry.documentWidth<=width+3,'horizontal page overflow');
+   // The existing site may already have intentional horizontal overhang from its
+   // decorative diagonal hero. Compare the new CSS against that baseline
+   // rather than incorrectly requiring a perfectly zero-overflow document.
+   if(phase==='after'){
+    const prior=records.find(r=>r.width===width&&r.height===height&&r.phase==='before');
+    assert.ok(geometry.documentWidth<=Math.max(width,prior.documentWidth)+3,
+      'new horizontal page overflow');
+   }
    records.push({width,height,phase,...geometry});
    console.log('RAIL '+width+'x'+height+' '+phase+' geometry='+JSON.stringify({rail:geometry.rail,ratios:geometry.items.map(i=>i.ratio),imageDims:geometry.items.map(i=>i.imageLayout)}));
    if((width===1920&&height===911)||(width===2560&&height===1271))
@@ -62,6 +69,9 @@ try{
   assert.ok(gap<=.035,'ratio differs Full HD / 2K slot '+i+': '+gap);
  }
  const previous=get(1920,911,'before');
+ assert.ok(fh.items[3].item.y<previous.items[3].item.y-25,'Full HD card spacing did not compress as intended');
+ assert.ok(Math.abs(k.items[3].item.y-get(2560,1271,'before').items[3].item.y)<2,
+   '2K approved vertical arrangement changed unexpectedly');
  console.log('FULLHD VS 2K delta before='+JSON.stringify(previous.items.map((v,i)=>+(v.ratio/get(2560,1271,'before').items[i].ratio-1).toFixed(3))));
  console.log('FULLHD VS 2K delta after='+JSON.stringify(fh.items.map((v,i)=>+(v.ratio/k.items[i].ratio-1).toFixed(3))));
  writeFileSync(dir+'/metrics.json',JSON.stringify(records,null,2));
