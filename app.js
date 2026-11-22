@@ -84,11 +84,11 @@ function load({animate=true}={}){
  setText('heroKicker',`CHARACTER FILE ${c.no} / ${String(state.people.length).padStart(3,'0')}`);setText('heroRole',c.roleJa||c.type||'ORIGINAL CHARACTER');
  const species=String(c.species||'').trim(),gender=String(c.gender||'').trim();$('heroCoreData').hidden=!(species||gender);$('heroSpeciesWrap').hidden=!species;$('heroGenderWrap').hidden=!gender;setText('heroSpecies',species);setText('heroGender',gender);
  setText('heroHook',c.hook||'');const voice=String(c.quote||'').trim(),bio=String(c.intro||'').trim();
- $('heroVoiceBlock').hidden=!voice;$('heroBioBlock').hidden=!bio;$('heroIntel').hidden=!(voice||bio);setText('heroVoice',voice);setText('heroBio',bio);$('heroBio').scrollTop=0;requestAnimationFrame(updateIntroScrollIndicator);$('heroCopy').classList.toggle('has-voice',!!voice);$('heroCopy').classList.toggle('has-bio',!!bio);$('heroNew').hidden=!isNew(c);setText('heroNumber',String(state.index+1).padStart(2,'0'));setText('ghostName',c.roman||'SIGNAL');
+ $('heroVoiceBlock').hidden=!voice;$('heroBioBlock').hidden=!bio;$('heroIntel').hidden=!(voice||bio);setText('heroVoice',voice);setText('heroBio',bio);cancelIntroWheelAnimation($('heroBio'));$('heroBio').scrollTop=0;requestAnimationFrame(updateIntroScrollIndicator);$('heroCopy').classList.toggle('has-voice',!!voice);$('heroCopy').classList.toggle('has-bio',!!bio);$('heroNew').hidden=!isNew(c);setText('heroNumber',String(state.index+1).padStart(2,'0'));setText('ghostName',c.roman||'SIGNAL');
  setText('mobileQuoteName',c.name||'名前未定');setText('mobileQuoteText',voice);
  $('mobileQuote').classList.toggle('no-quote',!voice);
  setText('mobileIntroText',bio||'紹介文は準備中です。');setText('mobileIntroNumber',c.no+' / CHARACTER FILE');
- $('mobileIntroText').scrollTop=0;requestAnimationFrame(updateMobileIntroProgress);
+ cancelIntroWheelAnimation($('mobileIntroText'));$('mobileIntroText').scrollTop=0;requestAnimationFrame(updateMobileIntroProgress);
  setText('heroMeta',`${c.playable?'PLAYABLE / zeta':'SHOWCASE'} / ${c.world}  ●  ${c.no}`);setText('sideDash',c.deco+' / SYSTEM READY');
  $('heroArt').src=c.artwork||'';const pos={x:0,y:0,zoom:1,...(c.artPosition||{})};$('heroArt').style.setProperty('--art-x',`${Number(pos.x)||0}%`);$('heroArt').style.setProperty('--art-y',`${Number(pos.y)||0}%`);$('heroArt').style.setProperty('--art-zoom',Number(pos.zoom)||1);$('heroArt').alt=c.name+'の立ち絵';const badge={...BADGE_DESKTOP_DEFAULT,...(c.fileBadgePosition||{})},mobileBadge={right:8,top:66,...(c.fileBadgePositionMobile||{})};$('artStamp').style.setProperty('--badge-right',Number(badge.right)+'%');$('artStamp').style.setProperty('--badge-top',Number(badge.top)+'%');$('artStamp').style.setProperty('--badge-mobile-right',Number(mobileBadge.right)+'%');$('artStamp').style.setProperty('--badge-mobile-top',Number(mobileBadge.top)+'%');$('artStamp').innerHTML=`<span class="v7-stamp-original">FILE<br><b>${esc(c.no)}</b></span><span class="v7-stamp-detail" aria-hidden="true"><span class="v7-stamp-corner tl"></span><span class="v7-stamp-corner tr"></span><span class="v7-stamp-corner bl"></span><span class="v7-stamp-corner br"></span><svg class="v10-stamp-arc" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><defs><path id="v10-stamp-arc-path" d="M 32 56 A 59 59 0 0 1 128 56"/></defs><text><textPath href="#v10-stamp-arc-path" startOffset="50%" text-anchor="middle">CAST SIGNAL</textPath></text></svg><span class="v7-stamp-inner"><small>FILE</small><strong>${esc(c.no)}</strong><i></i></span></span>`;
  renderPicker();renderMobileSelection();if(state.panel==='dossier')renderDossier();
@@ -401,9 +401,15 @@ $('pickerStrip').addEventListener('dblclick',e=>{
 $('prev').onclick=()=>shift(-1);$('next').onclick=()=>shift(1);
 $('pickerStrip').addEventListener('scroll',updatePickerEdges,{passive:true});
 $('heroBio').addEventListener('scroll',updateIntroScrollIndicator,{passive:true});
-// A full wheel notch is usually ~100px, more than the four-line INTRODUCTION viewport.
-// Cap each event to roughly 1–2 lines, but preserve smaller touchpad deltas.
-// Touch and keyboard scrolling stay native; no scroll-snap or layout changes.
+// INTRODUCTION wheel control: small steps with a smooth, interruptible glide.
+// Native touch/keyboard scrolling, trackpad-sized deltas, and fixed layout remain intact.
+const introWheelAnimations=new WeakMap();
+function cancelIntroWheelAnimation(el){
+ const motion=introWheelAnimations.get(el);
+ if(!motion)return;
+ cancelAnimationFrame(motion.raf);
+ introWheelAnimations.delete(el);
+}
 function stepIntroWheel(e){
  if(e.ctrlKey||e.metaKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
  const el=e.currentTarget,overflow=el.scrollHeight-el.clientHeight;
@@ -412,10 +418,37 @@ function stepIntroWheel(e){
  const limit=Math.min(36,el.clientHeight*.45);
  const step=Math.sign(pixels)*Math.min(Math.abs(pixels),limit);
  e.preventDefault();
- el.scrollTop=Math.max(0,Math.min(overflow,el.scrollTop+step));
+ const existing=introWheelAnimations.get(el);
+ const target=Math.max(0,Math.min(overflow,(existing?.target??el.scrollTop)+step));
+ if(!state.animations||matchMedia('(prefers-reduced-motion:reduce)').matches){
+  cancelIntroWheelAnimation(el);el.scrollTop=target;return;
+ }
+ if(existing){existing.target=target;return;}
+ const motion={target,lastTime:0,raf:0};
+ introWheelAnimations.set(el,motion);
+ function glide(now){
+  if(introWheelAnimations.get(el)!==motion)return;
+  const dt=motion.lastTime?Math.max(1,Math.min(48,now-motion.lastTime)):16;
+  motion.lastTime=now;
+  const end=Math.max(0,Math.min(el.scrollHeight-el.clientHeight,motion.target));
+  const remaining=end-el.scrollTop;
+  if(Math.abs(remaining)<0.6){
+   el.scrollTop=end;introWheelAnimations.delete(el);return;
+  }
+  // Frame-rate-independent ease-out: about 90% of the distance in 180 ms.
+  el.scrollTop+=remaining*(1-Math.exp(-dt/78));
+  motion.raf=requestAnimationFrame(glide);
+ }
+ motion.raf=requestAnimationFrame(glide);
 }
-$('heroBio').addEventListener('wheel',stepIntroWheel,{passive:false});
-$('mobileIntroText').addEventListener('wheel',stepIntroWheel,{passive:false});
+for(const id of ['heroBio','mobileIntroText']){
+ const el=$(id);
+ el.addEventListener('wheel',stepIntroWheel,{passive:false});
+ // A manual drag/touch interaction must immediately take over from the glide.
+ el.addEventListener('pointerdown',()=>cancelIntroWheelAnimation(el),{passive:true});
+ el.addEventListener('touchstart',()=>cancelIntroWheelAnimation(el),{passive:true});
+ el.addEventListener('keydown',()=>cancelIntroWheelAnimation(el));
+}
 window.addEventListener('resize',()=>{followSelected(false);updatePickerEdges();updateIntroScrollIndicator()});
 $('pickerEdgePrev').onclick=()=>shift(-1);$('pickerEdgeNext').onclick=()=>shift(1);
 $('openDetail').onclick=()=>{state.tab='profile';open('dossier')};
