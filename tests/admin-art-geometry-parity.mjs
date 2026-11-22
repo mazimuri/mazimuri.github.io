@@ -54,10 +54,18 @@ try{
       const img=el=>({transform:getComputedStyle(el).transform,origin:getComputedStyle(el).transformOrigin,
         fit:getComputedStyle(el).objectFit,position:getComputedStyle(el).objectPosition});
       const scene=q('artPreviewScene'),main=q('hero');
+      // Compare against how SELECT would actually render the draft character,
+      // not the different published character currently behind EDIT.
+      main.classList.remove('theme-rov');
+      main.classList.add('theme-orphe');
+      const realArt=metrics(q('artWrap')),realImage=img(q('heroArt')),
+        realBadge=metrics(q('artStamp'));
+      main.classList.remove('theme-orphe');
+      main.classList.add('theme-rov');
       return {
-       realArt:metrics(q('artWrap')),previewArt:metrics(q('artPreviewWrap')),
-       realImage:img(q('heroArt')),previewImage:img(q('artStageImg')),
-       realBadge:metrics(q('artStamp')),previewBadge:metrics(q('artPreviewBadge')),
+       realArt,previewArt:metrics(q('artPreviewWrap')),
+       realImage,previewImage:img(q('artStageImg')),
+       realBadge,previewBadge:metrics(q('artPreviewBadge')),
        realTheme:main.className,
        width:main.clientWidth,stageWidth:scene.offsetWidth,
        scaledScene:scene.getBoundingClientRect().width,
