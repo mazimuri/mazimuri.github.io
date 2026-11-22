@@ -451,6 +451,41 @@
 #worldDetailPanel .world-story-item.pending .world-story-arrow{
   background:#677475;color:#e3e9e6;
 }
+/* A SIDE story is a compact 3-part file: title → appearing cast → play.
+   Give the last row its own solid area so it cannot overlap character faces. */
+#worldDetailPanel .world-story-entry.wd4-side-story .world-story-item{
+  min-height:clamp(90px,6.25vw,147px);
+  padding-bottom:clamp(13px,.95vw,23px);
+}
+#worldDetailPanel .wd4-side-footer{
+  order:2;min-height:clamp(51px,3.4vw,78px);
+  display:flex;justify-content:flex-end;align-items:center;
+  padding:clamp(7px,.55vw,14px);
+  background:#dce2df;
+  border-top:1px solid #9caaa6;
+}
+#worldDetailPanel .wd4-side-play{
+  min-width:clamp(117px,7.9vw,180px);
+  height:clamp(35px,2.4vw,54px);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:0 clamp(11px,.7vw,17px);
+  background:#202a2d;color:white;
+  font:950 clamp(10px,.73vw,17px)/1 var(--jpn);
+  text-decoration:none;
+  clip-path:polygon(0 0,100% 0,100% 72%,84% 100%,0 100%);
+  transition:background .2s,color .2s;
+}
+#worldDetailPanel .wd4-side-play span{
+  font:1000 clamp(18px,1.28vw,28px)/1 var(--sans);
+}
+#worldDetailPanel .wd4-side-play.clickable:hover,
+#worldDetailPanel .wd4-side-play.clickable:focus-visible{
+  background:var(--ws-lime);color:#13191c;
+}
+#worldDetailPanel .wd4-side-play.pending{
+  background:#778280;color:#ebeeee;
+}
+
 #worldDetailPanel .world-story-entry.wd4-side-story .world-story-item{
   display:grid;grid-template-columns:auto minmax(0,1fr);
   min-height:clamp(135px,8.5vw,204px);
@@ -692,6 +727,8 @@
   #worldDetailPanel .world-story-arrow-label{
     font-size:11px;
   }
+  #worldDetailPanel .wd4-side-footer{min-height:51px;padding:7px 8px}
+  #worldDetailPanel .wd4-side-play{height:36px;min-width:133px;font-size:11px;padding:0 12px}
   #worldDetailPanel .world-story-cast{
     flex-direction:column;align-items:flex-start;
     gap:9px;min-height:0;
