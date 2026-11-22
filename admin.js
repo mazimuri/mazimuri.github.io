@@ -175,7 +175,7 @@ function showCrop(){const c=selected();if(!c)return;const p=cropVals(c,cropMode(
 function resetCrop(){const c=selected();if(!c)return;setCrop(c,{x:50,y:50,zoom:1});showCrop();persist('現在のアイコン枠をリセットしたよ')}
 let cropDrag=null;
 /* Pixel movement is mapped to the same actual picture bay rendered in SELECT.
-   Mobile has a centered transform origin; PC/ALL CAST use focal origins. */
+   Mobile has a fixed top-left transform origin; PC/ALL CAST use focal origins. */
 function startCrop(e){
   const frame=e.target.closest('#cropCanvas');if(!frame||!selected())return;
   e.preventDefault();
@@ -184,10 +184,10 @@ function startCrop(e){
   const img=$('cropMainImg'),fw=photo?.clientWidth||frame.clientWidth,fh=photo?.clientHeight||frame.clientHeight;
   const ratio=img?.naturalWidth&&img.naturalHeight?img.naturalWidth/img.naturalHeight:1;
   const coverW=Math.max(fw,fh*ratio),coverH=Math.max(fh,fw/ratio);
-  const scale=(p.zoom||1)*(mode==='choose'?1.15:1),centerOrigin=mode==='mobile';
+  const scale=(p.zoom||1)*(mode==='choose'?1.15:1),fixedOrigin=mode==='mobile';
   cropDrag={id:e.pointerId,mode,x:e.clientX,y:e.clientY,cx:p.x,cy:p.y,h:fh,
-    overflowX:Math.max(0,centerOrigin?scale*(coverW-fw):scale*coverW-fw),
-    overflowY:Math.max(0,centerOrigin?scale*(coverH-fh):scale*coverH-fh)};
+    overflowX:Math.max(0,fixedOrigin?scale*(coverW-fw):scale*coverW-fw),
+    overflowY:Math.max(0,fixedOrigin?scale*(coverH-fh):scale*coverH-fh)};
   frame.setPointerCapture(e.pointerId);frame.classList.add('dragging');
 }
 function dragCrop(e){
