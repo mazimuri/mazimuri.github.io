@@ -136,15 +136,31 @@ async function runWorld(w,h){
  const worldTitle=await page.locator('#worldDetailPanel .world-detail-hero h2').textContent();
  await page.locator('#worldDetailContent .world-cast-card').first().click();
  await page.locator('#dossier.open').waitFor();
- const btn=page.locator('#dossierWorldReturn');
+ const btn=page.locator('#dossier .dossier-head .panel-close');
  await btn.waitFor({state:'visible'});
- assert.ok((await btn.textContent()).includes(worldTitle),'Return button should name originating WORLD');
+ assert.equal(await page.locator('#dossier .dossier-head button').count(),1,'PROFILE must have only one BACK action');
+ assert.ok((await btn.textContent()).includes(worldTitle),'Single BACK action should name originating WORLD');
+ assert.ok((await btn.getAttribute('aria-label')).includes('世界観詳細'),'WORLD return needs a clear accessible label');
  await page.screenshot({path:dir+'/'+tag+'-WORLD-RETURN.png',animations:'disabled'});
  await btn.click();
  await page.locator('#worldDetailPanel.open').waitFor();
  await page.waitForTimeout(150);
  const after=await page.locator('#worldDetailContent').evaluate(el=>el.scrollTop);
  assert.ok(Math.abs(after-scroll)<4,'WORLD scroll location was not restored: '+scroll+' -> '+after);
+ // The same contextual return must work with Escape after reopening.
+ await page.locator('#worldDetailContent .world-cast-card').first().scrollIntoViewIfNeeded();
+ await page.locator('#worldDetailContent .world-cast-card').first().click();
+ await page.locator('#dossier.open').waitFor();
+ await page.keyboard.press('Escape');
+ await page.locator('#worldDetailPanel.open').waitFor();
+ // A normal, direct SELECT route must keep the original BACK TO SELECT label.
+ const firstId=await page.locator('#pickerStrip [data-person]').first().getAttribute('data-person');
+ await page.evaluate(id=>window.CAST_PUBLIC.openCharacter(id),firstId);
+ await page.locator('#dossier.open').waitFor();
+ assert.ok((await btn.textContent()).includes('BACK TO SELECT'),'Normal PROFILE must return to SELECT');
+ assert.equal(await page.locator('#dossier .dossier-head button').count(),1,'Normal PROFILE has one BACK action too');
+ await btn.click();
+ await page.waitForFunction(()=>document.getElementById('dossier').getAttribute('aria-hidden')==='true');
  assert.deepEqual(errors,[]);
  findings.push({tag,worldTitle,scroll,after,returnVisible:true});
  await page.close();
