@@ -50,14 +50,14 @@
   gap:clamp(13px,1.25vw,28px);
   align-items:stretch;
   width:100%;
-  max-width:2320px;
+  max-width:1280px;
   margin:clamp(22px,1.7vw,42px) auto 0;
 }
 #worldsPanel .world-card.ws5-card{
   isolation:isolate;
   display:flex;flex-direction:column;justify-content:flex-start;
   position:relative;min-width:0;
-  width:100%;height:clamp(408px,26.5vw,615px);
+  width:100%;height:clamp(408px,22vw,430px);
   min-height:0;padding:0;
   text-align:left;color:#141b1e;
   border:4px solid #101719;
@@ -185,7 +185,7 @@
 }
 #worldsPanel .ws5-name{
   display:block;margin:clamp(9px,.75vw,19px) 0 0;
-  font:1000 clamp(26px,1.95vw,48px)/1.1 var(--jpn);
+  font:1000 clamp(26px,1.8vw,34px)/1.1 var(--jpn);
   letter-spacing:-.05em;color:#13191c;
   overflow-wrap:anywhere;max-width:100%;
   text-shadow:none!important;
@@ -193,7 +193,7 @@
 #worldsPanel .ws5-summary{
   margin:clamp(8px,.55vw,14px) 0 0;
   color:#44514f;
-  font:760 clamp(11px,.75vw,17px)/1.48 var(--jpn);
+  font:760 clamp(12px,.83vw,16px)/1.48 var(--jpn);
   display:-webkit-box;-webkit-box-orient:vertical;
   -webkit-line-clamp:2;overflow:hidden;
   min-height:2.96em; /* Reserve two complete lines above the CTA even on narrow cards. */
@@ -227,7 +227,7 @@
   background:repeating-linear-gradient(125deg,#ffffff05 0 1px,transparent 1px 65px),#10171a;
 }
 #worldDetailPanel .wd4-center{
-  width:min(84%,2240px);margin:0 auto;
+  width:min(92%,1280px);margin:0 auto;
   padding:clamp(17px,1.2vw,29px) 0 90px;
 }
 #worldDetailPanel .wd4-dossier{
@@ -313,7 +313,7 @@
   /* WORLD story lead: centered on desktop at the original 1120px content width. */
   width:min(100%,1120px);
   color:#141d20;
-  font:750 clamp(14px,1vw,23px)/1.64 var(--jpn);
+  font:750 clamp(16px,.95vw,20px)/1.7 var(--jpn);
   text-align:center;white-space:pre-wrap;overflow-wrap:anywhere;
 }
 #worldDetailPanel .wd4-description[data-short="true"]{text-align:center}
@@ -349,7 +349,7 @@
 }
 #worldDetailPanel .world-detail-section-title h3{
   color:#fff;margin:2px 0 0;
-  font:1000 clamp(36px,3.2vw,78px)/1 var(--sans);
+  font:1000 clamp(36px,3vw,60px)/1 var(--sans);
   letter-spacing:-.085em;
 }
 #worldDetailPanel .world-detail-section-title h3 i{
@@ -431,12 +431,12 @@
 #worldDetailPanel .world-story-info b{
   display:block;
   color:#172021;
-  font:1000 clamp(17px,1.3vw,29px)/1.32 var(--jpn);
+  font:1000 clamp(16px,1.2vw,24px)/1.32 var(--jpn);
   letter-spacing:-.045em;
   overflow-wrap:anywhere;
 }
 #worldDetailPanel .wd4-main-story .world-story-info b{
-  font-size:clamp(27px,2.05vw,49px);
+  font-size:clamp(26px,1.7vw,36px);
 }
 #worldDetailPanel .world-story-info p{
   margin:7px 0 0;color:#54625e;
@@ -604,9 +604,9 @@
   border-color:var(--ws-lime);transform:translateY(-3px);
 }
 #worldDetailPanel .world-cast-visual{
-  display:block;flex:0 0 clamp(93px,8vw,198px);
+  display:block;flex:0 0 clamp(93px,5.5vw,130px);
   height:auto;min-height:100%;
-  width:clamp(93px,8vw,198px);
+  width:clamp(93px,5.5vw,130px);
   background:#151e21;border-right:3px solid #141d1e;
 }
 #worldDetailPanel .world-cast-visual img{
@@ -641,7 +641,6 @@
 /* Mid desktop: prioritize readable cards, keep all data. */
 @media(min-width:801px) and (max-width:1399px){
   #worldsPanel .world-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
-  #worldsPanel .world-card.ws5-card{height:clamp(408px,32vw,485px)}
   #worldDetailPanel .world-story-list{grid-template-columns:repeat(2,minmax(0,1fr))}
   #worldDetailPanel .world-cast-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   #worldDetailPanel .wd4-center{width:92%}
