@@ -4,7 +4,7 @@ const api=window.CAST_DATA, pub=window.CAST_PUBLIC;
 const $=id=>document.getElementById(id), $$=q=>[...document.querySelectorAll(q)];
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cleanColor=(x,fallback='#eafa42')=>/^#[0-9a-f]{6}$/i.test(x)?x:fallback;
-const state={section:'dashboard',charId:null,worldId:null,tab:'basic',dragId:null,saveTimer:null,cropMode:'choose'};
+const state={section:'dashboard',charId:null,worldId:null,tab:'basic',dragId:null,saveTimer:null,cropMode:'choose',worldImageView:'select',worldImageSaveTimer:null,worldImageDrag:null};
 // Same ORPHE approved FILE badge baseline as app.js. Saved personal values win.
 const BADGE_DESKTOP_DEFAULT=Object.freeze({right:9.051756007393713,top:14.186685998241362});
 const doc=()=>api.getDraft();
@@ -142,7 +142,126 @@ function renderWorlds(){
   </div>`;
  }).join('')}</div>`;
 }
-function worldForm(w){return `${headline('02 / WORLD EDIT','EDIT WORLD',`世界観：${w.title}`,btn('delete-world','WORLDを削除','danger',`data-id="${esc(w.id)}"`))}<div class="edit-layout"><div class="edit-main"><div class="form-section"><h3>WORLD DATA / 作品・世界観</h3><div class="form-grid">${f('WORLD名','title',w.title)}${f('副題・ストーリータイトル','subtitle',w.subtitle)}${f('ジャンル / TYPE','category',w.category)}${f('WORLD代表URL（任意・詳細画面に表示）','link',w.link)}${f('WORLD SELECT用の短い紹介文（1〜2行）','cardTeaser',w.cardTeaser||'',{wide:true,placeholder:'例：希少種への国家保護の知らせが、ロジエ邸の平穏を揺るがす。'})}${f('WORLD DETAIL用の紹介文（本文）','summary',w.summary,{wide:true,area:true,rows:5})}<div class="form-field wide"><label>メイン画像</label>${imageSlot(w,'image','WORLD キービジュアル','この世界を紹介する画像')}</div><div class="form-field wide"><label>WORLDテーマカラー</label><div class="color-input"><input type="color" data-world-color="accent" value="${cleanColor(w.accent)}"><input type="text" data-world-hex="accent" value="${cleanColor(w.accent)}"></div></div></div></div><div class="form-section"><h3>STORY FILES / このWORLDの複数作品</h3><p class="hint">本編・派生作品を何本でも登録できます。URLがある作品には外部リンクが表示されます。作品名だけの登録もOK。↑↓で順序を変更できます。</p>${repeatRows('worldStories',w.stories||[],[['label','区分（例：MAIN STORY）'],['title','作品タイトル',true],['description','短い紹介文',true],['url','zeta等の作品URL',true]])}${btn('repeat-add','＋ WORLDに作品を追加','small',`data-repeat="worldStories"`)}</div><div class="form-section"><h3>CAST CONNECTION / 登場キャラ</h3><div class="chip-line">${doc().characters.map(c=>`<label class="chip-check"><input type="checkbox" data-assignment-char="${esc(c.id)}" ${c.worldIds?.includes(w.id)?'checked':''}> ${esc(c.name)}</label>`).join('')}</div></div>${btn('show-worlds','← WORLD一覧へ')}</div><aside class="edit-sidebar"><div class="mini-preview" style="--preview-accent:${cleanColor(w.accent)}"><div class="mini-preview-head">WORLD ARCHIVE</div><div class="mini-preview-art"><img src="${esc(w.image||'')}" alt=""></div><div class="mini-preview-info"><strong>${esc(w.title)}</strong><p>${esc(String(w.cardTeaser||'').trim()||w.summary)}</p></div></div></aside></div>`}
+function worldImageValues(w,mode){
+ const p=w?.worldImageCrop?.[mode]||{};
+ const clamp=(v,def,min,max)=>{const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):def};
+ return {x:clamp(p.x,0,-100,100),y:clamp(p.y,0,-100,100),zoom:clamp(p.zoom,1,.65,2.5)};
+}
+function worldImageCss(v){return `--wi-x:${v.x}%;--wi-y:${v.y}%;--wi-z:${v.zoom}`;}
+function worldImageActiveMode(){return state.worldImageView==='select'?'select':'detail';}
+function worldImageStudio(w){
+ const view=['select','detail','mobile'].includes(state.worldImageView)?state.worldImageView:'select';
+ const mode=view==='select'?'select':'detail',v=worldImageValues(w,mode),style=esc(worldImageCss(v));
+ const idx=String(doc().worlds.findIndex(x=>x.id===w.id)+1).padStart(2,'0');
+ const count=(w.stories||[]).filter(x=>x.title?.trim()).length;
+ const title=esc(w.title||'UNNAMED WORLD'),category=esc(w.category||'WORLD ARCHIVE');
+ const tagline=esc(String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。');
+ const image=esc(w.image||''),hasImage=!!w.image,disabled=hasImage?'':'disabled';
+ const imgTag=hasImage?`<img src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:'<div class="world-image-studio-empty">画像をアップロードすると、ここで位置と拡大率を調整できます。</div>';
+ const cover=view==='select'?`<div class="world-image-card">
+  <div class="world-image-stage world-image-select-stage" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
+   ${hasImage?`<img class="ws5-backdrop" src="${image}" alt="" draggable="false"><img class="ws5-art" src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:imgTag}
+   <span class="world-image-filemark"><b>◆</b> FILE / ${idx} &nbsp; ${category}</span>
+   <span class="world-image-huge">${idx}</span>
+  </div>
+  <div class="world-image-card-info">
+   <span class="world-image-card-meta"><span>WORLD ID / ${idx}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span>
+   <strong data-world-studio-title>${title}</strong>
+   <span class="world-image-card-copy" data-world-studio-copy>${tagline}</span>
+   <span class="world-image-card-cta">OPEN WORLD FILE <b>↗</b></span>
+  </div>
+ </div>`:'';
+ const detail=view!=='select'?`<div class="world-image-stage world-image-detail-stage ${view==='mobile'?'is-mobile':''}" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
+   ${hasImage?`<img class="world-detail-art" src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:imgTag}
+   <div class="world-image-detail-content">
+    <small>WORLD DOSSIER / ${idx} · ${category}</small>
+    <strong data-world-studio-title>${title}</strong>
+    <span data-world-studio-subtitle>${esc(w.subtitle||w.category||'ORIGINAL WORLD')}</span>
+   </div>
+  </div>`:'';
+ const tab=(label,key)=>`<button type="button" data-action="world-image-view" data-view="${key}" aria-pressed="${String(view===key)}">${label}</button>`;
+ const axis=(label,key,min,max,step)=>`<div class="world-image-range"><label for="world-image-range-${key}">${label}<output data-world-image-value="${key}">${key==='zoom'?v[key].toFixed(2)+'×':Math.round(v[key])+'%'}</output></label><input id="world-image-range-${key}" type="range" data-world-image-axis="${key}" min="${min}" max="${max}" step="${step}" value="${v[key]}" ${disabled}></div>`;
+ return `<div class="world-image-studio" id="worldImageStudio">
+  <div class="world-image-studio-head"><strong class="world-image-studio-kicker">WORLD IMAGE STUDIO / LIVE PREVIEW</strong><small>画像そのものは変更せず、表示位置だけを保存します</small></div>
+  <div class="world-image-tabs" role="group" aria-label="WORLD画像のプレビュー切り替え">
+   ${tab('SELECT CARD','select')}${tab('DETAIL / PC','detail')}${tab('DETAIL / MOBILE','mobile')}
+  </div>
+  <div class="world-image-canvas">${cover||detail}</div>
+  <div class="world-image-control-grid">
+   ${axis('横位置 / X','x',-100,100,1)}${axis('縦位置 / Y','y',-100,100,1)}${axis('拡大率 / ZOOM','zoom',.65,2.5,.05)}
+  </div>
+  <div class="world-image-studio-foot"><small>画像を直接ドラッグして移動できます。SELECTとDETAILはそれぞれ位置を記憶します（PCとMOBILEは共通）。</small><button type="button" data-action="world-image-reset" ${disabled}>↺ RESET POSITION</button></div>
+ </div>`;
+}
+function worldImageSync(){
+ const w=world(),panel=document.getElementById('worldImageStudio');if(!w||!panel)return;
+ const v=worldImageValues(w,worldImageActiveMode());
+ const img=panel.querySelector('[data-world-preview-img]');
+ if(img)img.setAttribute('style',worldImageCss(v));
+ for(const key of ['x','y','zoom']){
+  const inp=panel.querySelector(`[data-world-image-axis="${key}"]`);
+  const output=panel.querySelector(`[data-world-image-value="${key}"]`);
+  if(inp)inp.value=v[key];
+  if(output)output.textContent=key==='zoom'?v[key].toFixed(2)+'×':Math.round(v[key])+'%';
+ }
+}
+function worldImageUpdateCopy(w){
+ const panel=document.getElementById('worldImageStudio');
+ if(panel){
+  const title=panel.querySelector('[data-world-studio-title]');
+  const copy=panel.querySelector('[data-world-studio-copy]');
+  const subtitle=panel.querySelector('[data-world-studio-subtitle]');
+  if(title)title.textContent=w.title||'UNNAMED WORLD';
+  if(copy)copy.textContent=String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。';
+  if(subtitle)subtitle.textContent=w.subtitle||w.category||'ORIGINAL WORLD';
+ }
+ const mini=document.querySelector('.edit-sidebar .mini-preview-info');
+ if(mini){const t=mini.querySelector('strong'),p=mini.querySelector('p');if(t)t.textContent=w.title||'';if(p)p.textContent=String(w.cardTeaser||'').trim()||w.summary||'';}
+}
+function worldImageScheduleSave(){
+ clearTimeout(state.worldImageSaveTimer);
+ state.worldImageSaveTimer=setTimeout(()=>{state.worldImageSaveTimer=null;persist('WORLD画像の表示位置を保存したよ')},300);
+}
+function worldImageSetAxis(axis,value){
+ const w=world();if(!w||!w.image||!['x','y','zoom'].includes(axis))return;
+ const mode=worldImageActiveMode(),v=worldImageValues(w,mode);
+ const num=Number(value);if(!Number.isFinite(num))return;
+ v[axis]=axis==='zoom'?Math.max(.65,Math.min(2.5,num)):Math.max(-100,Math.min(100,num));
+ w.worldImageCrop={...(w.worldImageCrop||{}),[mode]:v};
+ worldImageSync();
+ worldImageScheduleSave();
+}
+function worldImageDragStart(e){
+ const stage=e.target.closest?.('[data-world-image-drag]');
+ if(!stage||e.button!==0||!world()?.image||state.section!=='worlds')return;
+ const img=stage.querySelector('[data-world-preview-img]');
+ if(!img)return;
+ const vals=worldImageValues(world(),worldImageActiveMode());
+ state.worldImageDrag={pointerId:e.pointerId,stage,img,startX:e.clientX,startY:e.clientY,origin:vals,moved:false};
+ stage.classList.add('is-dragging');stage.setPointerCapture?.(e.pointerId);e.preventDefault();
+}
+function worldImageDragMove(e){
+ const drag=state.worldImageDrag;
+ if(!drag||e.pointerId!==drag.pointerId)return;
+ const stepX=(e.clientX-drag.startX)*100/Math.max(1,drag.img.offsetWidth);
+ const stepY=(e.clientY-drag.startY)*100/Math.max(1,drag.img.offsetHeight);
+ const x=Math.round(Math.max(-100,Math.min(100,drag.origin.x+stepX)));
+ const y=Math.round(Math.max(-100,Math.min(100,drag.origin.y+stepY)));
+ if(x===drag.origin.x&&y===drag.origin.y&&!drag.moved)return;
+ drag.moved=true;
+ const w=world(),mode=worldImageActiveMode();
+ w.worldImageCrop={...(w.worldImageCrop||{}),[mode]:{...worldImageValues(w,mode),x,y}};
+ worldImageSync();
+}
+function worldImageDragEnd(e){
+ const drag=state.worldImageDrag;
+ if(!drag||e.pointerId!==drag.pointerId)return;
+ drag.stage.classList.remove('is-dragging');
+ if(drag.stage.hasPointerCapture?.(e.pointerId))drag.stage.releasePointerCapture(e.pointerId);
+ state.worldImageDrag=null;
+ if(drag.moved)worldImageScheduleSave();
+}
+function worldForm(w){return `${headline('02 / WORLD EDIT','EDIT WORLD',`世界観：${w.title}`,btn('delete-world','WORLDを削除','danger',`data-id="${esc(w.id)}"`))}<div class="edit-layout"><div class="edit-main"><div class="form-section"><h3>WORLD DATA / 作品・世界観</h3><div class="form-grid">${f('WORLD名','title',w.title)}${f('副題・ストーリータイトル','subtitle',w.subtitle)}${f('ジャンル / TYPE','category',w.category)}${f('WORLD代表URL（任意・詳細画面に表示）','link',w.link)}${f('WORLD SELECT用の短い紹介文（1〜2行）','cardTeaser',w.cardTeaser||'',{wide:true,placeholder:'例：希少種への国家保護の知らせが、ロジエ邸の平穏を揺るがす。'})}${f('WORLD DETAIL用の紹介文（本文）','summary',w.summary,{wide:true,area:true,rows:5})}<div class="form-field wide"><label>メイン画像</label>${imageSlot(w,'image','WORLD キービジュアル','この世界を紹介する画像')}</div>${worldImageStudio(w)}<div class="form-field wide"><label>WORLDテーマカラー</label><div class="color-input"><input type="color" data-world-color="accent" value="${cleanColor(w.accent)}"><input type="text" data-world-hex="accent" value="${cleanColor(w.accent)}"></div></div></div></div><div class="form-section"><h3>STORY FILES / このWORLDの複数作品</h3><p class="hint">本編・派生作品を何本でも登録できます。URLがある作品には外部リンクが表示されます。作品名だけの登録もOK。↑↓で順序を変更できます。</p>${repeatRows('worldStories',w.stories||[],[['label','区分（例：MAIN STORY）'],['title','作品タイトル',true],['description','短い紹介文',true],['url','zeta等の作品URL',true]])}${btn('repeat-add','＋ WORLDに作品を追加','small',`data-repeat="worldStories"`)}</div><div class="form-section"><h3>CAST CONNECTION / 登場キャラ</h3><div class="chip-line">${doc().characters.map(c=>`<label class="chip-check"><input type="checkbox" data-assignment-char="${esc(c.id)}" ${c.worldIds?.includes(w.id)?'checked':''}> ${esc(c.name)}</label>`).join('')}</div></div>${btn('show-worlds','← WORLD一覧へ')}</div><aside class="edit-sidebar"><div class="mini-preview" style="--preview-accent:${cleanColor(w.accent)}"><div class="mini-preview-head">WORLD ARCHIVE</div><div class="mini-preview-art"><img src="${esc(w.image||'')}" alt=""></div><div class="mini-preview-info"><strong>${esc(w.title)}</strong><p>${esc(String(w.cardTeaser||'').trim()||w.summary)}</p></div></div></aside></div>`}
 function renderTags(){const d=doc();return `${headline('03 / TAXONOMY','TAG DATABASE','キャラ編集画面から自動登録された共通タグの一覧です。名前の一括変更・使用数の確認ができます。',btn('new-tag','＋ NEW TAG','accent'))}<div class="admin-card"><div class="admin-kicker">SHARED TAG LIBRARY</div><p>登録済みのタグを一覧・整理できます。新しいタグは各キャラのPROFILEから直接追加できます。</p>${d.tags.map(t=>{const n=d.characters.filter(c=>c.tagIds?.includes(t.id)).length;return `<div class="tag-manager-row"><span>⌗</span><input type="text" value="${esc(t.label)}" data-tag-name="${esc(t.id)}" aria-label="タグ名"><small>${n} CAST</small>${btn('delete-tag','削除','small danger',`data-id="${esc(t.id)}"`)}</div>`}).join('')}</div>`}
 function renderAboutEditor(){
  const t={...api.initial.site,...(doc().site||{})};
@@ -178,7 +297,7 @@ function render(){const panel=$('adminContent');const section=state.section;
 }
 function openChar(id){state.section='characters';state.charId=id;state.tab='basic';render();$('adminContent').scrollIntoView({block:'start'})}
 function newChar(){const data=doc(),id=api.createId('char');const position=prompt(`何番目に挿入する？ 1〜${data.characters.length+1}（空欄なら最後）`,String(data.characters.length+1));if(position===null)return;const idx=position.trim()?Number(position)-1:data.characters.length;if(!Number.isInteger(idx)||idx<0||idx>data.characters.length){notify('1以上の正しい順番を入力してね');return}const newC={id,name:'新しいキャラクター',reading:'',aliases:'',roman:'NEW CAST',surname:'',type:'ORIGINAL CHARACTER',roleJa:'オリジナルキャラクター',hook:'ここに一文紹介を入力します。',quote:'',intro:'',age:'',height:'',species:'',gender:'',personality:'',artwork:'',icon:'',iconPosition:25,iconCrop:{x:50,y:50,zoom:1},allCastCrop:null,artPosition:{x:0,y:0,zoom:1},fileBadgePosition:{...BADGE_DESKTOP_DEFAULT},fileBadgePositionMobile:null,relationships:[],colors:{accent:'#e8fa42',deep:'#181920',soft:'#f1efef',bright:'#e8fa42'},worldIds:[],tagIds:[],playable:false,works:[],links:[],gallery:[],fields:[],published:false,createdAt:new Date().toISOString(),firstPublishedAt:null};data.characters.splice(idx,0,newC);persist();openChar(id);notify(`${String(idx+1).padStart(3,'0')} に追加したよ！`)}
-function newWorld(){const id=api.createId('world');doc().worlds.push({id,title:'新しいWORLD',subtitle:'',cardTeaser:'',summary:'',category:'',accent:'#e8fa42',image:'',link:'',stories:[],createdAt:new Date().toISOString(),firstPublishedAt:null});persist();state.section='worlds';state.worldId=id;render()}
+function newWorld(){state.worldImageView='select';const id=api.createId('world');doc().worlds.push({id,title:'新しいWORLD',subtitle:'',cardTeaser:'',summary:'',category:'',accent:'#e8fa42',image:'',link:'',stories:[],createdAt:new Date().toISOString(),firstPublishedAt:null});persist();state.section='worlds';state.worldId=id;render()}
 function newTag(){const name=prompt('新しい共通タグ名を入力してね（例：人外）');if(!name?.trim())return;if(doc().tags.some(t=>t.label===name.trim())){notify('同じ名前のタグが登録済みだよ');return}doc().tags.push({id:api.createId('tag'),label:name.trim()});persist();render()}
 function repeat(type,action,index){const c=selected(),w=world();const obj=type==='worldStories'?w:c;if(!obj)return;const name=type==='worldStories'?'stories':type;const list=obj[name]||(obj[name]=[]);if(action==='repeat-add'){const defaults={fields:{label:'',value:''},works:{title:'',url:''},links:{label:'',url:''},gallery:{image:'',caption:''},worldStories:{label:'SIDE STORY',title:'',description:'',url:''}};list.push({...defaults[type]})}else if(action==='repeat-del')list.splice(index,1);else sortIndex(list,index,action==='repeat-up'?-1:1);persist();render()}
 function sortIndex(items,idx,delta){const to=idx+delta;if(to<0||to>=items.length)return;[items[idx],items[to]]=[items[to],items[idx]]}
@@ -237,16 +356,18 @@ function exportData(){const payload=JSON.stringify(doc(),null,2),file=new Blob([
 async function importData(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.version!==5||!Array.isArray(data.characters)||!Array.isArray(data.worlds)||!Array.isArray(data.tags))throw Error('format');if(!confirm('このバックアップで現在の下書きを上書きする？'))return;if(!(await api.replaceDraft(data)))throw Error('storage');state.charId=null;state.worldId=null;state.section='dashboard';render();notify('バックアップを読み込んだよ')}catch(e){notify('読み込みに失敗。CAST / SIGNAL v5のJSONか容量を確認してね')}}
 function handleAction(el){const a=el.dataset.action,id=el.dataset.id,index=Number(el.dataset.index);if(a==='preview-about'){preview();window.location.hash='about';return}if(a==='show-chars'){state.section='characters';state.charId=null;render()}
  else if(a==='crop-mode'){state.cropMode=['choose','mobile','all'].includes(el.dataset.view)?el.dataset.view:'choose';render();}else if(a==='crop-enable-y'){const c=selected();setCrop(c,{...cropVals(c,cropMode()),zoom:Math.max(1.3,cropVals(c,cropMode()).zoom)});showCrop();persist('上下方向の調整幅を増やしたよ')}else if(a==='crop-reset')resetCrop();else if(a==='badge-reset'){selected()[badgeField()]=badgeIsMobile()?{right:8,top:66}:{...BADGE_DESKTOP_DEFAULT};refreshArtEditor();persist()}else if(a==='art-reset'){selected().artPosition={x:0,y:0,zoom:1};persist();render()}else if(a.startsWith('relation-'))updateRelation(a,index);else if(a.startsWith('tag-')){const c=selected();if(!c)return;if(a==='tag-apply'){const input=$('tagQuickInput');if(commitTags(c,input?.value))render();return}const ids=c.tagIds||[];if(a==='tag-left'&&index>0)[ids[index-1],ids[index]]=[ids[index],ids[index-1]];if(a==='tag-right'&&index<ids.length-1)[ids[index+1],ids[index]]=[ids[index],ids[index+1]];if(a==='tag-remove')ids.splice(index,1);persist();render()}else if(a==='show-publish')setSection('publish');else if(a==='export-publish')exportPublish();else if(a==='new-char')newChar();else if(a==='edit-char')openChar(id);else if(a==='edit-prev'||a==='edit-next'){if(id&&doc().characters.some(c=>c.id===id)){state.charId=id;render();document.querySelector('.admin-workspace')?.scrollTo({top:0,behavior:'instant'})}}else if(a==='move-up')moveChar(id,-1);else if(a==='move-down')moveChar(id,1);else if(a==='delete-char')deleteChar(id);
- else if(a==='show-worlds'){state.section='worlds';state.worldId=null;render()}else if(a==='new-world')newWorld();else if(a==='world-up')moveWorld(id,-1);else if(a==='world-down')moveWorld(id,1);else if(a==='edit-world'){state.worldId=id;render()}else if(a==='delete-world')deleteWorld(id);
+ else if(a==='world-image-view'){if(!world()||!['select','detail','mobile'].includes(el.dataset.view))return;state.worldImageView=el.dataset.view;const studio=document.getElementById('worldImageStudio');if(studio)studio.outerHTML=worldImageStudio(world());}
+ else if(a==='world-image-reset'){const w=world();if(!w||!w.image)return;const mode=worldImageActiveMode();w.worldImageCrop={...(w.worldImageCrop||{}),[mode]:{x:0,y:0,zoom:1}};worldImageSync();worldImageScheduleSave();}
+ else if(a==='show-worlds'){state.section='worlds';state.worldId=null;render()}else if(a==='new-world')newWorld();else if(a==='world-up')moveWorld(id,-1);else if(a==='world-down')moveWorld(id,1);else if(a==='edit-world'){state.worldId=id;state.worldImageView='select';render()}else if(a==='delete-world')deleteWorld(id);
  else if(a==='show-tags')setSection('tags');else if(a==='show-about')setSection('about');else if(a==='new-tag')newTag();else if(a==='delete-tag')deleteTag(id);
  else if(a.startsWith('repeat-'))repeat(el.dataset.repeat,a,index);
  else if(a==='clear-image'){const target=state.section==='worlds'?world():selected();target[el.dataset.field]='';persist();render()}
  else if(a==='preview-char')preview(selected()?.id)
  else if(a==='show-backup')setSection('backup');else if(a==='export')exportData();else if(a==='reset'){if(confirm('下書きの変更が失われます。現在の公開用データで下書きを上書きしていいですか？')){api.reset().then(ok=>{if(ok){setSection('dashboard');notify('公開用データに戻しました')}else notify('復元できませんでした。先にバックアップを取ってください')})}}
 }
-function updateField(el){const c=selected(),w=world();if(el.dataset.badgeControl&&c){c[badgeField()]={...badgeVals(c),[el.dataset.badgeControl]:Number(el.value)};refreshArtEditor();clearTimeout(state.saveTimer);state.saveTimer=setTimeout(()=>persist('FILE番号位置を保存したよ'),230);return}if(el.dataset.cropAxis&&c){const mode=cropMode(),axis=el.dataset.cropAxis;let p=cropVals(c,mode);if(mode==='mobile'&&Number(el.value)!==Number(p[axis])&&cropMetrics(mode,p.zoom)[axis==='x'?'overflowX':'overflowY']<=1)p={...p,zoom:Math.max(1.3,Number(p.zoom)||1)};setCrop(c,{...p,[axis]:Number(el.value)});showCrop();clearTimeout(state.saveTimer);state.saveTimer=setTimeout(()=>persist('アイコン位置を保存したよ'),230);return}if(el.dataset.artControl&&c){const k=el.dataset.artControl;c.artPosition={...artVals(c),[k]:Number(el.value)};refreshArtEditor();clearTimeout(state.saveTimer);state.saveTimer=setTimeout(()=>persist('立ち絵位置を保存したよ'),230);return}if(el.dataset.relationIndex!==undefined&&c){const item=c.relationships?.[Number(el.dataset.relationIndex)];if(item){item[el.dataset.relationField]=el.value;persist()}return}if(el.matches('[data-crop-zoom]')&&c){setCrop(c,{...cropVals(c,cropMode()),zoom:Number(el.value)});showCrop();persist();return}if(el.dataset.siteField){doc().site=doc().site||{...api.initial.site};doc().site[el.dataset.siteField]=el.value;persist();return}
+function updateField(el){const c=selected(),w=world();if(el.dataset.worldImageAxis&&w){worldImageSetAxis(el.dataset.worldImageAxis,el.value);return}if(el.dataset.badgeControl&&c){c[badgeField()]={...badgeVals(c),[el.dataset.badgeControl]:Number(el.value)};refreshArtEditor();clearTimeout(state.saveTimer);state.saveTimer=setTimeout(()=>persist('FILE番号位置を保存したよ'),230);return}if(el.dataset.cropAxis&&c){const mode=cropMode(),axis=el.dataset.cropAxis;let p=cropVals(c,mode);if(mode==='mobile'&&Number(el.value)!==Number(p[axis])&&cropMetrics(mode,p.zoom)[axis==='x'?'overflowX':'overflowY']<=1)p={...p,zoom:Math.max(1.3,Number(p.zoom)||1)};setCrop(c,{...p,[axis]:Number(el.value)});showCrop();clearTimeout(state.saveTimer);state.saveTimer=setTimeout(()=>persist('アイコン位置を保存したよ'),230);return}if(el.dataset.artControl&&c){const k=el.dataset.artControl;c.artPosition={...artVals(c),[k]:Number(el.value)};refreshArtEditor();clearTimeout(state.saveTimer);state.saveTimer=setTimeout(()=>persist('立ち絵位置を保存したよ'),230);return}if(el.dataset.relationIndex!==undefined&&c){const item=c.relationships?.[Number(el.dataset.relationIndex)];if(item){item[el.dataset.relationField]=el.value;persist()}return}if(el.matches('[data-crop-zoom]')&&c){setCrop(c,{...cropVals(c,cropMode()),zoom:Number(el.value)});showCrop();persist();return}if(el.dataset.siteField){doc().site=doc().site||{...api.initial.site};doc().site[el.dataset.siteField]=el.value;persist();return}
  if(el.dataset.siteDays!==undefined){doc().site=doc().site||{...api.initial.site};doc().site.newDays=Math.max(0,Math.min(90,Number(el.value)||0));persist();return}
- if(el.dataset.bind){const target=state.section==='worlds'?w:c;if(!target)return;target[el.dataset.bind]=el.value;persist();updatePreview();return}
+ if(el.dataset.bind){const target=state.section==='worlds'?w:c;if(!target)return;target[el.dataset.bind]=el.value;persist();updatePreview();if(w)worldImageUpdateCopy(w);return}
  if(el.dataset.boolean&&c){c[el.dataset.boolean]=el.checked;persist();return}
  if(el.dataset.range&&c){c[el.dataset.range]=Number(el.value);persist();const label=el.previousElementSibling;if(label)label.textContent='アイコンの縦位置 / '+el.value+'%';return}
  if(el.dataset.tagId&&c){const t=el.dataset.tagId;c.tagIds=el.checked?[...new Set([...c.tagIds,t])]:c.tagIds.filter(x=>x!==t);persist();return}
@@ -273,7 +394,8 @@ $('cloudLogout').addEventListener('click', async()=>{if(confirm('ログアウト
 $('adminContent').addEventListener('click',e=>{const tab=e.target.closest('[data-char-tab]');if(tab){state.tab=tab.dataset.charTab;render();return}const b=e.target.closest('[data-action]');if(b)handleAction(b)});
 $('adminContent').addEventListener('input',e=>{const el=e.target;if(el.matches('[type=file]'))return;updateField(el)});
 $('adminContent').addEventListener('change',e=>{const el=e.target;if(el.id==='tagQuickInput'){if(commitTags(selected(),el.value))render();return}if(el.matches('[type=file]')){if(el.id==='backupInput')importData(el.files?.[0]);else upload(el)}});
-$('adminContent').addEventListener('keydown',e=>{if(e.target?.id==='tagQuickInput'&&e.key==='Enter'){e.preventDefault();if(commitTags(selected(),e.target.value))render()}});$('adminContent').addEventListener('pointerdown',startCrop);$('adminContent').addEventListener('pointerdown',startBadge);$('adminContent').addEventListener('pointerdown',startArt);
+$('adminContent').addEventListener('keydown',e=>{if(e.target?.id==='tagQuickInput'&&e.key==='Enter'){e.preventDefault();if(commitTags(selected(),e.target.value))render()}});$('adminContent').addEventListener('pointerdown',worldImageDragStart);$('adminContent').addEventListener('pointermove',worldImageDragMove);$('adminContent').addEventListener('pointerup',worldImageDragEnd);$('adminContent').addEventListener('pointercancel',worldImageDragEnd);
+$('adminContent').addEventListener('pointerdown',startCrop);$('adminContent').addEventListener('pointerdown',startBadge);$('adminContent').addEventListener('pointerdown',startArt);
 $('adminContent').addEventListener('pointermove',dragCrop);$('adminContent').addEventListener('pointermove',moveBadge);$('adminContent').addEventListener('pointermove',moveArt);
 $('adminContent').addEventListener('pointerup',endCrop);$('adminContent').addEventListener('pointerup',endBadge);$('adminContent').addEventListener('pointerup',endArt);
 $('adminContent').addEventListener('pointercancel',endCrop);$('adminContent').addEventListener('pointercancel',endBadge);$('adminContent').addEventListener('pointercancel',endArt);
