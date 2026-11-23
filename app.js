@@ -237,12 +237,13 @@ function renderWorlds(){
    const group=state.people.filter(c=>c.worldIds?.includes(w.id));
    const num=String(i+1).padStart(2,'0');
    const count=Array.isArray(w.stories)?w.stories.filter(s=>s.title?.trim()).length:0;
+   const cardCopy=String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。';
    const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
    const art=w.image?`<img class="ws5-backdrop" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}"><img class="ws5-art" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}">`:'';
    const placeholder=motif==='research'?'<span class="ws5-motif" aria-hidden="true">R0</span><span class="ws5-warning" aria-hidden="true"></span>':motif==='unassigned'?'<span class="ws5-motif" aria-hidden="true"><b>+</b><small>UNASSIGNED</small></span>':'';
    return `<button type="button" class="world-card ws5-card ${w.image?'has-cover':'no-cover'}" data-world="${esc(w.id)}" aria-label="${esc(w.title||'WORLD')}の詳細を見る">
      <span class="ws5-visual" data-motif="${motif}" aria-hidden="true">${art}<span class="ws5-file-mark"><b>◆</b> FILE / ${num} &nbsp; ${esc(w.category||'WORLD ARCHIVE')}</span><span class="ws5-huge">${num}</span>${placeholder}</span>
-     <span class="ws5-info"><span class="ws5-meta"><span>WORLD ID / ${num}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span><strong class="ws5-name">${esc(w.title||'UNNAMED WORLD')}</strong><span class="ws5-summary">${esc(w.summary||w.subtitle||'世界観の紹介は準備中です。')}</span><span class="ws5-action">OPEN WORLD FILE <span class="ws5-arrow" aria-hidden="true">↗</span></span></span>
+     <span class="ws5-info"><span class="ws5-meta"><span>WORLD ID / ${num}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span><strong class="ws5-name">${esc(w.title||'UNNAMED WORLD')}</strong><span class="ws5-summary">${esc(cardCopy)}</span><span class="ws5-action">OPEN WORLD FILE <span class="ws5-arrow" aria-hidden="true">↗</span></span></span>
    </button>`;
  }).join('');
 }
