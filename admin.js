@@ -149,48 +149,57 @@ function worldImageValues(w,mode){
 }
 function worldImageCss(v){return `--wi-x:${v.x}%;--wi-y:${v.y}%;--wi-z:${v.zoom}`;}
 function worldImageActiveMode(){return state.worldImageView==='select'?'select':'detail';}
+function worldImageFrameDoc(w,view,idx){
+ const num=String(idx).padStart(2,'0'),count=(w.stories||[]).filter(t=>t.title?.trim()).length;
+ const cat=esc(w.category||'WORLD ARCHIVE'),title=esc(w.title||'UNNAMED WORLD');
+ const image=esc(w.image||''),copy=esc(String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。');
+ const mode=view==='select'?'select':'detail',st=esc(worldImageCss(worldImageValues(w,mode)));
+ const cssLinks=`<link rel="stylesheet" href="style.css?v=5.9.13"><link rel="stylesheet" href="mobile.css?v=15.4.0"><link rel="stylesheet" href="cast-worlds-current.css?v=1.0.4">`;
+ let panel='';
+ if(view==='select'){
+  const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
+  const art=w.image?`<img class="ws5-backdrop" src="${image}" alt="" draggable="false"><img data-world-preview-img class="ws5-art" src="${image}" alt="" draggable="false" style="${st}">`:'';
+  const placeholder=motif==='research'?'<span class="ws5-motif" aria-hidden="true">R0</span><span class="ws5-warning" aria-hidden="true"></span>':motif==='unassigned'?'<span class="ws5-motif" aria-hidden="true"><b>+</b><small>UNASSIGNED</small></span>':'';
+  panel=`<aside class="directory worlds-panel" id="worldsPanel"><div class="directory-head"></div><div class="directory-content"><span class="directory-kicker mono">INTERCONNECTED STORIES</span><h2>WORLD <i>SELECT</i><span>.</span></h2><p class="worlds-intro">同じ世界に暮らすキャラクターを、作品から探す。</p><div class="world-cards">
+   <button type="button" class="world-card ws5-card ${w.image?'has-cover':'no-cover'}" data-world-preview-anchor>
+    <span class="ws5-visual" data-motif="${motif}" aria-hidden="true">${art}<span class="ws5-file-mark"><b>◆</b> FILE / ${num} &nbsp; ${cat}</span><span class="ws5-huge">${num}</span>${placeholder}</span>
+    <span class="ws5-info"><span class="ws5-meta"><span>WORLD ID / ${num}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span><strong class="ws5-name">${title}</strong><span class="ws5-summary">${copy}</span><span class="ws5-action">OPEN WORLD FILE <span class="ws5-arrow" aria-hidden="true">↗</span></span></span>
+   </button></div></div></aside>`;
+ }else{
+  const accent=/^#[0-9a-f]{6}$/i.test(w.accent)?w.accent:'#eafa42';
+  const imageHtml=w.image?`<img src="${image}" alt="" draggable="false" class="world-detail-art" data-world-preview-img style="${st}">`:'';
+  panel=`<aside class="directory world-detail-panel" id="worldDetailPanel"><div class="directory-head"></div><div class="world-detail-content"><div class="wd4-center"><section class="wd4-dossier">
+   <div class="world-detail-hero wd4-hero" data-world-preview-anchor style="--wd-accent:${esc(accent)}"><div class="world-detail-backdrop">${imageHtml}</div><div class="world-detail-hero-content">
+    <div class="world-detail-kicker mono">WORLD DOSSIER / ${num} &nbsp; · &nbsp; ${cat}</div><h2>${title}</h2><span class="world-detail-subtitle">${esc(w.subtitle||w.category||'ORIGINAL WORLD')}</span>
+   </div></div></section></div></div></aside>`;
+ }
+ const iframeFix=`html,body{margin:0!important;padding:0!important;width:100%!important;min-height:100%;background:#151b1e;overflow:visible!important}#worldsPanel,#worldDetailPanel{position:relative!important;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:none!important;transform:none!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;max-width:none!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}#worldsPanel .directory-head,#worldDetailPanel .directory-head{display:none!important}#worldsPanel .directory-content,#worldDetailPanel .world-detail-content{height:auto!important;max-height:none!important;overflow:visible!important}#worldsPanel .world-card.ws5-card:hover{transform:none!important;border-color:#101719!important;outline-color:#526164!important;box-shadow:8px 9px 0 #05080a,0 0 0 1px #a7b5b644!important}#worldsPanel .world-card.ws5-card:hover .ws5-art{transform:translate(var(--wi-x,0%),var(--wi-y,0%)) scale(var(--wi-z,1))!important}`;
+ return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${cssLinks}<style>${iframeFix}</style></head><body>${panel}</body></html>`;
+}
 function worldImageStudio(w){
  const view=['select','detail','mobile'].includes(state.worldImageView)?state.worldImageView:'select';
- const mode=view==='select'?'select':'detail',v=worldImageValues(w,mode),style=esc(worldImageCss(v));
- const idx=String(doc().worlds.findIndex(x=>x.id===w.id)+1).padStart(2,'0');
- const count=(w.stories||[]).filter(x=>x.title?.trim()).length;
- const title=esc(w.title||'UNNAMED WORLD'),category=esc(w.category||'WORLD ARCHIVE');
- const tagline=esc(String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。');
- const image=esc(w.image||''),hasImage=!!w.image,disabled=hasImage?'':'disabled';
- const imgTag=hasImage?`<img src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:'<div class="world-image-studio-empty">画像をアップロードすると、ここで位置と拡大率を調整できます。</div>';
- const cover=view==='select'?`<div class="world-image-card">
-  <div class="world-image-stage world-image-select-stage" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
-   ${hasImage?`<img class="ws5-backdrop" src="${image}" alt="" draggable="false"><img class="ws5-art" src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:imgTag}
-   <span class="world-image-filemark"><b>◆</b> FILE / ${idx} &nbsp; ${category}</span>
-   <span class="world-image-huge">${idx}</span>
-  </div>
-  <div class="world-image-card-info">
-   <span class="world-image-card-meta"><span>WORLD ID / ${idx}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span>
-   <strong data-world-studio-title>${title}</strong>
-   <span class="world-image-card-copy" data-world-studio-copy>${tagline}</span>
-   <span class="world-image-card-cta">OPEN WORLD FILE <b>↗</b></span>
-  </div>
- </div>`:'';
- const detail=view!=='select'?`<div class="world-image-stage world-image-detail-stage ${view==='mobile'?'is-mobile':''}" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
-   ${hasImage?`<img class="world-detail-art" src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:imgTag}
-   <div class="world-image-detail-content">
-    <small>WORLD DOSSIER / ${idx} · ${category}</small>
-    <strong data-world-studio-title>${title}</strong>
-    <span data-world-studio-subtitle>${esc(w.subtitle||w.category||'ORIGINAL WORLD')}</span>
-   </div>
-  </div>`:'';
+ const mode=view==='select'?'select':'detail',v=worldImageValues(w,mode);
+ const idx=doc().worlds.findIndex(item=>item.id===w.id)+1;
+ const viewport=view==='mobile'?390:view==='detail'?Math.max(1024,window.innerWidth):Math.max(320,window.innerWidth);
+ const iframeSrcdoc=esc(worldImageFrameDoc(w,view,idx));
+ const hasImage=!!w.image,disabled=hasImage?'':'disabled';
  const tab=(label,key)=>`<button type="button" data-action="world-image-view" data-view="${key}" aria-pressed="${String(view===key)}">${label}</button>`;
  const axis=(label,key,min,max,step)=>`<div class="world-image-range"><label for="world-image-range-${key}">${label}<output data-world-image-value="${key}">${key==='zoom'?v[key].toFixed(2)+'×':Math.round(v[key])+'%'}</output></label><input id="world-image-range-${key}" type="range" data-world-image-axis="${key}" min="${min}" max="${max}" step="${step}" value="${v[key]}" ${disabled}></div>`;
  return `<div class="world-image-studio" id="worldImageStudio">
-  <div class="world-image-studio-head"><strong class="world-image-studio-kicker">WORLD IMAGE STUDIO / LIVE PREVIEW</strong><small>画像そのものは変更せず、表示位置だけを保存します</small></div>
+  <div class="world-image-studio-head"><strong class="world-image-studio-kicker">WORLD IMAGE STUDIO / REAL VIEW PREVIEW</strong><small>公開画面と同じレイアウト・CSSで画像位置を確認できます</small></div>
   <div class="world-image-tabs" role="group" aria-label="WORLD画像のプレビュー切り替え">
    ${tab('SELECT CARD','select')}${tab('DETAIL / PC','detail')}${tab('DETAIL / MOBILE','mobile')}
   </div>
-  <div class="world-image-canvas">${cover||detail}</div>
+  <div class="world-image-canvas"><div class="world-image-frame-shell" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
+    <iframe title="${view==='select'?'WORLD SELECT':view==='mobile'?'WORLD DETAIL MOBILE':'WORLD DETAIL PC'} の実際の画面プレビュー" data-world-image-frame
+     data-world-preview-viewport="${viewport}" loading="eager" sandbox="allow-same-origin" tabindex="-1"
+     style="width:${viewport}px;height:1400px" srcdoc="${iframeSrcdoc}"></iframe>
+    <div class="world-image-drag-cover" aria-hidden="true"></div>
+   </div></div>
   <div class="world-image-control-grid">
    ${axis('横位置 / X','x',-100,100,1)}${axis('縦位置 / Y','y',-100,100,1)}${axis('拡大率 / ZOOM','zoom',.65,2.5,.05)}
   </div>
-  <div class="world-image-studio-foot"><small>画像を直接ドラッグして移動できます。SELECTとDETAILはそれぞれ位置を記憶します（PCとMOBILEは共通）。</small><button type="button" data-action="world-image-reset" ${disabled}>↺ RESET POSITION</button></div>
+  <div class="world-image-studio-foot"><small>画像をドラッグして移動。SELECTとDETAILは別々に保存（PCとMOBILEは共通）。</small><div class="world-image-studio-actions"><button type="button" data-action="world-image-expand">↗ PREVIEWを拡大</button><button type="button" data-action="world-image-reset" ${disabled}>↺ RESET POSITION</button></div></div>
  </div>`;
 }
 function worldImageSync(){
