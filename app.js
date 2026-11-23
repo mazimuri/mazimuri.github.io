@@ -231,6 +231,13 @@ function renderDirectory({resetScroll=false}={}){
  if(resetScroll)el.scrollTop=0;
  requestAnimationFrame(updateAllCastRosterFooter);
 }
+/* Image adjustments are non-destructive; old WORLD files default to their original framing. */
+function worldImageStyle(w,view){
+ const raw=w?.worldImageCrop?.[view]||{};
+ const range=(v,f,min,max)=>{const n=Number(v);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):f};
+ const x=range(raw.x,0,-100,100),y=range(raw.y,0,-100,100),zoom=range(raw.zoom,1,.65,2.5);
+ return `--wi-x:${x}%;--wi-y:${y}%;--wi-z:${zoom}`;
+}
 function renderWorlds(){
  const worlds=state.doc.worlds||[];
  $('worldCards').innerHTML=worlds.map((w,i)=>{
@@ -239,7 +246,7 @@ function renderWorlds(){
    const count=Array.isArray(w.stories)?w.stories.filter(s=>s.title?.trim()).length:0;
    const cardCopy=String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。';
    const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
-   const art=w.image?`<img class="ws5-backdrop" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}"><img class="ws5-art" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}">`:'';
+   const art=w.image?`<img class="ws5-backdrop" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}"><img class="ws5-art" src="${esc(w.image)}" alt="" loading="${i<3?'eager':'lazy'}" style="${esc(worldImageStyle(w,'select'))}">`:'';
    const placeholder=motif==='research'?'<span class="ws5-motif" aria-hidden="true">R0</span><span class="ws5-warning" aria-hidden="true"></span>':motif==='unassigned'?'<span class="ws5-motif" aria-hidden="true"><b>+</b><small>UNASSIGNED</small></span>':'';
    return `<button type="button" class="world-card ws5-card ${w.image?'has-cover':'no-cover'}" data-world="${esc(w.id)}" aria-label="${esc(w.title||'WORLD')}の詳細を見る">
      <span class="ws5-visual" data-motif="${motif}" aria-hidden="true">${art}<span class="ws5-file-mark"><b>◆</b> FILE / ${num} &nbsp; ${esc(w.category||'WORLD ARCHIVE')}</span><span class="ws5-huge">${num}</span>${placeholder}</span>
@@ -280,7 +287,7 @@ function renderWorldDetail(){
  const mainLink=validUrl(w.link);
  const mainAlready=stories.some(t=>Boolean(mainLink)&&((storyPlotId(mainLink)&&storyPlotId(t.url)===storyPlotId(mainLink))||validUrl(t.url)===mainLink));
  const linkBlock=mainLink&&!mainAlready?`<a class="world-primary-link" href="${esc(mainLink)}" target="_blank" rel="noopener noreferrer"><span>↗ MAIN / WORLD LINK</span><b>登録した作品URLへ進む</b></a>`:'';
- const heroImage=w.image?`<img src="${esc(w.image)}" alt="" class="world-detail-art">`:'';
+ const heroImage=w.image?`<img src="${esc(w.image)}" alt="" class="world-detail-art" style="${esc(worldImageStyle(w,'detail'))}">`:'';
  const safeAccent=/^#[0-9a-f]{6}$/i.test(w.accent)?w.accent:'#eafa42';
  const realMain=stories.some(t=>/\bMAIN\b/i.test(t.label||''));
  const storyCards=stories.map((t,i)=>{
