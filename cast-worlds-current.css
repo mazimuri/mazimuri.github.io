@@ -310,10 +310,11 @@
   background:var(--ws-coral);
 }
 #worldDetailPanel .wd4-description{
-  width:min(100%,1120px);
+  /* WORLD story lead: centered on desktop with a readable, deliberate line length. */
+  width:min(100%,800px);
   color:#141d20;
   font:750 clamp(14px,1vw,23px)/1.64 var(--jpn);
-  text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;
+  text-align:center;white-space:pre-wrap;overflow-wrap:anywhere;
 }
 #worldDetailPanel .wd4-description[data-short="true"]{text-align:center}
 #worldDetailPanel .wd4-stats{
@@ -689,7 +690,8 @@
   }
   #worldDetailPanel .wd4-brief-kicker{font-size:9px}
   #worldDetailPanel .wd4-description{
-    font-size:13px;line-height:1.65;
+    /* Long-form world lore stays scannable on narrow screens. */
+    font-size:13px;line-height:1.65;text-align:left;
   }
   #worldDetailPanel .wd4-stats{font-size:9px;gap:15px}
   #worldDetailPanel .wd4-story-jump{height:32px;font-size:10px}

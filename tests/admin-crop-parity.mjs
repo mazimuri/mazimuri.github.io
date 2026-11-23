@@ -26,9 +26,9 @@ assert.match(mobile,/\.mobile-portrait img\{/);
 assert.match(css,/\.crop-gallery-frame\{aspect-ratio:1!important\}/);
 assert.match(all,/--allcast-portrait-h:/);
 assert.match(html,/admin-v15-studio\.css\?v=16\.2\.0/);
-assert.match(html,/admin\.js\?v=16\.3\.7/);
-assert.match(html,/cast-worlds-current\.css\?v=1\.0\.5/);
-assert.match(js,/cast-worlds-current\.css\?v=1\.0\.5/);
+assert.match(html,/admin\.js\?v=16\.3\.8/);
+assert.match(html,/cast-worlds-current\.css\?v=1\.0\.6/);
+assert.match(js,/cast-worlds-current\.css\?v=1\.0\.6/);
 assert.match(js,/function worldImageFrameDoc\(w,view,idx\)/);
 assert.match(js,/function worldImageFit\(frame=/);
 assert.match(js,/function worldImageFrameReady\(frame\)/);
@@ -38,6 +38,9 @@ assert.match(js,/data-world-image-frame/);
 assert.match(js,/function worldImageToggleExpand\(\)/);
 assert.match(worldCss,/#admin \.world-image-frame-shell iframe/);
 assert.match(worldCss,/#admin \.world-image-studio\.is-expanded/);
+assert.match(worldCss,/#worldDetailPanel \.wd4-description\{[^}]*width:min\(100%,800px\);/,'WORLD DETAIL PC description must use max 800px width');
+assert.match(worldCss,/#worldDetailPanel \.wd4-description\{[^}]*text-align:center/,'WORLD DETAIL PC description must be centered');
+assert.match(worldCss,/@media\(max-width:800px\)\{[\s\S]*?#worldDetailPanel \.wd4-description\{[^}]*text-align:left/,'WORLD DETAIL mobile description must remain left aligned');
 assert.match(js,/function worldImageStudio\(w\)/);
 assert.match(js,/function worldImageDragStart\(e\)/);
 assert.match(js,/function worldImageDragMove\(e\)/);
@@ -211,7 +214,24 @@ if(process.argv.includes('--browser')){
       if(view==='select')assert.ok(outcome.height>400,'WORLD SELECT should use real responsive card height');
       if(view==='mobile')assert.ok(Math.abs(outcome.height-145)<1,'WORLD MOBILE should use real 145px detail header');
     }
+    // Verify WORLD DETAIL prose is centered on desktop and scannable on mobile.
+    for(const [viewportWidth,expectedAlign] of [[1440,'center'],[390,'left']]){
+      await page.setViewportSize({width:viewportWidth,height:900});
+      await page.setContent(`<!doctype html><html><head><style>${stylesForFrame}</style></head><body>
+        <aside id="worldDetailPanel" class="directory world-detail-panel open">
+          <div class="world-detail-content"><div class="wd4-center"><section class="wd4-dossier">
+            <div class="wd4-brief"><div class="wd4-description" data-short="false">World lore paragraph 1. A longer passage about the setting and the place characters inhabit.\n\nWorld lore paragraph 2. This text should be legible across both desktop and mobile.</div></div>
+          </section></div></div>
+        </aside></body></html>`,{waitUntil:'load'});
+      const details=await page.evaluate(()=>{
+        const el=document.querySelector('#worldDetailPanel .wd4-description');
+        const style=getComputedStyle(el);
+        return {align:style.textAlign,width:el.getBoundingClientRect().width};
+      });
+      assert.equal(details.align,expectedAlign,`WORLD DETAIL prose alignment at ${viewportWidth}px`);
+      assert.ok(details.width<=801,`WORLD DETAIL prose max width at ${viewportWidth}px: ${details.width}`);
+    }
     await page.close();
-    console.log('PASS: Chromium V16 crop parity and true WORLD preview viewport layout');
+    console.log('PASS: Chromium V16 crop parity, true WORLD preview, and responsive WORLD prose');
   } finally {await browser.close()}
 }
