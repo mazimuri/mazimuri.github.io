@@ -154,7 +154,7 @@ function worldImageFrameDoc(w,view,idx){
  const cat=esc(w.category||'WORLD ARCHIVE'),title=esc(w.title||'UNNAMED WORLD');
  const image=esc(w.image||''),copy=esc(String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。');
  const mode=view==='select'?'select':'detail',st=esc(worldImageCss(worldImageValues(w,mode)));
- const cssLinks=`<link rel="stylesheet" href="style.css?v=5.9.13"><link rel="stylesheet" href="mobile.css?v=15.4.0"><link rel="stylesheet" href="cast-worlds-current.css?v=1.0.6">`;
+ const cssLinks=`<link rel="stylesheet" href="style.css?v=5.9.13"><link rel="stylesheet" href="mobile.css?v=15.4.0"><link rel="stylesheet" href="cast-worlds-current.css?v=1.0.7">`;
  let panel='';
  if(view==='select'){
   const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
