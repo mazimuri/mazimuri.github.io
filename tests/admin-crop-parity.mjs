@@ -236,7 +236,47 @@ if(process.argv.includes('--browser')){
       assert.equal(details.align,expectedAlign,`WORLD DETAIL prose alignment at ${viewportWidth}px`);
       assert.ok(details.width<=1121,`WORLD DETAIL prose max width at ${viewportWidth}px: ${details.width}`);
     }
+
+    // WORLD and ALL CAST responsive density: FHD and QHD should share a
+    // centered WORLD max-width, while all six portrait cards remain visible.
+    const layoutStyles=[read('style.css'),read('mobile.css'),worldCss,all].join('\n');
+    const cardWorld='<button class="world-card ws5-card"><span class="ws5-visual"></span><span class="ws5-info"><strong class="ws5-name">WORLD FILE</strong><span class="ws5-summary">A short excerpt</span></span></button>';
+    const cardCast='<button class="cast-gallery-card"><span class="cast-gallery-visual"></span><span class="cast-gallery-caption"><span class="cast-gallery-nameplate"><b class="cast-gallery-name">CHARACTER</b><small class="cast-gallery-role">ORIGINAL CAST</small></span></span></button>';
+    const responsiveFixture='<!doctype html><html><head><style>'+layoutStyles+'</style></head><body>'
+      +'<aside id="worldsPanel" class="directory worlds-panel open"><div class="directory-head"></div><div class="directory-content"><div class="world-cards">'+cardWorld.repeat(3)+'</div></div></aside>'
+      +'<aside id="worldDetailPanel" class="directory world-detail-panel open"><div class="directory-head"></div><div class="world-detail-content"><div class="wd4-center"><div class="wd4-dossier"><div class="wd4-brief"><div class="wd4-description">World story passage</div></div></div></div></div></aside>'
+      +'<aside id="directory" class="directory open"><div class="directory-head"></div><div class="directory-content cast-directory-content"><div class="allcast-roster-shell is-gallery"><div class="allcast-deck-top">CAST FILE DECK</div><div id="directoryItems" class="directory-items directory-gallery">'+cardCast.repeat(6)+'</div></div></div></aside>'
+      +'</body></html>';
+    for(const [width,columns] of [[1100,4],[1350,5],[1920,6],[2560,6]]){
+      await page.setViewportSize({width,height:1080});
+      await page.setContent(responsiveFixture,{waitUntil:'load'});
+      const results=await page.evaluate(()=>{
+        const rect=selector=>document.querySelector(selector)?.getBoundingClientRect();
+        const allItems=[...document.querySelectorAll('#directoryItems .cast-gallery-card')].map(n=>n.getBoundingClientRect());
+        const grid=getComputedStyle(document.querySelector('#directoryItems')).gridTemplateColumns.split(' ');
+        return {viewport:innerWidth,worldWidth:rect('#worldsPanel .world-cards')?.width,
+          detailWidth:rect('#worldDetailPanel .wd4-center')?.width,
+          worldCardHeight:rect('#worldsPanel .world-card')?.height,
+          castPanelWidth:rect('#directory .allcast-roster-shell')?.width,
+          castWidth:allItems[0]?.width,castPortraitHeight:rect('#directory .cast-gallery-visual')?.height,
+          castColumns:grid.length,allOnFirstRow:allItems.length===6&&allItems.every(r=>Math.abs(r.top-allItems[0].top)<2),
+          castNamesize:parseFloat(getComputedStyle(document.querySelector('.cast-gallery-name')).fontSize)};
+      });
+      assert.equal(results.castColumns,columns,'ALL CAST responsive grid columns at '+width+': '+JSON.stringify(results));
+      assert.ok(results.castPanelWidth<=width-30,'ALL CAST panel must not overflow the screen: '+JSON.stringify(results));
+      assert.ok(results.castWidth>=136,'ALL CAST portraits stay usable: '+JSON.stringify(results));
+      assert.ok(Math.abs(results.castPortraitHeight-results.castWidth)<12,'ALL CAST portrait scales proportionally to card: '+JSON.stringify(results));
+      assert.ok(results.castNamesize>=11,'ALL CAST names must remain readable: '+JSON.stringify(results));
+      if(columns===6)assert.ok(results.allOnFirstRow,'ALL CAST 6 portraits must fit in one row: '+JSON.stringify(results));
+      if(width>=1920){
+        assert.ok(Math.abs(results.worldWidth-1280)<3,'WORLD SELECT max 1280px at '+width+': '+JSON.stringify(results));
+        assert.ok(Math.abs(results.detailWidth-1280)<3,'WORLD DETAIL max 1280px at '+width+': '+JSON.stringify(results));
+        assert.ok(results.worldCardHeight>=400&&results.worldCardHeight<=435,
+          'WORLD SELECT card height must suit reduced width: '+JSON.stringify(results));
+        assert.ok(results.castWidth>=185,'ALL CAST icons enlarged for FHD/QHD: '+JSON.stringify(results));
+      }
+    }
     await page.close();
-    console.log('PASS: Chromium V16 crop parity, true WORLD preview, and responsive WORLD prose');
+    console.log('PASS: Chromium responsive WORLD widths, ALL CAST portraits, and existing crop parity');
   } finally {await browser.close()}
 }
