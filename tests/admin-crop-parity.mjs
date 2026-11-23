@@ -39,11 +39,11 @@ assert.match(js,/function worldImageToggleExpand\(\)/);
 assert.match(worldCss,/#admin \.world-image-frame-shell iframe/);
 assert.match(worldCss,/#admin \.world-image-studio\.is-expanded/);
 assert.match(worldCss,/#worldDetailPanel \.wd4-description\{[^}]*width:min\(100%,1120px\);/,'WORLD DETAIL PC description should retain its original max 1120px width');
-assert.match(html,/cast-allcast-current\.css\?v=2\.0\.2/);
-assert.match(all,/--allcast-card-w:clamp\(176px,10vw,236px\)/);
-assert.match(all,/--allcast-portrait-h:var\(--allcast-card-w\)/);
-assert.match(all,/@media \(min-width:1500px\) and \(max-height:1100px\)/,'compact FHD-height layout is scoped by viewport height');
-assert.match(all,/--allcast-card-w:clamp\(156px,8\.55vw,170px\)/,'short desktop uses compact cards');
+assert.match(html,/cast-allcast-current\.css\?v=2\.0\.3/);
+assert.match(all,/--allcast-card-w:clamp\(151px,7\.8646vw,202px\)/,'restore original accepted ALL CAST width');
+assert.match(all,/--allcast-portrait-h:clamp\(151px,7\.8646vw,202px\)/,'restore original portrait height');
+assert.doesNotMatch(all,/@media \(min-width:1500px\) and \(max-height:1100px\)/,'revert FHD compact rule that clipped nameplates');
+assert.match(all,/--allcast-card-h:clamp\(222px,11\.5625vw,296px\)/,'restore original card proportions');
 assert.match(worldCss,/#worldsPanel \.world-cards\{[^}]*max-width:2320px/,'approved WORLD SELECT max width restored');
 assert.match(worldCss,/#worldDetailPanel \.wd4-center\{[^}]*width:min\(84%,2240px\)/,'approved WORLD DETAIL width restored');
 assert.match(worldCss,/#worldDetailPanel \.wd4-description\{[^}]*text-align:center/,'WORLD DETAIL PC description must be centered');
@@ -239,8 +239,8 @@ if(process.argv.includes('--browser')){
       assert.ok(details.width<=1121,`WORLD DETAIL prose max width at ${viewportWidth}px: ${details.width}`);
     }
 
-    // WORLD and ALL CAST responsive density: FHD and QHD should share a
-    // centered WORLD max-width, while all six portrait cards remain visible.
+    // Regression: keep the restored full-width WORLD layout and original
+    // ALL CAST card proportions across desktop breakpoints.
     const layoutStyles=[read('style.css'),read('mobile.css'),worldCss,all].join('\n');
     const cardWorld='<button class="world-card ws5-card"><span class="ws5-visual"></span><span class="ws5-info"><strong class="ws5-name">WORLD FILE</strong><span class="ws5-summary">A short excerpt</span></span></button>';
     const cardCast='<button class="cast-gallery-card"><span class="cast-gallery-visual"></span><span class="cast-gallery-caption"><span class="cast-gallery-nameplate"><b class="cast-gallery-name">CHARACTER</b><small class="cast-gallery-role">ORIGINAL CAST</small></span></span></button>';
@@ -268,21 +268,21 @@ if(process.argv.includes('--browser')){
       assert.ok(results.castPanelWidth<=width-30,'ALL CAST panel must not overflow the screen: '+JSON.stringify(results));
       assert.ok(results.castWidth>=136,'ALL CAST portraits stay usable: '+JSON.stringify(results));
       assert.ok(Math.abs(results.castPortraitHeight-results.castWidth)<12,'ALL CAST portrait scales proportionally to card: '+JSON.stringify(results));
-      assert.ok(results.castNamesize>=11,'ALL CAST names must remain readable: '+JSON.stringify(results));
+      assert.ok(results.castNamesize>=10,'ALL CAST original name sizes are preserved: '+JSON.stringify(results));
       if(columns===6)assert.ok(results.allOnFirstRow,'ALL CAST 6 portraits must fit in one row: '+JSON.stringify(results));
       if(width===1920){
         assert.ok(results.worldWidth>1600,'Restore full-width WORLD SELECT at FHD: '+JSON.stringify(results));
         assert.ok(results.detailWidth>1500,'Restore full-width WORLD DETAIL at FHD: '+JSON.stringify(results));
         assert.ok(results.worldCardHeight>=500,'Restore tall WORLD art panels at FHD: '+JSON.stringify(results));
-        assert.ok(results.castWidth>=155&&results.castWidth<=172,
-          'Short FHD viewport should use dense but readable portraits: '+JSON.stringify(results));
+        assert.ok(results.castWidth>=150&&results.castWidth<=154,
+          'Full HD must use original approved 151px portraits: '+JSON.stringify(results));
       }
       if(width===2560){
         assert.ok(results.worldWidth>2000,'Restore full-width WORLD SELECT at QHD: '+JSON.stringify(results));
         assert.ok(results.detailWidth>2000,'Restore full-width WORLD DETAIL at QHD: '+JSON.stringify(results));
         assert.ok(results.worldCardHeight>=600,'Restore tall WORLD art panels at QHD: '+JSON.stringify(results));
-        assert.ok(results.castWidth>=230&&results.castWidth<=238,
-          'Tall QHD viewport must retain approved enlarged portrait size: '+JSON.stringify(results));
+        assert.ok(results.castWidth>=200&&results.castWidth<=203,
+          'QHD must use original approved ~201px portraits: '+JSON.stringify(results));
       }
     }
     await page.close();
