@@ -310,8 +310,8 @@
   background:var(--ws-coral);
 }
 #worldDetailPanel .wd4-description{
-  /* WORLD story lead: centered on desktop with a readable, deliberate line length. */
-  width:min(100%,800px);
+  /* WORLD story lead: centered on desktop at the original 1120px content width. */
+  width:min(100%,1120px);
   color:#141d20;
   font:750 clamp(14px,1vw,23px)/1.64 var(--jpn);
   text-align:center;white-space:pre-wrap;overflow-wrap:anywhere;
