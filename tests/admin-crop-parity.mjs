@@ -172,15 +172,15 @@ if(process.argv.includes('--browser')){
       const frameHtml=sourceFor(view);
       const encoded=imageEsc(frameHtml);
       await page.setViewportSize({width:1280,height:900});
-      await page.setContent(\`<!doctype html><html><head><style>\${worldCss}</style></head><body style="margin:0">
+      await page.setContent(`<!doctype html><html><head><style>${worldCss}</style></head><body style="margin:0">
         <div id="admin"><div id="worldImageStudio" class="world-image-studio">
           <div class="world-image-canvas" style="width:570px;box-sizing:border-box">
             <div class="world-image-frame-shell" data-world-image-drag>
-              <iframe data-world-image-frame sandbox="allow-same-origin" style="width:\${naturalWidth}px;height:1400px"
-                srcdoc="\${encoded}"></iframe>
+              <iframe data-world-image-frame sandbox="allow-same-origin" style="width:${naturalWidth}px;height:1400px"
+                srcdoc="${encoded}"></iframe>
             </div>
           </div>
-        </div></div></body></html>\`,{waitUntil:'load'});
+        </div></div></body></html>`,{waitUntil:'load'});
       const outcome=await page.evaluate(()=>{
         const iframe=document.querySelector('[data-world-image-frame]');
         const inner=iframe.contentDocument;
@@ -194,7 +194,7 @@ if(process.argv.includes('--browser')){
         const scale=Math.min(1,Math.max(120,avail)/rect.width);
         outer.style.width=Math.ceil(rect.width*scale)+'px';
         outer.style.height=Math.ceil(rect.height*scale)+'px';
-        iframe.style.transform=\`translate(\${-rect.left*scale}px,\${-rect.top*scale}px) scale(\${scale})\`;
+        iframe.style.transform=`translate(${-rect.left*scale}px,${-rect.top*scale}px) scale(${scale})`;
         return {width:rect.width,height:rect.height,scale,shell:outer.getBoundingClientRect().width,
           visual:getComputedStyle(inner.querySelector('[data-world-preview-img]')).transform};
       });
