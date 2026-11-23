@@ -148,7 +148,63 @@ if(process.argv.includes('--browser')){
     for(const item of motion)assert.ok(Math.abs(item.dx)>5,
       'X position must physically move square icons at zoom > 1: '+JSON.stringify(motion));
     assert.equal(mob.all,'1 / 1.08');
+
+    // WORLD IMAGE STUDIO: render the real editor iframe markup at the public
+    // responsive viewport widths, and confirm the editor can crop it precisely.
+    const frameGeneratorSource=js.slice(js.indexOf('function worldImageFrameDoc(w,view,idx){'),
+      js.indexOf('function worldImageStudio(w){'));
+    const imageEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const generator=new Function('esc','worldImageCss','worldImageValues',
+      frameGeneratorSource+';return worldImageFrameDoc;')(
+      imageEsc,v=>'--wi-x:'+v.x+'%;--wi-y:'+v.y+'%;--wi-z:'+v.zoom,
+      ()=>({x:15,y:-20,zoom:1.4}));
+    const worldSample={title:'TEST WORLD',category:'FANTASY / ROMANCE',cardTeaser:'Two-line world introduction',
+      image:artwork,stories:[{title:'MAIN STORY'}],accent:'#eafa42'};
+    const stylesForFrame=[read('style.css'),read('mobile.css'),worldCss].join('\n');
+    const sourceFor=(view)=>{
+      const doc=generator(worldSample,view,1);
+      return doc.replace(/<link rel="stylesheet" href="[^"]+">/g,'')
+        .replace('</head>','<style>'+stylesForFrame+'</style></head>');
+    };
+    for(const view of ['select','detail','mobile']){
+      const naturalWidth=view==='mobile'?390:1280;
+      const frameHtml=sourceFor(view);
+      const encoded=imageEsc(frameHtml);
+      await page.setViewportSize({width:1280,height:900});
+      await page.setContent(\`<!doctype html><html><head><style>\${worldCss}</style></head><body style="margin:0">
+        <div id="admin"><div id="worldImageStudio" class="world-image-studio">
+          <div class="world-image-canvas" style="width:570px;box-sizing:border-box">
+            <div class="world-image-frame-shell" data-world-image-drag>
+              <iframe data-world-image-frame sandbox="allow-same-origin" style="width:\${naturalWidth}px;height:1400px"
+                srcdoc="\${encoded}"></iframe>
+            </div>
+          </div>
+        </div></div></body></html>\`,{waitUntil:'load'});
+      const outcome=await page.evaluate(()=>{
+        const iframe=document.querySelector('[data-world-image-frame]');
+        const inner=iframe.contentDocument;
+        const anchor=inner?.querySelector('[data-world-preview-anchor]');
+        if(!anchor)return null;
+        const rect=anchor.getBoundingClientRect();
+        const outer=document.querySelector('.world-image-frame-shell');
+        const canvas=document.querySelector('.world-image-canvas');
+        const css=getComputedStyle(canvas);
+        const avail=canvas.clientWidth-(parseFloat(css.paddingLeft)||0)-(parseFloat(css.paddingRight)||0)-4;
+        const scale=Math.min(1,Math.max(120,avail)/rect.width);
+        outer.style.width=Math.ceil(rect.width*scale)+'px';
+        outer.style.height=Math.ceil(rect.height*scale)+'px';
+        iframe.style.transform=\`translate(\${-rect.left*scale}px,\${-rect.top*scale}px) scale(\${scale})\`;
+        return {width:rect.width,height:rect.height,scale,shell:outer.getBoundingClientRect().width,
+          visual:getComputedStyle(inner.querySelector('[data-world-preview-img]')).transform};
+      });
+      assert.ok(outcome&&outcome.width>150,'WORLD '+view+' iframe should load real public CSS and card markup');
+      assert.ok(outcome.shell>100&&Math.abs(outcome.shell-outcome.width*outcome.scale)<3,
+        'WORLD '+view+' fitted preview must preserve correct aspect: '+JSON.stringify(outcome));
+      if(view==='select')assert.ok(outcome.height>400,'WORLD SELECT should use real responsive card height');
+      if(view==='mobile')assert.ok(Math.abs(outcome.height-145)<1,'WORLD MOBILE should use real 145px detail header');
+    }
     await page.close();
-    console.log('PASS: Chromium desktop V16 picture-bay transforms and mobile/gallery previews');
+    console.log('PASS: Chromium V16 crop parity and true WORLD preview viewport layout');
   } finally {await browser.close()}
 }
