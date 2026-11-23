@@ -149,54 +149,98 @@ function worldImageValues(w,mode){
 }
 function worldImageCss(v){return `--wi-x:${v.x}%;--wi-y:${v.y}%;--wi-z:${v.zoom}`;}
 function worldImageActiveMode(){return state.worldImageView==='select'?'select':'detail';}
+function worldImageFrameDoc(w,view,idx){
+ const num=String(idx).padStart(2,'0'),count=(w.stories||[]).filter(t=>t.title?.trim()).length;
+ const cat=esc(w.category||'WORLD ARCHIVE'),title=esc(w.title||'UNNAMED WORLD');
+ const image=esc(w.image||''),copy=esc(String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。');
+ const mode=view==='select'?'select':'detail',st=esc(worldImageCss(worldImageValues(w,mode)));
+ const cssLinks=`<link rel="stylesheet" href="style.css?v=5.9.13"><link rel="stylesheet" href="mobile.css?v=15.4.0"><link rel="stylesheet" href="cast-worlds-current.css?v=1.0.4">`;
+ let panel='';
+ if(view==='select'){
+  const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
+  const art=w.image?`<img class="ws5-backdrop" src="${image}" alt="" draggable="false"><img data-world-preview-img class="ws5-art" src="${image}" alt="" draggable="false" style="${st}">`:'';
+  const placeholder=motif==='research'?'<span class="ws5-motif" aria-hidden="true">R0</span><span class="ws5-warning" aria-hidden="true"></span>':motif==='unassigned'?'<span class="ws5-motif" aria-hidden="true"><b>+</b><small>UNASSIGNED</small></span>':'';
+  panel=`<aside class="directory worlds-panel" id="worldsPanel"><div class="directory-head"></div><div class="directory-content"><span class="directory-kicker mono">INTERCONNECTED STORIES</span><h2>WORLD <i>SELECT</i><span>.</span></h2><p class="worlds-intro">同じ世界に暮らすキャラクターを、作品から探す。</p><div class="world-cards">
+   <button type="button" class="world-card ws5-card ${w.image?'has-cover':'no-cover'}" data-world-preview-anchor>
+    <span class="ws5-visual" data-motif="${motif}" aria-hidden="true">${art}<span class="ws5-file-mark"><b>◆</b> FILE / ${num} &nbsp; ${cat}</span><span class="ws5-huge">${num}</span>${placeholder}</span>
+    <span class="ws5-info"><span class="ws5-meta"><span>WORLD ID / ${num}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span><strong class="ws5-name">${title}</strong><span class="ws5-summary">${copy}</span><span class="ws5-action">OPEN WORLD FILE <span class="ws5-arrow" aria-hidden="true">↗</span></span></span>
+   </button></div></div></aside>`;
+ }else{
+  const accent=/^#[0-9a-f]{6}$/i.test(w.accent)?w.accent:'#eafa42';
+  const imageHtml=w.image?`<img src="${image}" alt="" draggable="false" class="world-detail-art" data-world-preview-img style="${st}">`:'';
+  panel=`<aside class="directory world-detail-panel" id="worldDetailPanel"><div class="directory-head"></div><div class="world-detail-content"><div class="wd4-center"><section class="wd4-dossier">
+   <div class="world-detail-hero wd4-hero" data-world-preview-anchor style="--wd-accent:${esc(accent)}"><div class="world-detail-backdrop">${imageHtml}</div><div class="world-detail-hero-content">
+    <div class="world-detail-kicker mono">WORLD DOSSIER / ${num} &nbsp; · &nbsp; ${cat}</div><h2>${title}</h2><span class="world-detail-subtitle">${esc(w.subtitle||w.category||'ORIGINAL WORLD')}</span>
+   </div></div></section></div></div></aside>`;
+ }
+ const iframeFix=`html,body{margin:0!important;padding:0!important;width:100%!important;min-height:100%;background:#151b1e;overflow:visible!important}#worldsPanel,#worldDetailPanel{position:relative!important;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:none!important;transform:none!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;max-width:none!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}#worldsPanel .directory-head,#worldDetailPanel .directory-head{display:none!important}#worldsPanel .directory-content,#worldDetailPanel .world-detail-content{height:auto!important;max-height:none!important;overflow:visible!important}#worldsPanel .world-card.ws5-card:hover{transform:none!important;border-color:#101719!important;outline-color:#526164!important;box-shadow:8px 9px 0 #05080a,0 0 0 1px #a7b5b644!important}#worldsPanel .world-card.ws5-card:hover .ws5-art{transform:translate(var(--wi-x,0%),var(--wi-y,0%)) scale(var(--wi-z,1))!important}`;
+ return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${cssLinks}<style>${iframeFix}</style></head><body>${panel}</body></html>`;
+}
 function worldImageStudio(w){
  const view=['select','detail','mobile'].includes(state.worldImageView)?state.worldImageView:'select';
- const mode=view==='select'?'select':'detail',v=worldImageValues(w,mode),style=esc(worldImageCss(v));
- const idx=String(doc().worlds.findIndex(x=>x.id===w.id)+1).padStart(2,'0');
- const count=(w.stories||[]).filter(x=>x.title?.trim()).length;
- const title=esc(w.title||'UNNAMED WORLD'),category=esc(w.category||'WORLD ARCHIVE');
- const tagline=esc(String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。');
- const image=esc(w.image||''),hasImage=!!w.image,disabled=hasImage?'':'disabled';
- const imgTag=hasImage?`<img src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:'<div class="world-image-studio-empty">画像をアップロードすると、ここで位置と拡大率を調整できます。</div>';
- const cover=view==='select'?`<div class="world-image-card">
-  <div class="world-image-stage world-image-select-stage" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
-   ${hasImage?`<img class="ws5-backdrop" src="${image}" alt="" draggable="false"><img class="ws5-art" src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:imgTag}
-   <span class="world-image-filemark"><b>◆</b> FILE / ${idx} &nbsp; ${category}</span>
-   <span class="world-image-huge">${idx}</span>
-  </div>
-  <div class="world-image-card-info">
-   <span class="world-image-card-meta"><span>WORLD ID / ${idx}</span><b>${count?'STORIES '+String(count).padStart(2,'0'):'WORLD FILE'}</b></span>
-   <strong data-world-studio-title>${title}</strong>
-   <span class="world-image-card-copy" data-world-studio-copy>${tagline}</span>
-   <span class="world-image-card-cta">OPEN WORLD FILE <b>↗</b></span>
-  </div>
- </div>`:'';
- const detail=view!=='select'?`<div class="world-image-stage world-image-detail-stage ${view==='mobile'?'is-mobile':''}" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
-   ${hasImage?`<img class="world-detail-art" src="${image}" alt="" draggable="false" data-world-preview-img style="${style}">`:imgTag}
-   <div class="world-image-detail-content">
-    <small>WORLD DOSSIER / ${idx} · ${category}</small>
-    <strong data-world-studio-title>${title}</strong>
-    <span data-world-studio-subtitle>${esc(w.subtitle||w.category||'ORIGINAL WORLD')}</span>
-   </div>
-  </div>`:'';
+ const mode=view==='select'?'select':'detail',v=worldImageValues(w,mode);
+ const idx=doc().worlds.findIndex(item=>item.id===w.id)+1;
+ const viewport=view==='mobile'?390:view==='detail'?Math.max(1024,window.innerWidth):Math.max(320,window.innerWidth);
+ const iframeSrcdoc=esc(worldImageFrameDoc(w,view,idx));
+ const hasImage=!!w.image,disabled=hasImage?'':'disabled';
  const tab=(label,key)=>`<button type="button" data-action="world-image-view" data-view="${key}" aria-pressed="${String(view===key)}">${label}</button>`;
  const axis=(label,key,min,max,step)=>`<div class="world-image-range"><label for="world-image-range-${key}">${label}<output data-world-image-value="${key}">${key==='zoom'?v[key].toFixed(2)+'×':Math.round(v[key])+'%'}</output></label><input id="world-image-range-${key}" type="range" data-world-image-axis="${key}" min="${min}" max="${max}" step="${step}" value="${v[key]}" ${disabled}></div>`;
  return `<div class="world-image-studio" id="worldImageStudio">
-  <div class="world-image-studio-head"><strong class="world-image-studio-kicker">WORLD IMAGE STUDIO / LIVE PREVIEW</strong><small>画像そのものは変更せず、表示位置だけを保存します</small></div>
+  <div class="world-image-studio-head"><strong class="world-image-studio-kicker">WORLD IMAGE STUDIO / REAL VIEW PREVIEW</strong><small>公開画面と同じレイアウト・CSSで画像位置を確認できます</small></div>
   <div class="world-image-tabs" role="group" aria-label="WORLD画像のプレビュー切り替え">
    ${tab('SELECT CARD','select')}${tab('DETAIL / PC','detail')}${tab('DETAIL / MOBILE','mobile')}
   </div>
-  <div class="world-image-canvas">${cover||detail}</div>
+  <div class="world-image-canvas"><div class="world-image-frame-shell" data-world-image-drag aria-label="ドラッグして画像の表示位置を変更">
+    <iframe title="${view==='select'?'WORLD SELECT':view==='mobile'?'WORLD DETAIL MOBILE':'WORLD DETAIL PC'} の実際の画面プレビュー" data-world-image-frame
+     data-world-preview-viewport="${viewport}" loading="eager" sandbox="allow-same-origin" tabindex="-1"
+     style="width:${viewport}px;height:1400px" srcdoc="${iframeSrcdoc}"></iframe>
+    <div class="world-image-drag-cover" aria-hidden="true"></div>
+   </div></div>
   <div class="world-image-control-grid">
    ${axis('横位置 / X','x',-100,100,1)}${axis('縦位置 / Y','y',-100,100,1)}${axis('拡大率 / ZOOM','zoom',.65,2.5,.05)}
   </div>
-  <div class="world-image-studio-foot"><small>画像を直接ドラッグして移動できます。SELECTとDETAILはそれぞれ位置を記憶します（PCとMOBILEは共通）。</small><button type="button" data-action="world-image-reset" ${disabled}>↺ RESET POSITION</button></div>
+  <div class="world-image-studio-foot"><small>画像をドラッグして移動。SELECTとDETAILは別々に保存（PCとMOBILEは共通）。</small><div class="world-image-studio-actions"><button type="button" data-action="world-image-expand">↗ PREVIEWを拡大</button><button type="button" data-action="world-image-reset" ${disabled}>↺ RESET POSITION</button></div></div>
  </div>`;
 }
+function worldImageFit(frame=document.querySelector('#worldImageStudio [data-world-image-frame]')){
+ if(!frame||!frame.isConnected)return;
+ const target=frame.contentDocument?.querySelector('[data-world-preview-anchor]');
+ const canvas=frame.closest('.world-image-canvas');
+ const shell=frame.closest('.world-image-frame-shell');
+ if(!target||!canvas||!shell)return;
+ const rect=target.getBoundingClientRect();
+ if(!(rect.width>0&&rect.height>0))return;
+ const css=getComputedStyle(canvas);
+ const available=Math.max(120,canvas.clientWidth-(parseFloat(css.paddingLeft)||0)-(parseFloat(css.paddingRight)||0)-4);
+ const scale=Math.min(1,available/rect.width);
+ shell.style.width=Math.ceil(rect.width*scale)+'px';
+ shell.style.height=Math.ceil(rect.height*scale)+'px';
+ shell.dataset.worldPreviewScale=String(scale);
+ frame.style.transform=`translate(${-rect.left*scale}px,${-rect.top*scale}px) scale(${scale})`;
+ frame.style.visibility='visible';
+}
+function worldImageFrameReady(frame){
+ if(!frame?.isConnected||!frame.contentDocument)return;
+ worldImageFit(frame);
+ const doc=frame.contentDocument;
+ if(doc.fonts?.ready)doc.fonts.ready.then(()=>{if(frame.isConnected)worldImageFit(frame)}).catch(()=>{});
+ const img=doc.querySelector('[data-world-preview-img]');
+ if(img&&!img.complete)img.addEventListener('load',()=>{if(frame.isConnected)worldImageFit(frame)},{once:true});
+}
+function worldImageToggleExpand(){
+ const studio=document.getElementById('worldImageStudio');
+ if(!studio)return;
+ const expanded=studio.classList.toggle('is-expanded');
+ const b=studio.querySelector('[data-action="world-image-expand"]');
+ if(b)b.textContent=expanded?'↙ プレビューを戻す':'↗ PREVIEWを拡大';
+ requestAnimationFrame(()=>worldImageFit());
+}
 function worldImageSync(){
- const w=world(),panel=document.getElementById('worldImageStudio');if(!w||!panel)return;
+ const w=world(),panel=document.getElementById('worldImageStudio');
+ if(!w||!panel)return;
  const v=worldImageValues(w,worldImageActiveMode());
- const img=panel.querySelector('[data-world-preview-img]');
+ const frame=panel.querySelector('[data-world-image-frame]');
+ const img=frame?.contentDocument?.querySelector('[data-world-preview-img]');
  if(img)img.setAttribute('style',worldImageCss(v));
  for(const key of ['x','y','zoom']){
   const inp=panel.querySelector(`[data-world-image-axis="${key}"]`);
@@ -206,17 +250,27 @@ function worldImageSync(){
  }
 }
 function worldImageUpdateCopy(w){
- const panel=document.getElementById('worldImageStudio');
- if(panel){
-  const title=panel.querySelector('[data-world-studio-title]');
-  const copy=panel.querySelector('[data-world-studio-copy]');
-  const subtitle=panel.querySelector('[data-world-studio-subtitle]');
-  if(title)title.textContent=w.title||'UNNAMED WORLD';
+ const frame=document.querySelector('#worldImageStudio [data-world-image-frame]');
+ const inner=frame?.contentDocument;
+ if(inner){
+  const titles=inner.querySelectorAll('.ws5-name,.world-detail-hero-content h2');
+  titles.forEach(t=>t.textContent=w.title||'UNNAMED WORLD');
+  const copy=inner.querySelector('.ws5-summary');
   if(copy)copy.textContent=String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。';
+  const subtitle=inner.querySelector('.world-detail-subtitle');
   if(subtitle)subtitle.textContent=w.subtitle||w.category||'ORIGINAL WORLD';
+  const cat=inner.querySelector('.ws5-file-mark');
+  if(cat)cat.innerHTML='<b>◆</b> FILE / '+String(doc().worlds.indexOf(w)+1).padStart(2,'0')+' &nbsp; '+esc(w.category||'WORLD ARCHIVE');
+  const kicker=inner.querySelector('.world-detail-kicker');
+  if(kicker)kicker.textContent='WORLD DOSSIER / '+String(doc().worlds.indexOf(w)+1).padStart(2,'0')+' · '+(w.category||'ARCHIVE');
+  worldImageFit(frame);
  }
  const mini=document.querySelector('.edit-sidebar .mini-preview-info');
- if(mini){const t=mini.querySelector('strong'),p=mini.querySelector('p');if(t)t.textContent=w.title||'';if(p)p.textContent=String(w.cardTeaser||'').trim()||w.summary||'';}
+ if(mini){
+  const t=mini.querySelector('strong'),p=mini.querySelector('p');
+  if(t)t.textContent=w.title||'';
+  if(p)p.textContent=String(w.cardTeaser||'').trim()||w.summary||'';
+ }
 }
 function worldImageScheduleSave(){
  clearTimeout(state.worldImageSaveTimer);
@@ -234,17 +288,21 @@ function worldImageSetAxis(axis,value){
 function worldImageDragStart(e){
  const stage=e.target.closest?.('[data-world-image-drag]');
  if(!stage||e.button!==0||!world()?.image||state.section!=='worlds')return;
- const img=stage.querySelector('[data-world-preview-img]');
+ const frame=stage.querySelector('[data-world-image-frame]');
+ const img=frame?.contentDocument?.querySelector('[data-world-preview-img]');
  if(!img)return;
  const vals=worldImageValues(world(),worldImageActiveMode());
- state.worldImageDrag={pointerId:e.pointerId,stage,img,startX:e.clientX,startY:e.clientY,origin:vals,moved:false};
- stage.classList.add('is-dragging');stage.setPointerCapture?.(e.pointerId);e.preventDefault();
+ const scale=Number(stage.dataset.worldPreviewScale)||1;
+ state.worldImageDrag={pointerId:e.pointerId,stage,img,scale,startX:e.clientX,startY:e.clientY,origin:vals,moved:false};
+ stage.classList.add('is-dragging');
+ stage.setPointerCapture?.(e.pointerId);
+ e.preventDefault();
 }
 function worldImageDragMove(e){
  const drag=state.worldImageDrag;
  if(!drag||e.pointerId!==drag.pointerId)return;
- const stepX=(e.clientX-drag.startX)*100/Math.max(1,drag.img.offsetWidth);
- const stepY=(e.clientY-drag.startY)*100/Math.max(1,drag.img.offsetHeight);
+ const stepX=(e.clientX-drag.startX)*100/Math.max(1,drag.img.offsetWidth*drag.scale*drag.origin.zoom);
+ const stepY=(e.clientY-drag.startY)*100/Math.max(1,drag.img.offsetHeight*drag.scale*drag.origin.zoom);
  const x=Math.round(Math.max(-100,Math.min(100,drag.origin.x+stepX)));
  const y=Math.round(Math.max(-100,Math.min(100,drag.origin.y+stepY)));
  if(x===drag.origin.x&&y===drag.origin.y&&!drag.moved)return;
@@ -357,6 +415,7 @@ async function importData(file){if(!file)return;try{const data=JSON.parse(await 
 function handleAction(el){const a=el.dataset.action,id=el.dataset.id,index=Number(el.dataset.index);if(a==='preview-about'){preview();window.location.hash='about';return}if(a==='show-chars'){state.section='characters';state.charId=null;render()}
  else if(a==='crop-mode'){state.cropMode=['choose','mobile','all'].includes(el.dataset.view)?el.dataset.view:'choose';render();}else if(a==='crop-enable-y'){const c=selected();setCrop(c,{...cropVals(c,cropMode()),zoom:Math.max(1.3,cropVals(c,cropMode()).zoom)});showCrop();persist('上下方向の調整幅を増やしたよ')}else if(a==='crop-reset')resetCrop();else if(a==='badge-reset'){selected()[badgeField()]=badgeIsMobile()?{right:8,top:66}:{...BADGE_DESKTOP_DEFAULT};refreshArtEditor();persist()}else if(a==='art-reset'){selected().artPosition={x:0,y:0,zoom:1};persist();render()}else if(a.startsWith('relation-'))updateRelation(a,index);else if(a.startsWith('tag-')){const c=selected();if(!c)return;if(a==='tag-apply'){const input=$('tagQuickInput');if(commitTags(c,input?.value))render();return}const ids=c.tagIds||[];if(a==='tag-left'&&index>0)[ids[index-1],ids[index]]=[ids[index],ids[index-1]];if(a==='tag-right'&&index<ids.length-1)[ids[index+1],ids[index]]=[ids[index],ids[index+1]];if(a==='tag-remove')ids.splice(index,1);persist();render()}else if(a==='show-publish')setSection('publish');else if(a==='export-publish')exportPublish();else if(a==='new-char')newChar();else if(a==='edit-char')openChar(id);else if(a==='edit-prev'||a==='edit-next'){if(id&&doc().characters.some(c=>c.id===id)){state.charId=id;render();document.querySelector('.admin-workspace')?.scrollTo({top:0,behavior:'instant'})}}else if(a==='move-up')moveChar(id,-1);else if(a==='move-down')moveChar(id,1);else if(a==='delete-char')deleteChar(id);
  else if(a==='world-image-view'){if(!world()||!['select','detail','mobile'].includes(el.dataset.view))return;state.worldImageView=el.dataset.view;const studio=document.getElementById('worldImageStudio');if(studio)studio.outerHTML=worldImageStudio(world());}
+ else if(a==='world-image-expand'){worldImageToggleExpand();}
  else if(a==='world-image-reset'){const w=world();if(!w||!w.image)return;const mode=worldImageActiveMode();w.worldImageCrop={...(w.worldImageCrop||{}),[mode]:{x:0,y:0,zoom:1}};worldImageSync();worldImageScheduleSave();}
  else if(a==='show-worlds'){state.section='worlds';state.worldId=null;render()}else if(a==='new-world')newWorld();else if(a==='world-up')moveWorld(id,-1);else if(a==='world-down')moveWorld(id,1);else if(a==='edit-world'){state.worldId=id;state.worldImageView='select';render()}else if(a==='delete-world')deleteWorld(id);
  else if(a==='show-tags')setSection('tags');else if(a==='show-about')setSection('about');else if(a==='new-tag')newTag();else if(a==='delete-tag')deleteTag(id);
@@ -394,7 +453,16 @@ $('cloudLogout').addEventListener('click', async()=>{if(confirm('ログアウト
 $('adminContent').addEventListener('click',e=>{const tab=e.target.closest('[data-char-tab]');if(tab){state.tab=tab.dataset.charTab;render();return}const b=e.target.closest('[data-action]');if(b)handleAction(b)});
 $('adminContent').addEventListener('input',e=>{const el=e.target;if(el.matches('[type=file]'))return;updateField(el)});
 $('adminContent').addEventListener('change',e=>{const el=e.target;if(el.id==='tagQuickInput'){if(commitTags(selected(),el.value))render();return}if(el.matches('[type=file]')){if(el.id==='backupInput')importData(el.files?.[0]);else upload(el)}});
-$('adminContent').addEventListener('keydown',e=>{if(e.target?.id==='tagQuickInput'&&e.key==='Enter'){e.preventDefault();if(commitTags(selected(),e.target.value))render()}});$('adminContent').addEventListener('pointerdown',worldImageDragStart);$('adminContent').addEventListener('pointermove',worldImageDragMove);$('adminContent').addEventListener('pointerup',worldImageDragEnd);$('adminContent').addEventListener('pointercancel',worldImageDragEnd);
+$('adminContent').addEventListener('keydown',e=>{if(e.target?.id==='tagQuickInput'&&e.key==='Enter'){e.preventDefault();if(commitTags(selected(),e.target.value))render()}});$('adminContent').addEventListener('load',e=>{if(e.target?.matches?.('iframe[data-world-image-frame]'))worldImageFrameReady(e.target)},true);
+window.addEventListener('resize',()=>{
+ const frame=document.querySelector('#worldImageStudio [data-world-image-frame]');
+ if(!frame)return;
+ const view=state.worldImageView;
+ const viewport=view==='mobile'?390:view==='detail'?Math.max(1024,window.innerWidth):Math.max(320,window.innerWidth);
+ frame.style.width=viewport+'px';frame.dataset.worldPreviewViewport=String(viewport);
+ worldImageFit(frame);
+},{passive:true});
+$('adminContent').addEventListener('pointerdown',worldImageDragStart);$('adminContent').addEventListener('pointermove',worldImageDragMove);$('adminContent').addEventListener('pointerup',worldImageDragEnd);$('adminContent').addEventListener('pointercancel',worldImageDragEnd);
 $('adminContent').addEventListener('pointerdown',startCrop);$('adminContent').addEventListener('pointerdown',startBadge);$('adminContent').addEventListener('pointerdown',startArt);
 $('adminContent').addEventListener('pointermove',dragCrop);$('adminContent').addEventListener('pointermove',moveBadge);$('adminContent').addEventListener('pointermove',moveArt);
 $('adminContent').addEventListener('pointerup',endCrop);$('adminContent').addEventListener('pointerup',endBadge);$('adminContent').addEventListener('pointerup',endArt);
