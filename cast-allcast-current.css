@@ -440,6 +440,36 @@
   #directory #directoryItems.directory-gallery .cast-gallery-badges{display:none!important}
   #directory #directoryItems.directory-gallery .cast-gallery-arrow{display:none!important}
 }
+/* FHD / short desktop windows: keep the taller QHD portrait treatment intact,
+   but fit more of the 6-column gallery in the available vertical viewport.
+   This is based on usable window height, not monitor labels or browser zoom. */
+@media (min-width:1500px) and (max-height:1100px){
+  #directory .allcast-roster-shell{
+    --allcast-card-w:clamp(156px,8.55vw,170px);
+    --allcast-card-h:calc(var(--allcast-card-w) + 56px);
+    --allcast-portrait-h:var(--allcast-card-w);
+    --allcast-gap:10px;
+  }
+  #directory .directory-fixed{
+    min-height:0;
+    padding-top:8px!important;
+    padding-bottom:6px!important;
+  }
+  #directory .allcast-roster-shell.is-gallery{
+    margin:7px auto 7px;
+    padding:6px 6px 4px;
+  }
+  #directory .allcast-deck-top{
+    padding-block:5px;
+  }
+  #directory #directoryItems.directory-gallery{
+    padding:8px!important;
+  }
+  #directory .allcast-roster-footer{
+    min-height:22px;
+    padding-top:2px;
+  }
+}
 @media (prefers-reduced-motion:reduce){
   #directory #directoryItems.directory-gallery .cast-gallery-card,
   #directory .allcast-roster-footer .allcast-scroll-progress{transition:none!important}
