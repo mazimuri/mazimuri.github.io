@@ -7,6 +7,7 @@ import {readFileSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const js=read('admin.js'),css=read('admin-v15-studio.css'),html=read('admin.html');
 const prod=read('cast-rail-current.css'),mobile=read('mobile.css'),all=read('cast-allcast-current.css');
+const worldCss=read('cast-worlds-current.css'),publicJs=read('app.js');
 new Function(js); // Syntax only; do not execute browser code in Node.
 assert.match(js,/mode==='choose'\?frame\?\.querySelector\('\.v15-rail-inner'\):frame/);
 assert.match(js,/function cropMetrics\(mode,zoom\)/);
@@ -36,7 +37,6 @@ assert.match(js,/data-world-image-frame/);
 assert.match(js,/function worldImageToggleExpand\(\)/);
 assert.match(worldCss,/#admin \.world-image-frame-shell iframe/);
 assert.match(worldCss,/#admin \.world-image-studio\.is-expanded/);
-const worldCss=read('cast-worlds-current.css'),publicJs=read('app.js');
 assert.match(js,/function worldImageStudio\(w\)/);
 assert.match(js,/function worldImageDragStart\(e\)/);
 assert.match(js,/function worldImageDragMove\(e\)/);
