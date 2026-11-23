@@ -78,7 +78,7 @@
   box-shadow:8px 9px 0 #05080a,0 0 0 3px var(--ws-lime);
 }
 #worldsPanel .ws5-visual{
-  position:relative;flex:0 0 47%;height:47%;
+  position:relative;flex:1 1 0%;height:auto;min-height:125px;
   overflow:hidden;background:#1c2529;color:white;
 }
 #worldsPanel .ws5-visual:before{
@@ -155,7 +155,7 @@
   font:900 clamp(8px,.54vw,12px)/1 var(--mono);
 }
 #worldsPanel .ws5-info{
-  flex:1;min-height:0;display:flex;flex-direction:column;
+  flex:0 0 auto;min-height:0;display:flex;flex-direction:column;
   position:relative;
   padding:clamp(13px,1.1vw,25px) clamp(16px,1.4vw,34px) clamp(10px,.85vw,21px);
   border-top:5px solid #12191c;background:var(--ws-paper);
@@ -192,7 +192,7 @@
 }
 #worldsPanel .ws5-action{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin-top:auto;
+  margin-top:clamp(14px,1.1vw,23px);
   padding-top:clamp(8px,.69vw,17px);
   border-top:1px solid #b5c2bc;
   font:1000 clamp(11px,.74vw,17px)/1 var(--mono);
@@ -649,7 +649,7 @@
   #worldsPanel .world-card.ws5-card{
     height:clamp(410px,108vw,475px);
   }
-  #worldsPanel .ws5-visual{flex-basis:46%;height:46%}
+  #worldsPanel .ws5-visual{flex:1 1 0%;height:auto;min-height:125px}
   #worldsPanel .ws5-huge{font-size:125px}
   #worldsPanel .ws5-name{font-size:clamp(26px,7.1vw,35px)}
   #worldsPanel .ws5-summary{font-size:12px}
