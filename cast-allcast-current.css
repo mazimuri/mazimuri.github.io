@@ -3,13 +3,13 @@
    were removed from cast-side-rail.css to prevent accumulating overrides.
    This module owns the desktop gallery only; DETAIL and mobile remain intact.
 
-   Accepted layout: 6 columns at 1920 and 2560, cards 151 -> ~201px,
+   Accepted layout: 6 columns at 1920 and 2560, now with larger portraits,
    dark cartridge frame, character art as the color source, yellow hover /
    focus (not persistent selection), and independent scrolling when needed.
 */
 /* V2 / CHARACTER DECK — approved PAPER nameplate design.
    This is the single current desktop ALL CAST module, not another Study layer.
-   Keep the six-column crop, fixed card size, status badge semantics, existing
+   Keep the six-column crop, responsive card size, status badge semantics, existing
    search/view functionality and internal scrolling. */
 @media (min-width:801px){
   #directory .cast-directory-content{
@@ -130,10 +130,11 @@
   }
 
   #directory .allcast-roster-shell{
-    --allcast-card-w:clamp(151px,7.8646vw,202px);
-    --allcast-card-h:clamp(222px,11.5625vw,296px);
-    --allcast-portrait-h:clamp(151px,7.8646vw,202px);
-    --allcast-gap:clamp(10px,.521vw,13.4px);
+    /* Larger face-forward portraits without scaling the navigation or entire UI. */
+    --allcast-card-w:clamp(176px,10vw,236px);
+    --allcast-card-h:calc(var(--allcast-card-w) + 74px);
+    --allcast-portrait-h:var(--allcast-card-w);
+    --allcast-gap:clamp(11px,.65vw,15px);
     --allcast-cols:6;
     --allcast-panel-w:calc(6 * var(--allcast-card-w) + 5 * var(--allcast-gap) + 70px);
     --allcast-yellow:#edff55;
@@ -283,14 +284,14 @@
   }
   #directory #directoryItems.directory-gallery .cast-gallery-name{
     display:block;width:100%;max-width:100%;min-height:0;
-    font:950 clamp(10px,.53vw,14px)/1.23 var(--jpn)!important;
+    font:950 clamp(12px,.67vw,15px)/1.23 var(--jpn)!important;
     color:#14191c!important;text-align:center;
     letter-spacing:-.035em!important;white-space:nowrap!important;
     overflow:hidden!important;text-overflow:ellipsis;
   }
   #directory #directoryItems.directory-gallery .cast-gallery-role{
     display:block;width:100%;max-width:100%;min-height:0;
-    font:760 clamp(7px,.34vw,10px)/1.2 var(--jpn)!important;
+    font:760 clamp(9px,.44vw,11px)/1.2 var(--jpn)!important;
     color:#43534e!important;text-align:center;
     overflow:hidden!important;white-space:nowrap;
     text-overflow:ellipsis;
@@ -398,12 +399,14 @@
 }
 @media (min-width:1200px) and (max-width:1499px){
   #directory .allcast-roster-shell{
+    --allcast-card-w:clamp(160px,12vw,182px);
     --allcast-cols:5;
     --allcast-panel-w:calc(5 * var(--allcast-card-w) + 4 * var(--allcast-gap) + 70px);
   }
 }
 @media (min-width:801px) and (max-width:1199px){
   #directory .allcast-roster-shell{
+    --allcast-card-w:clamp(138px,calc((100vw - 175px) / 4),174px);
     --allcast-cols:4;
     --allcast-panel-w:calc(4 * var(--allcast-card-w) + 3 * var(--allcast-gap) + 70px);
   }
