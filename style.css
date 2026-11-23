@@ -1166,3 +1166,9 @@ body.detail-open .hero-art-wrap{transition:transform 760ms cubic-bezier(.18,.73,
 .about-signal-actions button:focus-visible,.about-signal-actions a:focus-visible{outline:2px solid #fff;outline-offset:3px}
 @media(max-width:940px){.about-signal{grid-template-columns:minmax(0,1fr);gap:14px}.about-signal-actions{justify-content:flex-start}}
 @media(max-width:620px){.about-signal{padding:20px 16px 19px 22px;gap:17px}.about-signal-label{font-size:9px}.about-signal-main{gap:6px}.about-signal-main strong{font-size:clamp(23px,6vw,29px)}.about-signal-main p{flex-basis:100%}.about-signal-actions{flex-wrap:wrap}.about-signal-actions button,.about-signal-actions a{padding:11px 12px}}
+
+/* WORLD EDIT / reorder controls. Only affects the world list inside the private studio. */
+.admin-row.world-editor-row .world-order-actions{flex:none;flex-wrap:nowrap;gap:5px;margin-left:auto}
+.admin-row.world-editor-row .world-order-actions [data-action="world-up"],.admin-row.world-editor-row .world-order-actions [data-action="world-down"]{min-width:35px;min-height:34px;padding:7px 9px;display:grid;place-items:center;font-size:16px;line-height:1}
+.admin-row.world-editor-row .world-order-actions button:disabled{opacity:.32;cursor:not-allowed}
+@media(max-width:600px){.admin-row.world-editor-row{flex-wrap:wrap;gap:9px}.admin-row.world-editor-row .world-art-thumb{height:64px;width:64px}.admin-row.world-editor-row .row-desc{flex:1 1 110px}.admin-row.world-editor-row .world-order-actions{flex:1 1 100%;justify-content:flex-end}}
