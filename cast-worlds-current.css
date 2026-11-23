@@ -111,7 +111,9 @@
 }
 #worldsPanel .ws5-art,
 #admin .world-image-studio .ws5-art{
-  position:absolute;right:0;bottom:-9%;
+  /* The scan lines and dark overlay (z-index:2) belong BEHIND the clear character.
+     FILE labels stay above both (z-index:5); giant FILE numbers stay behind. */
+  position:absolute;z-index:3;right:0;bottom:-9%;
   height:115%;width:auto;max-width:74%;
   object-fit:contain;object-position:right bottom;
   filter:drop-shadow(0 9px 15px #0009);
