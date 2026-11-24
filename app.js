@@ -161,18 +161,18 @@ function renderDossier(){const c=cur();if(!c)return;
  const extraFields=(c.fields||[]).filter(f=>f.label&&f.value),tags=(c.tags||[]);
  box.innerHTML=`<div class="file-profile-v59 file-profile-v592 file-profile-v593">
    <div class="file-profile-top mono"><span>PERSONAL FILE / ${esc(c.no)}</span><span>IDENTITY VERIFIED</span></div>
-   <section class="file-profile-section file-personality">
-     <div class="file-section-label mono"><b>01</b><span>PERSONALITY <small>人物像</small></span></div>
-     <p class="file-reading">${esc(c.personality||'設定準備中')}</p>
-   </section>
    <section class="file-profile-section file-identity">
-     <div class="file-section-label mono"><b>02</b><span>PROFILE DATA <small>基本データ</small></span></div>
+     <div class="file-section-label mono"><b>01</b><span>PROFILE DATA <small>基本データ</small></span></div>
      <div class="file-data-layout">
        ${basic.filter(([k])=>k==='TYPE').map(([k,v])=>`<div class="file-data-role"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}
        <div class="file-data-facts">
          ${[...basic.filter(([k])=>k!=='TYPE'),...secondary,...extraFields.map(f=>[f.label,f.value])].map(([k,v])=>`<div class="file-data-fact"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')||'<span class="file-empty">基本データは未登録です</span>'}
        </div>
      </div>
+   </section>
+   <section class="file-profile-section file-personality">
+     <div class="file-section-label mono"><b>02</b><span>PERSONALITY <small>人物像</small></span></div>
+     <p class="file-reading">${esc(c.personality||'設定準備中')}</p>
    </section>
    ${relationPanel(c)}
    ${tags.length?`<section class="file-profile-section file-keywords"><div class="file-section-label mono"><b>04</b><span>KEYWORDS <small>タグ</small></span></div><div class="file-tags">${tags.map(t=>`<span># ${esc(t)}</span>`).join('')}</div></section>`:''}
