@@ -1,0 +1,76 @@
+/* CAST // SIGNAL — approved Layout Study 08 (desktop only).
+   Preserve mobile, existing artwork crops, navigation and content. */
+@media (min-width:1500px) {
+  #directory .directory-fixed { min-height:0!important; padding-block:8px 6px!important; row-gap:3px!important; }
+  #directory .directory-heading-row h2 { margin:3px 0 3px!important; font-size:clamp(54px,3.8vw,96px)!important; }
+  #directory .directory-control { gap:clamp(10px,.65vw,16px)!important; padding:0!important; }
+  #directory .directory-search-label { height:clamp(34px,2vw,48px)!important; }
+  #directory .directory-search-label input { padding-block:4px!important; }
+  #directory .directory-subtools { padding-top:4px!important; }
+  #directory .directory-count { padding-block:3px!important; }
+  #directory .allcast-roster-shell.is-gallery {
+    --allcast-card-w:clamp(166px,8.65vw,222px);
+    width:min(calc(var(--allcast-panel-w) + clamp(60px,4vw,100px)),calc(100vw - 46px))!important;
+    margin-block:10px 12px!important;
+  }
+  #directory #directoryItems.directory-gallery { gap:calc(var(--allcast-gap) + 4px)!important; }
+  #directory #directoryItems.directory-gallery .cast-gallery-card{height:auto!important;}
+  #directory #directoryItems.directory-gallery .cast-gallery-visual{flex:0 0 auto!important;height:auto!important;aspect-ratio:1/1!important;box-sizing:border-box;}
+  #directory #directoryItems.directory-gallery .cast-gallery-caption{flex:0 0 auto!important;overflow:visible!important;}
+  #directory #directoryItems.directory-gallery .cast-gallery-nameplate{flex:0 0 auto!important;min-height:clamp(32px,1.7vw,44px)!important;padding:3px 3px!important;gap:1px!important;}
+  #directory #directoryItems.directory-gallery .cast-gallery-name{flex-shrink:0;line-height:1.3!important;}
+  #directory #directoryItems.directory-gallery .cast-gallery-role{display:block!important;flex-shrink:0;line-height:1.3!important;}
+  #directory .allcast-roster-shell.is-gallery .cast-deck-fade{
+    position:absolute;z-index:5;pointer-events:none;
+    left:var(--cast-fade-left,0px);top:var(--cast-fade-top,0px);
+    width:var(--cast-fade-width,0px);height:var(--cast-fade-height,0px);
+    background:linear-gradient(to bottom,transparent 0%,rgba(32,40,44,.22) 46%,#20282c 100%);
+    opacity:0;transition:opacity .14s ease;
+  }
+  #directory .allcast-roster-shell.is-gallery .cast-deck-fade[data-more="true"]{opacity:1;}
+
+  #worldsPanel .directory-content {padding-inline:0!important;}
+  #worldsPanel .directory-content > .directory-kicker,
+  #worldsPanel .directory-content > h2,
+  #worldsPanel .directory-content > .worlds-intro,
+  #worldsPanel .world-cards {box-sizing:border-box;width:min(78%,1800px)!important;margin-inline:auto!important;}
+  #worldsPanel .directory-content > .directory-kicker {display:block;}
+  #worldsPanel .world-card.ws5-card{height:clamp(408px,23vw,560px)!important;container-type:inline-size;}
+  #worldsPanel .ws5-huge{font-size:clamp(112px,8.8vw,200px)!important;font-size:clamp(112px,34cqw,200px)!important;left:10px;bottom:-5px;}
+  #worldsPanel .ws5-visual:before{
+    background:repeating-linear-gradient(90deg,#cfdcda09 0 1px,transparent 1px 34px),linear-gradient(125deg,#080d1145 0,transparent 65%);
+    background:repeating-linear-gradient(90deg,#cfdcda09 0 1px,transparent 1px clamp(26px,7cqw,40px)),linear-gradient(125deg,#080d1145 0,transparent 65%);
+  }
+  #worldsPanel .ws5-file-mark{left:clamp(10px,.8vw,18px);top:clamp(10px,.72vw,16px);font-size:clamp(9px,.55vw,13px);}
+  #worldsPanel .ws5-name{white-space:nowrap;overflow-wrap:normal;font-size:var(--cast-title-size,clamp(26px,1.95vw,48px))!important;}
+  #worldsPanel .ws5-name[data-cast-wrap]{white-space:normal;overflow-wrap:anywhere;}
+
+  #worldDetailPanel .wd4-center{width:min(78%,1400px)!important;}
+  #worldDetailPanel .wd4-dossier{width:100%!important;box-sizing:border-box;margin-inline:auto;}
+  #worldDetailPanel .wd4-brief{width:100%!important;box-sizing:border-box;margin:0!important;min-height:0!important;padding-block:clamp(12px,.8vw,20px)!important;gap:clamp(6px,.45vw,11px)!important;}
+  #worldDetailPanel .wd4-description{width:min(100%,1120px)!important;font-size:clamp(14px,.88vw,20px)!important;line-height:1.65!important;text-align:center!important;padding-inline:0!important;}
+  #worldDetailPanel .wd4-description:not([data-short="true"]){text-align:center!important;}
+  #worldDetailPanel .world-cast-visual{flex-basis:clamp(93px,6vw,150px)!important;width:clamp(93px,6vw,150px)!important;}
+  /* 5.5 lines at 1.65 line height; fade the last 1.5 lines. */
+  #worldDetailPanel .wd4-description[data-cast-fold="closed"]{max-height:9.075em;overflow:hidden;mask-image:linear-gradient(to bottom,#000 0%,#000 calc(100% - 2.475em),transparent 100%);}
+  #worldDetailPanel .cast-brief-toggle{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:28px;padding:3px 9px;border:0;border-bottom:1px solid #7e8c87;background:transparent;color:#364747;font:900 11px/1.4 var(--mono);letter-spacing:.035em;cursor:pointer;clip-path:none;}
+  #worldDetailPanel .cast-brief-toggle::before{content:"+";display:grid;place-items:center;width:17px;height:17px;border:1px solid #415252;color:#243437;font:900 15px/1 var(--mono);}
+  #worldDetailPanel .cast-brief-toggle[aria-expanded="true"]::before{content:"−";}
+  #worldDetailPanel .cast-brief-toggle:hover,#worldDetailPanel .cast-brief-toggle:focus-visible{background:transparent;color:#141b1e;border-bottom-color:#141b1e;}
+}
+@media (min-width:1500px) and (max-height:1150px) {
+  #worldsPanel .directory-content{padding-top:20px!important;}
+  #worldsPanel .directory-content h2{font-size:clamp(58px,4vw,82px)!important;margin-block:5px 7px!important;}
+  #worldsPanel .world-cards{margin-top:18px!important;}
+}
+@media(min-width:2048px){
+  #worldDetailPanel .wd4-center{width:min(78%,clamp(1400px,calc(58.59375vw + 200px),1700px))!important;}
+}
+@media(max-width:1499px){
+  #worldDetailPanel .cast-brief-toggle,#directory .cast-deck-fade{display:none!important;}
+}
+@media(prefers-reduced-motion:reduce){#directory .cast-deck-fade{transition:none!important;}}
+@media print{
+  #worldDetailPanel .wd4-description[data-cast-fold="closed"]{max-height:none;overflow:visible;mask-image:none;}
+  #worldDetailPanel .cast-brief-toggle,#directory .cast-deck-fade{display:none!important;}
+}
