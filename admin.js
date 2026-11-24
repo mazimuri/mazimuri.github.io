@@ -154,7 +154,7 @@ function worldImageFrameDoc(w,view,idx){
  const cat=esc(w.category||'WORLD ARCHIVE'),title=esc(w.title||'UNNAMED WORLD');
  const image=esc(w.image||''),copy=esc(String(w.cardTeaser||'').trim()||w.summary||w.subtitle||'世界観の紹介は準備中です。');
  const mode=view==='select'?'select':'detail',st=esc(worldImageCss(worldImageValues(w,mode)));
- const cssLinks=`<link rel="stylesheet" href="style.css?v=5.9.13"><link rel="stylesheet" href="mobile.css?v=15.4.0"><link rel="stylesheet" href="cast-worlds-current.css?v=1.0.9">`;
+ const cssLinks=`<link rel="stylesheet" href="style.css?v=5.9.13"><link rel="stylesheet" href="mobile.css?v=15.4.0"><link rel="stylesheet" href="cast-worlds-current.css?v=1.0.9"><link rel="stylesheet" href="cast-layout-current.css?v=1.0.0">`;
  let panel='';
  if(view==='select'){
   const motif=w.image?'art':(/零号|研究|施設|RESEARCH|LAB|DARK FANTASY/i.test(String(w.title||'')+' '+String(w.category||''))?'research':'unassigned');
@@ -208,6 +208,21 @@ function worldImageFit(frame=document.querySelector('#worldImageStudio [data-wor
  const canvas=frame.closest('.world-image-canvas');
  const shell=frame.closest('.world-image-frame-shell');
  if(!target||!canvas||!shell)return;
+ // Match the public WORLD SELECT title fitting before measuring the crop anchor.
+ const frameWin=frame.contentWindow;
+ const title=target.querySelector('.ws5-name');
+ if(title){
+  title.style.removeProperty('--cast-title-size');
+  title.removeAttribute('data-cast-wrap');
+  if(frameWin?.matchMedia('(min-width:1500px)').matches&&title.clientWidth){
+   let size=parseFloat(frameWin.getComputedStyle(title).fontSize);
+   while(title.scrollWidth>title.clientWidth+1&&size>18){
+    size=Math.max(18,size-1);
+    title.style.setProperty('--cast-title-size',size+'px');
+   }
+   if(title.scrollWidth>title.clientWidth+1)title.setAttribute('data-cast-wrap','');
+  }
+ }
  const rect=target.getBoundingClientRect();
  if(!(rect.width>0&&rect.height>0))return;
  const css=getComputedStyle(canvas);
