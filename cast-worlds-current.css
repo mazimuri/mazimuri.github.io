@@ -99,7 +99,7 @@
 #worldsPanel .ws5-huge{
   position:absolute;left:12px;bottom:-9px;z-index:2;
   font:1000 clamp(90px,9.4vw,225px)/.96 var(--sans);
-  letter-spacing:-.09em;color:#ffffff19;
+  letter-spacing:-.09em;color:rgba(255,255,255,.25);
   transform:skewX(-6deg);pointer-events:none;
 }
 /* Keep the translucent world number in front of uploaded cover artwork. */
