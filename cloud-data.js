@@ -127,7 +127,9 @@
       converted.set(value,data.publicUrl);
       return data.publicUrl;
     }
+    if(publicDoc.site?.soundtrack?.jacket)publicDoc.site.soundtrack.jacket=await transform(publicDoc.site.soundtrack.jacket,'MAIN THEME JACKET');
     for(const c of publicDoc.characters){
+      if(c.soundtrack?.jacket)c.soundtrack.jacket=await transform(c.soundtrack.jacket,c.name+' JACKET');
       c.artwork=await transform(c.artwork,c.name+' 立ち絵');
       c.icon=await transform(c.icon,c.name+' アイコン');
       for(const g of c.gallery||[])g.image=await transform(g.image,c.name+' ギャラリー');
@@ -136,8 +138,10 @@
     // Replace image data URIs on the corresponding public characters in the
     // working draft as well, preventing duplicate uploads on future publishes.
     function replaceStoredImage(value){return converted.get(value)||value}
+    if(nextDraft.site?.soundtrack?.jacket)nextDraft.site.soundtrack.jacket=replaceStoredImage(nextDraft.site.soundtrack.jacket);
     for(const c of nextDraft.characters){
       if(publicDoc.characters.some(x=>x.id===c.id)){
+        if(c.soundtrack?.jacket)c.soundtrack.jacket=replaceStoredImage(c.soundtrack.jacket);
         c.artwork=replaceStoredImage(c.artwork);c.icon=replaceStoredImage(c.icon);
         for(const g of c.gallery||[])g.image=replaceStoredImage(g.image);
       }
@@ -157,7 +161,7 @@
       if(converted.has(value)){m.src=converted.get(value);return}
       if(!/^data:audio\/mpeg;base64,/i.test(value))throw Error(label+'：MP3形式のみ対応しています');
       const blob=await (await fetch(value)).blob();
-      if(blob.size>5*1024*1024)throw Error(label+'：5MB以下のMP3にしてください');
+      if(blob.size>8*1024*1024)throw Error(label+'：8MB以下のMP3にしてください');
       const filename='published/audio-'+crypto.randomUUID()+'.mp3';
       const {error}=await client.storage.from('cast-public-media').upload(filename,blob,{contentType:'audio/mpeg',cacheControl:'31536000',upsert:false});
       if(error)throw Error(label+'：音源のアップロードに失敗しました。Supabaseのcast-public-mediaバケットがaudio/mpegを許可しているか確認してください。 '+error.message);
