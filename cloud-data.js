@@ -306,37 +306,76 @@
     try{await importAudioReferences(next);await putRow('draft',next);draft=next;lastError='';return true}
     catch(e){lastError=e.message||String(e);return false}
   }
-  // Read-only inventory of our published media folder, not billing usage.
+  // Inventory is deliberately limited to the managed published/ directory in each bucket.
+  const resourceBuckets=['cast-public-media','cast-private-media'];
+  const resourcePrefix='published/';
+  const resourceKey=(bucket,path)=>bucket+'/'+path;
+  const resourcePathOK=path=>/^published\/(?:audio-[0-9a-f-]{36}\.mp3|\d+-[0-9a-f-]{36}\.(?:webp|png|jpg|jpeg|gif))$/i.test(path);
   async function scanResources(){
-    const bucket='cast-public-media',prefix='published';
     const latest=await Promise.all([getRow('draft'),getRow('published')]);
     if(!latest.every(validDoc))throw Error('保存済みの下書き・公開データを確認できません');
-    const origin=new URL(cfg.url).origin,base='/storage/v1/object/public/'+bucket+'/';
-    const refs=new Set();
-    function visit(v){
+    const origin=new URL(cfg.url).origin,refs=new Map(),docs=[...latest,draft,published],serialized=docs.map(d=>JSON.stringify(d));
+    function add(bucket,path,label){
+      const key=resourceKey(bucket,path);
+      if(!refs.has(key))refs.set(key,new Set());
+      refs.get(key).add(label);
+    }
+    function visit(v,label){
       if(typeof v==='string'){
-        if(!v.includes(origin+base))return;
-        for(const m of v.match(/https:\/\/[^\s<>"'\x60]+/g)||[]){
-          try{const u=new URL(m);if(u.origin===origin&&u.pathname.startsWith(base))refs.add(decodeURIComponent(u.pathname.slice(base.length)))}catch{}
+        if(isPrivateAudio(v)){try{add('cast-private-media',privateAudioPath(v),label)}catch{}}
+        if(v.includes(origin+'/storage/v1/')){
+          for(const m of v.match(/https:\/\/[^\s<>"'\x60]+/g)||[]){
+            try{const u=new URL(m);if(u.origin!==origin)continue;for(const b of resourceBuckets){const prefix='/storage/v1/object/public/'+b+'/';if(u.pathname.startsWith(prefix))add(b,decodeURIComponent(u.pathname.slice(prefix.length)),label)}}catch{}
+          }
         }
-      }else if(v&&typeof v==='object'){for(const x of Object.values(v))visit(x)}
+      }else if(v&&typeof v==='object'){for(const x of Object.values(v))visit(x,label)}
     }
-    for(const d of [...latest,draft,published])visit(d);
-    const files=[],storage=client.storage.from(bucket);
-    for(let offset=0;;offset+=100){
-      const {data,error}=await storage.list(prefix,{limit:100,offset,sortBy:{column:'name',order:'asc'}});
-      if(error)throw error;
-      if(!Array.isArray(data))throw Error('一覧を取得できません');
-      for(const f of data){
-        if(!f.id&&!f.metadata)continue;
-        const path=prefix+'/'+f.name,n=f.metadata?.size;
-        files.push({path,size:n!=null&&Number.isFinite(Number(n))&&Number(n)>=0?Number(n):null,type:f.metadata?.mimetype||'',referenced:refs.has(path)});
+    docs.forEach((d,i)=>{const label=i%2===0?'DRAFT':'PUBLISHED';visit(d.site,label+' / MAIN THEME');for(const c of d.characters)visit(c,label+' / '+c.name);for(const w of d.worlds)visit(w,label+' / '+w.title);visit(d,label)});
+    const files=[],warnings=[];
+    for(const bucket of resourceBuckets){
+      const storage=client.storage.from(bucket);
+      for(let offset=0;;offset+=100){
+        const {data,error}=await storage.list('published',{limit:100,offset,sortBy:{column:'name',order:'asc'}});
+        if(error)throw Error(bucket+'：'+error.message);
+        if(!Array.isArray(data))throw Error(bucket+' の一覧を取得できません');
+        for(const f of data){
+          if(!f.id&&!f.metadata){warnings.push(bucket+' / published/'+f.name+'：サブフォルダは対象外');continue}
+          const path=resourcePrefix+f.name,n=f.metadata?.size,key=resourceKey(bucket,path);
+          // Conservative secondary check: a raw or URI-encoded path anywhere protects both buckets.
+          const matched=refs.has(key)||serialized.some(s=>s.includes(path)||s.includes(encodeURIComponent(path)));
+          const type=f.metadata?.mimetype||(/\.mp3$/i.test(path)?'audio/mpeg':/\.webp$/i.test(path)?'image/webp':/\.png$/i.test(path)?'image/png':/\.gif$/i.test(path)?'image/gif':/\.jpe?g$/i.test(path)?'image/jpeg':'');
+          files.push({id:key,bucket,path,size:n!=null&&Number.isFinite(Number(n))&&Number(n)>=0?Number(n):null,type,created:f.created_at||'',referenced:matched,refs:[...(refs.get(key)||[])],manageable:resourcePathOK(path)});
+        }
+        if(data.length<100)break;
+        if(offset>=9900)throw Error('1万件以上のためスキャンを中止しました');
       }
-      if(data.length<100)break;
-      if(offset>=9900)throw Error('1万件以上のためスキャンを中止しました');
     }
-    const paths=new Set(files.map(f=>f.path));
-    return {files,missing:[...refs].filter(x=>x.startsWith(prefix+'/')&&!paths.has(x)),draftBytes:new Blob([JSON.stringify(latest[0])]).size,publishedBytes:new Blob([JSON.stringify(latest[1])]).size,scannedAt:new Date().toISOString()};
+    const keys=new Set(files.map(f=>f.id)),missing=[...refs.keys()].filter(x=>resourceBuckets.some(b=>x.startsWith(b+'/'+resourcePrefix))&&!keys.has(x));
+    return {files,missing,warnings,draftBytes:new Blob([JSON.stringify(latest[0])]).size,publishedBytes:new Blob([JSON.stringify(latest[1])]).size,scannedAt:new Date().toISOString()};
+  }
+  async function resourcePreview(bucket,path){
+    if(!resourceBuckets.includes(bucket)||!path.startsWith(resourcePrefix)||path.includes('..'))throw Error('対象外のファイルです');
+    const storage=client.storage.from(bucket);
+    if(bucket==='cast-public-media')return storage.getPublicUrl(path).data.publicUrl;
+    const {data,error}=await storage.createSignedUrl(path,3600);
+    if(error||!data?.signedUrl)throw Error(error?.message||'プレビューURLを取得できません');
+    return data.signedUrl;
+  }
+  // No auto-delete. Re-read both documents and both listings; abort the entire selection if any is unsafe.
+  async function deleteResources(ids){
+    if(!Array.isArray(ids)||!ids.length||ids.length>10000)throw Error('削除対象がありません');
+    const unique=[...new Set(ids)],fresh=await scanResources();
+    if(fresh.missing.length||fresh.warnings.length)throw Error('一覧が不完全なため削除を中止しました');
+    const selected=unique.map(id=>fresh.files.find(f=>f.id===id));
+    if(selected.some(f=>!f||f.referenced||!f.manageable))throw Error('参照中・対象外・消失したファイルが含まれるため削除を中止しました');
+    if(new Set(selected.map(f=>f.bucket)).size!==1)throw Error('バケットごとに削除してください');
+    const bucket=selected[0].bucket,storage=client.storage.from(bucket);
+    // Supabase's DELETE RLS must also permit the action; it is not granted by this code.
+    let failure='';
+    try{for(let i=0;i<selected.length;i+=100){const {error}=await storage.remove(selected.slice(i,i+100).map(f=>f.path));if(error){failure=error.message;break}}}catch(e){failure=e.message||String(e)}
+    const after=await scanResources(),remaining=new Set(after.files.map(f=>f.id)),removed=unique.filter(id=>!remaining.has(id)).length;
+    if(after.missing.length||after.warnings.length)throw Error('削除後の一覧に不整合があります。Storage管理画面を確認してください');
+    return {report:after,removed,requested:unique.length,failure};
   }
 
   async function signOut(){
@@ -380,7 +419,7 @@
       initial:clone(seed),clone,
       getDraft:()=>draft,getPublished:()=>published,
       getLastError:()=>lastError,
-      saveDraft,publish,replaceDraft,scanResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,
+      saveDraft,publish,replaceDraft,scanResources,resourcePreview,deleteResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,
       reset:async()=>replaceDraft(published),
       signOut,
       createId:(prefix)=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`
