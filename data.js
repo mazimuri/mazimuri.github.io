@@ -62,11 +62,11 @@
   // The published document is fetched at initial page load. If an editor
   // publishes while the visitor keeps this tab open, check the PUBLIC row when
   // the tab is revisited. Never request private draft data from the public app.
-  let checkingPublished=false,lastPublishedCheck=0;
+  let checkingPublished=false,lastPublishedCheck=Date.now();
   async function checkPublishedWhenActive(force=false){
     if(checkingPublished||document.hidden||/\/admin\.html$/i.test(location.pathname))return;
     const now=Date.now();
-    if(force!==true && now-lastPublishedCheck<3000)return;
+    if(force!==true && now-lastPublishedCheck<30000)return;
     checkingPublished=true;lastPublishedCheck=now;
     try{
       await window.CAST_DATA_READY;
