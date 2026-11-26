@@ -13,12 +13,34 @@ const world=()=>doc().worlds.find(w=>w.id===state.worldId);
 const sortId=(arr,id,delta)=>{const idx=arr.findIndex(x=>x.id===id);const target=idx+delta;if(idx<0||target<0||target>=arr.length)return;[arr[idx],arr[target]]=[arr[target],arr[idx]]};
 function persist(note='クラウドに保存済み'){$('adminStatus').textContent='● CLOUD DRAFT';const el=$('saveStatus');el.textContent='クラウド保存中…';api.saveDraft().then(ok=>{el.textContent=ok?note:'⚠ クラウド保存失敗。ネット接続・権限を確認してね';el.style.color=ok?'#b8cc98':'#ff9b82'});return true}
 function notify(m){pub.toast(m)}
+// Private references are durable; signed URLs live only on rendered image nodes.
+function privateImageMarkup(html){
+ return html.replace(/src="(private-image:published\/\d+-[0-9a-f-]{36}\.(?:webp|png|jpg|jpeg|gif))"/gi,'data-private-image="$1"')
+ .replace(/src=&quot;(private-image:published\/\d+-[0-9a-f-]{36}\.(?:webp|png|jpg|jpeg|gif))&quot;/gi,'data-private-image=&quot;$1&quot;');
+}
+function resolvePrivateImages(root){
+ for(const img of root.querySelectorAll('img[data-private-image]')){
+  const ref=img.dataset.privateImage;
+  if(img.dataset.privateLoading===ref)continue;
+  img.dataset.privateLoading=ref;
+  api.imagePreviewURL(ref).then(url=>{if(img.isConnected&&img.dataset.privateImage===ref){img.src=url;img.dataset.loadedPrivateRef=ref;img.removeAttribute('data-private-image');delete img.dataset.privateLoading}}).catch(e=>{if(img.isConnected&&img.dataset.privateImage===ref){img.alt='非公開画像を取得できません：'+(e.message||String(e));delete img.dataset.privateLoading}});
+ }
+}
+function setEditorImage(img,value){
+ if(api.isPrivateImage(value)){if(img.dataset.privateImage!==value){img.removeAttribute('src');img.dataset.privateImage=value;delete img.dataset.privateLoading}resolvePrivateImages(img.parentNode)}
+ else{delete img.dataset.privateImage;delete img.dataset.privateLoading;delete img.dataset.loadedPrivateRef;img.src=value||''}
+}
+async function storeCompressedImage(file,maxSide){
+ const data=await compress(file,maxSide);
+ return api.storePrivateImage(await (await fetch(data)).blob());
+}
 function visible(on){$('admin').hidden=!on;document.body.classList.toggle('admin-open',on);document.body.style.overflow=on?'hidden':''}
 function enter(){visible(true);render()}
-function exit(){visible(false);pub.refresh('published')}
+function exit(){if(soundBusy||previewBusy)return;visible(false);pub.refresh('published')}
 let previewBusy=false;
 async function preview(id=state.section==='characters'?selected()?.id:null){if(previewBusy||soundBusy)return;previewBusy=true;try{const snapshot=await api.previewDraft();visible(false);pub.refresh('draft',snapshot);if(id&&snapshot.characters.some(c=>c.id===id))pub.openCharacter(id);notify('下書きプレビューです。ネットには公開されません')}catch(e){notify('下書きプレビューの準備に失敗：'+(e.message||String(e)))}finally{previewBusy=false}}
 async function publish(){
+ if(soundBusy||previewBusy){notify('素材の登録・プレビュー処理が完了してから公開してください');return}
  const yes=confirm('公開するキャラクターとWORLDを確認しましたか？\n\n公開用データをSupabaseに保存し、公開サイトから実際に読み取れることまで確認します。HTML/CSSの変更やGitHubへの自動アップロードは行いません。');
  if(!yes)return;
  const button=$('adminPublish');button.disabled=true;
@@ -38,7 +60,7 @@ async function publish(){
  }
  finally{button.disabled=false;panel.inert=false;$('adminStatus').textContent=verified?'● PUBLIC VERIFIED':'● PUBLISH CHECK FAILED'}
 }
-function setSection(s){state.section=s;state.charId=null;state.worldId=null;render();if(s==='analytics')window.CAST_SIGNAL_REPORT.load()}
+function setSection(s){if(soundBusy||previewBusy)return;state.section=s;state.charId=null;state.worldId=null;render();if(s==='analytics')window.CAST_SIGNAL_REPORT.load()}
 function headline(kicker,title,desc,right=''){return `<div class="admin-headline"><div><div class="admin-kicker">${esc(kicker)}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p></div>${right}</div>`}
 function btn(action,text,cls='',attrs=''){return `<button type="button" class="admin-btn ${cls}" data-action="${action}" ${attrs}>${text}</button>`}
 function f(label,key,value,opt={}){
@@ -128,7 +150,7 @@ function soundEditor(target,scope){
 const soundTarget=scope=>scope==='site'?doc().site:selected();
 let soundBusy=false;
 async function previewPrivateAudio(el){const src=soundTarget(el.dataset.soundScope)?.soundtrack?.src,node=$('cs-private-preview');if(!node||!api.isPrivateAudio(src)||el.disabled)return;el.disabled=true;try{const url=await api.audioPreviewURL(src);if(node.isConnected){node.src=url;node.hidden=false;el.textContent='↻ 試聴URLを更新';notify('試聴の準備ができました。プレイヤーの再生ボタンを押してください')}}catch(e){notify(e.message||String(e))}finally{el.disabled=false}}
-async function uploadSoundJacket(el){const file=el.files?.[0],target=soundTarget(el.dataset.soundJacket);if(!file||!target||soundBusy)return;if(file.size>20*1024*1024){notify('20MB以下の画像を選んでね');return}const button=$('adminPublish');soundBusy=true;el.disabled=true;if(button)button.disabled=true;try{const data=await compress(file,1000),old=target.soundtrack;target.soundtrack={...(old||{}),jacket:data};if(!(await api.saveDraft())){target.soundtrack=old;throw Error(api.getLastError?.()||'下書き保存に失敗しました')}render();notify('ジャケットを下書きに保存しました')}catch(e){notify('ジャケットの登録に失敗：'+(e.message||'画像を確認してください'))}finally{soundBusy=false;el.disabled=false;if(button)button.disabled=false}}
+async function uploadSoundJacket(el){const file=el.files?.[0],target=soundTarget(el.dataset.soundJacket);if(!file||!target||soundBusy)return;if(file.size>20*1024*1024){notify('20MB以下の画像を選んでね');return}const button=$('adminPublish');soundBusy=true;el.disabled=true;if(button)button.disabled=true;try{const data=await storeCompressedImage(file,1000),old=target.soundtrack;target.soundtrack={...(old||{}),jacket:data};if(!(await api.saveDraft())){target.soundtrack=old;throw Error(api.getLastError?.()||'下書き保存に失敗しました')}render();notify('ジャケットを下書きに保存しました')}catch(e){notify('ジャケットの登録に失敗：'+(e.message||'画像を確認してください'))}finally{soundBusy=false;el.disabled=false;if(button)button.disabled=false}}
 async function uploadSound(el){
  const file=el.files?.[0],scope=el.dataset.soundUpload,target=soundTarget(scope);if(!file||!target||soundBusy)return;
  if(!/\.mp3$/i.test(file.name)||file.size===0||file.size>15*1024*1024){notify('MP3形式・15MB以下の音源を選んでね');el.value='';return}
@@ -216,7 +238,7 @@ function worldImageStudio(w){
  const mode=view==='select'?'select':'detail',v=worldImageValues(w,mode);
  const idx=doc().worlds.findIndex(item=>item.id===w.id)+1;
  const viewport=view==='mobile'?390:view==='detail'?Math.max(1024,window.innerWidth):Math.max(320,window.innerWidth);
- const iframeSrcdoc=esc(worldImageFrameDoc(w,view,idx));
+ const iframeSrcdoc=esc(privateImageMarkup(worldImageFrameDoc(w,view,idx)));
  const hasImage=!!w.image,disabled=hasImage?'':'disabled';
  const tab=(label,key)=>`<button type="button" data-action="world-image-view" data-view="${key}" aria-pressed="${String(view===key)}">${label}</button>`;
  const axis=(label,key,min,max,step)=>`<div class="world-image-range"><label for="world-image-range-${key}">${label}<output data-world-image-value="${key}">${key==='zoom'?v[key].toFixed(2)+'×':Math.round(v[key])+'%'}</output></label><input id="world-image-range-${key}" type="range" data-world-image-axis="${key}" min="${min}" max="${max}" step="${step}" value="${v[key]}" ${disabled}></div>`;
@@ -271,6 +293,7 @@ function worldImageFit(frame=document.querySelector('#worldImageStudio [data-wor
 }
 function worldImageFrameReady(frame){
  if(!frame?.isConnected||!frame.contentDocument)return;
+ resolvePrivateImages(frame.contentDocument);
  worldImageFit(frame);
  const doc=frame.contentDocument;
  if(doc.fonts?.ready)doc.fonts.ready.then(()=>{if(frame.isConnected)worldImageFit(frame)}).catch(()=>{});
@@ -465,7 +488,8 @@ function reviewResources(){
 }
 function render(){const panel=$('adminContent');const section=state.section;
  $$('[data-admin-section]').forEach(b=>b.classList.toggle('active',b.dataset.adminSection===section));$('adminPath').textContent=`/ CONTROL / ${section.toUpperCase()}${state.charId?' / CHARACTER FILE':''}${state.worldId?' / WORLD FILE':''}`;
- let html='';if(section==='dashboard')html=renderDashboard();if(section==='characters')html=state.charId&&selected()?charForm(selected()):renderCharacters();if(section==='worlds')html=state.worldId&&world()?worldForm(world()):renderWorlds();if(section==='tags')html=renderTags();if(section==='about')html=renderAboutEditor();if(section==='backup')html=renderBackup();if(section==='publish')html=renderPublish();if(section==='resources')html=renderResources();if(section==='analytics')html=window.CAST_SIGNAL_REPORT.render();panel.innerHTML=html;
+ let html='';if(section==='dashboard')html=renderDashboard();if(section==='characters')html=state.charId&&selected()?charForm(selected()):renderCharacters();if(section==='worlds')html=state.worldId&&world()?worldForm(world()):renderWorlds();if(section==='tags')html=renderTags();if(section==='about')html=renderAboutEditor();if(section==='backup')html=renderBackup();if(section==='publish')html=renderPublish();if(section==='resources')html=renderResources();if(section==='analytics')html=window.CAST_SIGNAL_REPORT.render();panel.innerHTML=privateImageMarkup(html);
+ resolvePrivateImages(panel);
  if(section==='analytics')window.CAST_SIGNAL_REPORT.bind(()=>{if(state.section==='analytics')render()});
  if(section==='resources')bindResources();else{resourceObserver?.disconnect();resourceObserver=null;}
  if(panel.querySelector('.v15-icon-studio'))requestAnimationFrame(syncRailCropAspect);
@@ -481,7 +505,7 @@ function moveWorld(id,delta){const worlds=doc().worlds;const at=worlds.findIndex
 function deleteChar(id){const c=doc().characters.find(x=>x.id===id);if(!c||!confirm(`「${c.name}」を下書きから削除する？（まだ公開ビューは変わりません）`))return;doc().characters=doc().characters.filter(x=>x.id!==id);state.charId=null;persist();render()}
 function deleteWorld(id){const w=doc().worlds.find(x=>x.id===id);if(!w||!confirm(`「${w.title}」を削除する？関連キャラからも所属が外れます。`))return;doc().worlds=doc().worlds.filter(x=>x.id!==id);doc().characters.forEach(c=>c.worldIds=c.worldIds.filter(x=>x!==id));state.worldId=null;persist();render()}
 function deleteTag(id){const t=doc().tags.find(x=>x.id===id);if(!t||!confirm(`共通タグ「${t.label}」をすべてのキャラから削除する？`))return;doc().tags=doc().tags.filter(x=>x.id!==id);doc().characters.forEach(c=>c.tagIds=c.tagIds.filter(x=>x!==id));persist();render()}
-function updatePreview(){const c=selected();if(!c)return;const preview=document.querySelector('.mini-preview');if(!preview)return;for(const k of ['accent','deep','soft','bright'])preview.style.setProperty('--preview-'+k,cleanColor(c.colors?.[k]));const img=$('liveImg');if(img)img.src=c.artwork||'';if($('liveName'))$('liveName').textContent=c.name||'';if($('liveRoman'))$('liveRoman').textContent=c.roman||'';if($('liveHook'))$('liveHook').textContent=c.hook||''}
+function updatePreview(){const c=selected();if(!c)return;const preview=document.querySelector('.mini-preview');if(!preview)return;for(const k of ['accent','deep','soft','bright'])preview.style.setProperty('--preview-'+k,cleanColor(c.colors?.[k]));const img=$('liveImg');if(img){const value=c.artwork||'';if(api.isPrivateImage(value)){if(img.dataset.loadedPrivateRef!==value)setEditorImage(img,value)}else setEditorImage(img,value)};if($('liveName'))$('liveName').textContent=c.name||'';if($('liveRoman'))$('liveRoman').textContent=c.roman||'';if($('liveHook'))$('liveHook').textContent=c.hook||''}
 function showCrop(){const c=selected();if(!c)return;const p=cropVals(c,cropMode());const main=$('cropMainImg');if(main){for(const [k,v] of Object.entries({x:p.x+'%',y:p.y+'%',zoom:p.zoom}))main.style.setProperty('--crop-'+k,v)}
  const choose=cropVals(c,'choose'),mobile=cropVals(c,'mobile'),all=cropVals(c,'all');const ims=document.querySelectorAll('.crop-rail-frame .crop-shared,.crop-phone-frame .crop-shared,.crop-gallery-frame .crop-shared');for(const im of ims){const settings=im.closest('.crop-phone-frame')?mobile:im.closest('.crop-gallery-frame')?all:choose;for(const[k,v]of Object.entries({x:settings.x+'%',y:settings.y+'%',zoom:settings.zoom}))im.style.setProperty('--crop-'+k,v)}
  for(const axis of ['x','y']){const val=document.querySelector('[data-crop-axis="'+axis+'"]');if(val)val.value=p[axis];if($('crop'+axis.toUpperCase()+'Label'))$('crop'+axis.toUpperCase()+'Label').textContent=Math.round(p[axis])+'%'}
@@ -526,11 +550,11 @@ function startBadge(e){const el=e.target.closest('#artPreviewBadge');if(!el||!se
 function moveBadge(e){if(!badgeDrag||badgeDrag.id!==e.pointerId||!selected())return;const c=selected();c[badgeField()]={...badgeVals(c),right:limit(badgeDrag.right-(e.clientX-badgeDrag.x)*100/badgeDrag.w,0,75),top:limit(badgeDrag.top+(e.clientY-badgeDrag.y)*100/badgeDrag.h,0,75)};refreshArtEditor();for(const k of ['right','top']){const el=document.querySelector('[data-badge-control="'+k+'"]');if(el)el.value=c[badgeField()][k]}}
 function endBadge(e){if(!badgeDrag||badgeDrag.id!==e.pointerId)return;badgeDrag=null;persist('FILE番号の位置を保存したよ')}
 function updateRelation(action,index){const c=selected();if(!c)return;const list=c.relationships||(c.relationships=[]);if(action==='relation-add'){const available=doc().characters.find(x=>x.id!==c.id&&!list.some(r=>r.targetId===x.id));if(!available){notify('追加できる別キャラがいません');return}list.push({targetId:available.id,type:'',detail:''})}else if(action==='relation-del')list.splice(index,1);else if(action==='relation-up'&&index>0){[list[index-1],list[index]]=[list[index],list[index-1]]}else if(action==='relation-down'&&index<list.length-1){[list[index+1],list[index]]=[list[index],list[index+1]]}persist();render()}
-async function exportPublish(){if(!window.CAST_PUBLISH){notify('書き出しツールが読み込めませんでした');return}const chars=[...document.querySelectorAll('[data-pub-char]:checked')].map(x=>x.dataset.pubChar),worlds=[...document.querySelectorAll('[data-pub-world]:checked')].map(x=>x.dataset.pubWorld);const status=$('publishStatus');const button=document.querySelector('[data-action="export-publish"]');if(button)button.disabled=true;if(status)status.textContent='ZIPを作成中…';try{await new Promise(r=>setTimeout(r,35));const result=window.CAST_PUBLISH.pack(await api.exportDraft({charIds:chars}),{charIds:chars,worldIds:worlds});const url=URL.createObjectURL(result.blob),a=document.createElement('a');a.href=url;a.download='cast-signal-github-publish.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);if(status)status.textContent=`完成！ キャラ${result.characters}人 / WORLD${result.worlds}件 / 画像${result.images}枚（${Math.round(result.size/1024)}KB）`;notify('公開用ZIPを書き出したよ！')}catch(e){if(status)status.textContent='書き出し失敗：'+e.message;notify('ZIPの作成に失敗しました')}finally{if(button)button.disabled=false}}
+async function exportPublish(){if(!window.CAST_PUBLISH){notify('書き出しツールが読み込めませんでした');return}const chars=[...document.querySelectorAll('[data-pub-char]:checked')].map(x=>x.dataset.pubChar),worlds=[...document.querySelectorAll('[data-pub-world]:checked')].map(x=>x.dataset.pubWorld);const status=$('publishStatus');const button=document.querySelector('[data-action="export-publish"]');if(button)button.disabled=true;if(status)status.textContent='ZIPを作成中…';try{await new Promise(r=>setTimeout(r,35));const result=window.CAST_PUBLISH.pack(await api.exportDraft({charIds:chars,worldIds:worlds}),{charIds:chars,worldIds:worlds});const url=URL.createObjectURL(result.blob),a=document.createElement('a');a.href=url;a.download='cast-signal-github-publish.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);if(status)status.textContent=`完成！ キャラ${result.characters}人 / WORLD${result.worlds}件 / 画像${result.images}枚（${Math.round(result.size/1024)}KB）`;notify('公開用ZIPを書き出したよ！')}catch(e){if(status)status.textContent='書き出し失敗：'+e.message;notify('ZIPの作成に失敗しました')}finally{if(button)button.disabled=false}}
 let backupBusy=false;
 async function exportData(){if(backupBusy)return;backupBusy=true;try{notify('バックアップ用データを準備しています');const payload=JSON.stringify(await api.exportDraft(),null,2),file=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download='cast-signal-v57-backup.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);notify('JSONバックアップを書き出したよ')}catch(e){notify('バックアップに失敗：'+(e.message||String(e)))}finally{backupBusy=false}}
-async function importData(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.version!==5||!Array.isArray(data.characters)||!Array.isArray(data.worlds)||!Array.isArray(data.tags))throw Error('format');if(!confirm('このバックアップで現在の下書きを上書きする？'))return;if(!(await api.replaceDraft(data)))throw Error('storage');state.charId=null;state.worldId=null;state.section='dashboard';render();notify('バックアップを読み込んだよ')}catch(e){notify('読み込みに失敗。CAST / SIGNAL v5のJSONか容量を確認してね')}}
-function handleAction(el){const a=el.dataset.action,id=el.dataset.id,index=Number(el.dataset.index);if(a==='scan-resources'){scanResourcesUI();return}if(a==='preview-private-audio'){previewPrivateAudio(el);return}if(a==='clear-sound-jacket'){const target=soundTarget(el.dataset.soundScope);if(target?.soundtrack&&confirm('専用ジャケットを外しますか？')){target.soundtrack={...target.soundtrack,jacket:''};persist();render()}return}if(a==='clear-sound'){const target=soundTarget(el.dataset.soundScope);if(target&&confirm('この楽曲の登録を外しますか？')){target.soundtrack={...(target.soundtrack||{}),src:'',filename:''};persist();render()}return}if(a==='preview-about'){preview();window.location.hash='about';return}if(a==='show-chars'){state.section='characters';state.charId=null;render()}
+async function importData(file){if(!file||soundBusy||previewBusy)return;try{const data=JSON.parse(await file.text());if(!data||data.version!==5||!Array.isArray(data.characters)||!Array.isArray(data.worlds)||!Array.isArray(data.tags))throw Error('format');if(!confirm('このバックアップで現在の下書きを上書きする？'))return;if(!(await api.replaceDraft(data)))throw Error('storage');state.charId=null;state.worldId=null;state.section='dashboard';render();notify('バックアップを読み込んだよ')}catch(e){notify('読み込みに失敗。CAST / SIGNAL v5のJSONか容量を確認してね')}}
+function handleAction(el){if(soundBusy||previewBusy)return;const a=el.dataset.action,id=el.dataset.id,index=Number(el.dataset.index);if(a==='scan-resources'){scanResourcesUI();return}if(a==='preview-private-audio'){previewPrivateAudio(el);return}if(a==='clear-sound-jacket'){const target=soundTarget(el.dataset.soundScope);if(target?.soundtrack&&confirm('専用ジャケットを外しますか？')){target.soundtrack={...target.soundtrack,jacket:''};persist();render()}return}if(a==='clear-sound'){const target=soundTarget(el.dataset.soundScope);if(target&&confirm('この楽曲の登録を外しますか？')){target.soundtrack={...(target.soundtrack||{}),src:'',filename:''};persist();render()}return}if(a==='preview-about'){preview();window.location.hash='about';return}if(a==='show-chars'){state.section='characters';state.charId=null;render()}
  else if(a==='crop-mode'){state.cropMode=['choose','mobile','all'].includes(el.dataset.view)?el.dataset.view:'choose';render();}else if(a==='crop-enable-y'){const c=selected();setCrop(c,{...cropVals(c,cropMode()),zoom:Math.max(1.3,cropVals(c,cropMode()).zoom)});showCrop();persist('上下方向の調整幅を増やしたよ')}else if(a==='crop-reset')resetCrop();else if(a==='badge-reset'){selected()[badgeField()]=badgeIsMobile()?{right:8,top:66}:{...BADGE_DESKTOP_DEFAULT};refreshArtEditor();persist()}else if(a==='art-reset'){selected().artPosition={x:0,y:0,zoom:1};persist();render()}else if(a.startsWith('relation-'))updateRelation(a,index);else if(a.startsWith('tag-')){const c=selected();if(!c)return;if(a==='tag-apply'){const input=$('tagQuickInput');if(commitTags(c,input?.value))render();return}const ids=c.tagIds||[];if(a==='tag-left'&&index>0)[ids[index-1],ids[index]]=[ids[index],ids[index-1]];if(a==='tag-right'&&index<ids.length-1)[ids[index+1],ids[index]]=[ids[index],ids[index+1]];if(a==='tag-remove')ids.splice(index,1);persist();render()}else if(a==='show-publish')setSection('publish');else if(a==='export-publish')exportPublish();else if(a==='new-char')newChar();else if(a==='edit-char')openChar(id);else if(a==='edit-prev'||a==='edit-next'){if(id&&doc().characters.some(c=>c.id===id)){state.charId=id;render();document.querySelector('.admin-workspace')?.scrollTo({top:0,behavior:'instant'})}}else if(a==='move-up')moveChar(id,-1);else if(a==='move-down')moveChar(id,1);else if(a==='delete-char')deleteChar(id);
  else if(a==='world-image-view'){if(!world()||!['select','detail','mobile'].includes(el.dataset.view))return;state.worldImageView=el.dataset.view;const studio=document.getElementById('worldImageStudio');if(studio)studio.outerHTML=worldImageStudio(world());}
  else if(a==='world-image-expand'){worldImageToggleExpand();}
@@ -559,11 +583,22 @@ function updateField(el){const c=selected(),w=world();if(el.dataset.soundMeta){c
 }
 // Resize uploads for the local browser storage demo. Original files are never modified.
 async function compress(file,maxSide=1300){return new Promise((resolve,reject)=>{const img=new Image(),src=URL.createObjectURL(file);img.onload=()=>{try{const r=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.round(img.naturalWidth*r),h=Math.round(img.naturalHeight*r);if(w*h>10000000)throw Error('image-too-large');const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);const out=canvas.toDataURL('image/webp',.78);URL.revokeObjectURL(src);resolve(out)}catch(e){URL.revokeObjectURL(src);reject(e)}};img.onerror=()=>{URL.revokeObjectURL(src);reject(Error('image'))};img.src=src})}
-async function upload(el){const file=el.files?.[0];if(!file)return;const c=selected(),w=world();const target=state.section==='worlds'?w:c;if(!target)return;const key=el.dataset.image||'image',gidx=el.dataset.galleryImage;
- try{if(file.size>20*1024*1024){notify('20MB以下の画像を選んでね');return}const data=await compress(file,key==='icon'?560:key==='image'?1000:1300);let old;
- if(gidx!==undefined&&c){old=c.gallery[Number(gidx)].image;c.gallery[Number(gidx)].image=data}else{old=target[key];target[key]=data}
- if(!(await api.saveDraft())){if(gidx!==undefined&&c)c.gallery[Number(gidx)].image=old;else target[key]=old;notify('画像の保存に失敗しました。BACKUPから書き出してね');return}render();notify('画像をクラウド下書きに保存したよ（公開までは非公開）')
- }catch(e){notify('画像を読み込めませんでした。PNG/JPG/WebPを試してね')}}
+async function upload(el){
+ const file=el.files?.[0];if(!file||soundBusy||previewBusy)return;
+ const c=selected(),w=world(),target=state.section==='worlds'?w:c;if(!target)return;
+ const key=el.dataset.image||'image',gidx=el.dataset.galleryImage;
+ const holder=gidx!==undefined&&c?c.gallery[Number(gidx)]:target,field=gidx!==undefined&&c?'image':key;
+ if(!holder)return;
+ if(file.size>20*1024*1024){notify('20MB以下の画像を選んでね');el.value='';return}
+ const button=$('adminPublish'),panel=$('adminContent');soundBusy=true;el.disabled=true;button.disabled=true;panel.inert=true;
+ try{
+  const data=await storeCompressedImage(file,key==='icon'?560:key==='image'?1000:1300),old=holder[field];
+  holder[field]=data;
+  if(!(await api.saveDraft())){holder[field]=old;throw Error(api.getLastError?.()||'下書き保存に失敗しました')}
+  render();notify('画像を非公開ストレージに保存しました（公開ボタンで反映）');
+ }catch(e){notify('画像の登録に失敗：'+(e.message||'画像を確認してください'))}
+ finally{soundBusy=false;el.disabled=false;button.disabled=false;panel.inert=false}
+}
 // Admin controls and delegation
 $('openAdmin').onclick=enter;$('adminExit').onclick=exit;$('adminPreview').onclick=()=>preview();$('adminPublish').onclick=publish;$('backToAdmin').onclick=enter;
 $$('[data-admin-section]').forEach(b=>b.onclick=()=>setSection(b.dataset.adminSection));
