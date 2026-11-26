@@ -18,17 +18,17 @@
 <link rel="stylesheet" href="cast-layout-current.css?v=1.0.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
   <script src="cloud-config.js" defer></script>
-  <script src="cloud-data.js?v=5.10.0" defer></script>
+  <script src="cloud-data.js?v=5.11.0" defer></script>
   <link rel="stylesheet" href="cloud-admin.css">
   <link rel="stylesheet" href="admin-v15-studio.css?v=16.2.0">
   <script src="app.js?v=15.3.0" defer></script>
 <script defer src="cast-side-rail.js?v=18.0.1"></script>
 <script defer src="cast-layout-current.js?v=1.0.0"></script>
-  <script src="publisher.js?v=5.8.0" defer></script>
-  <script src="admin.js?v=16.4.0" defer></script>
+  <script src="publisher.js?v=5.9.0" defer></script>
+  <script src="admin.js?v=16.5.0" defer></script>
   <script src="visual-engine.js?v=16.3.0" defer></script>
-<link rel="stylesheet" href="cast-sound.css?v=1.0.1">
-<script defer src="cast-sound.js?v=1.0.1"></script>
+<link rel="stylesheet" href="cast-sound.css?v=1.1.0">
+<script defer src="cast-sound.js?v=1.1.0"></script>
 </head>
 <body class="cloud-locked">
   <div id="cloudLogin" class="cloud-auth" role="dialog" aria-label="管理者ログイン" aria-modal="true">
@@ -285,7 +285,9 @@
  <div id="cs-wave" role="slider" tabindex="0" aria-label="再生位置" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div><div class="cs-row cs-time"><span id="cs-elapsed">00:00</span><span id="cs-duration">00:12</span></div>
  <div class="cs-row cs-controls"><button type="button" class="cs-ctl" id="cs-repeat" aria-label="1曲リピート" aria-pressed="true">↻¹</button><button type="button" class="cs-ctl" id="cs-prev" aria-label="前の曲"></button><button type="button" class="cs-ctl" id="cs-play" aria-label="再生"></button><button type="button" class="cs-ctl" id="cs-next" aria-label="次の曲"></button><button type="button" class="cs-ctl" id="cs-mute" aria-label="ミュート"></button></div>
  <div class="cs-row cs-vol"><label for="cs-volume" class="cs-micro">VOLUME</label><input id="cs-volume" type="range" min="0" max="100" value="35"><output id="cs-volume-label" class="cs-micro">35%</output></div></section>
- <div class="cs-row cs-micro" id="cs-list-head"><strong>TRACK DATABASE</strong><span id="cs-count"></span></div><div id="cs-list"></div>
+ <div class="cs-tabs" id="cs-tabs" hidden role="group" aria-label="楽曲情報"><button type="button" id="cs-tracks-tab" aria-pressed="true">TRACK DATABASE</button><button type="button" id="cs-lyrics-tab" aria-pressed="false">LYRICS / 歌詞</button></div>
+ <div id="cs-tracks-pane"><div class="cs-row cs-micro" id="cs-list-head"><strong>TRACK DATABASE</strong><span id="cs-count"></span></div><div id="cs-list"></div></div>
+ <div id="cs-lyrics-pane" hidden><div class="cs-lang" role="group" aria-label="歌詞の表示言語"><button type="button" data-cs-lang="en" aria-pressed="false">ORIGINAL</button><button type="button" data-cs-lang="ja" aria-pressed="false">和訳 / JP</button><button type="button" data-cs-lang="both" aria-pressed="true">BOTH / 両方</button></div><div id="cs-lyric-scroll" tabindex="0" aria-label="歌詞本文"></div><p class="cs-lyric-note">LYRICS / JAPANESE TRANSLATION · 手動スクロール</p></div>
  <button type="button" id="cs-main-return">◈ RETURN TO MAIN THEME</button><p id="cs-note">楽曲はページを切り替えても再生を継続します。</p>
 </aside><audio id="cs-audio" preload="none"></audio>
 </body>
