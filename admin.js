@@ -38,7 +38,7 @@ async function publish(){
  }
  finally{button.disabled=false;panel.inert=false;$('adminStatus').textContent=verified?'● PUBLIC VERIFIED':'● PUBLISH CHECK FAILED'}
 }
-function setSection(s){state.section=s;state.charId=null;state.worldId=null;render()}
+function setSection(s){state.section=s;state.charId=null;state.worldId=null;render();if(s==='analytics')window.CAST_SIGNAL_REPORT.load()}
 function headline(kicker,title,desc,right=''){return `<div class="admin-headline"><div><div class="admin-kicker">${esc(kicker)}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p></div>${right}</div>`}
 function btn(action,text,cls='',attrs=''){return `<button type="button" class="admin-btn ${cls}" data-action="${action}" ${attrs}>${text}</button>`}
 function f(label,key,value,opt={}){
@@ -464,7 +464,8 @@ function reviewResources(){
 }
 function render(){const panel=$('adminContent');const section=state.section;
  $$('[data-admin-section]').forEach(b=>b.classList.toggle('active',b.dataset.adminSection===section));$('adminPath').textContent=`/ CONTROL / ${section.toUpperCase()}${state.charId?' / CHARACTER FILE':''}${state.worldId?' / WORLD FILE':''}`;
- let html='';if(section==='dashboard')html=renderDashboard();if(section==='characters')html=state.charId&&selected()?charForm(selected()):renderCharacters();if(section==='worlds')html=state.worldId&&world()?worldForm(world()):renderWorlds();if(section==='tags')html=renderTags();if(section==='about')html=renderAboutEditor();if(section==='backup')html=renderBackup();if(section==='publish')html=renderPublish();if(section==='resources')html=renderResources();panel.innerHTML=html;
+ let html='';if(section==='dashboard')html=renderDashboard();if(section==='characters')html=state.charId&&selected()?charForm(selected()):renderCharacters();if(section==='worlds')html=state.worldId&&world()?worldForm(world()):renderWorlds();if(section==='tags')html=renderTags();if(section==='about')html=renderAboutEditor();if(section==='backup')html=renderBackup();if(section==='publish')html=renderPublish();if(section==='resources')html=renderResources();if(section==='analytics')html=window.CAST_SIGNAL_REPORT.render();panel.innerHTML=html;
+ if(section==='analytics')window.CAST_SIGNAL_REPORT.bind(()=>{if(state.section==='analytics')render()});
  if(section==='resources')bindResources();else{resourceObserver?.disconnect();resourceObserver=null;}
  if(panel.querySelector('.v15-icon-studio'))requestAnimationFrame(syncRailCropAspect);
 }
