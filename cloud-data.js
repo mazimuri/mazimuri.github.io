@@ -142,9 +142,69 @@
     if(error||!data?.signedUrl)throw Error('非公開音源の試聴URLを取得できません：'+(error?.message||'URLなし'));
     return data.signedUrl;
   }
+  const PRIVATE_IMAGE='private-image:',IMAGE_LIMIT=5*1024*1024;
+  const imageExt={'image/webp':'webp','image/png':'png','image/jpeg':'jpg','image/gif':'gif'};
+  const isPrivateImage=v=>typeof v==='string'&&v.startsWith(PRIVATE_IMAGE);
+  function privateImagePath(v){
+    const path=String(v).slice(PRIVATE_IMAGE.length);
+    if(!/^published\/\d+-[0-9a-f-]{36}\.(?:webp|png|jpg|jpeg|gif)$/i.test(path))throw Error('非公開画像の参照先が正しくありません');
+    return path;
+  }
+  function imageFields(d){
+    const fields=[];
+    const add=(obj,key)=>{if(obj&&typeof obj[key]==='string'&&obj[key])fields.push([obj,key])};
+    add(d.site?.soundtrack,'jacket');
+    for(const c of d.characters){add(c,'artwork');add(c,'icon');add(c.soundtrack,'jacket');for(const g of c.gallery||[])add(g,'image')}
+    for(const w of d.worlds)add(w,'image');
+    return fields;
+  }
+  function validateImageBlob(blob){
+    if(!blob||!Object.hasOwn(imageExt,blob.type)||blob.size<=0||blob.size>IMAGE_LIMIT)throw Error('5MB以下のWebP/PNG/JPEG/GIF画像を選んでください');
+  }
+  async function storePrivateImage(blob){
+    validateImageBlob(blob);
+    const path='published/'+Date.now()+'-'+crypto.randomUUID()+'.'+imageExt[blob.type];
+    const {error}=await client.storage.from('cast-private-media').upload(path,blob,{contentType:blob.type,cacheControl:'0',upsert:false});
+    if(error)throw Error('非公開画像の保存に失敗：'+error.message);
+    return PRIVATE_IMAGE+path;
+  }
+  async function readPrivateImage(value){
+    const {data,error}=await client.storage.from('cast-private-media').download(privateImagePath(value));
+    if(error||!data)throw Error('非公開画像の取得に失敗：'+(error?.message||'ファイルなし'));
+    validateImageBlob(data);return data;
+  }
+  const imageSignedCache=new Map();
+  async function imagePreviewURL(value){
+    if(!isPrivateImage(value))return value||'';
+    const path=privateImagePath(value),now=Date.now();
+    let entry=imageSignedCache.get(path);
+    if(!entry||now-entry.time>45*60*1000){
+      const promise=(async()=>{const {data,error}=await client.storage.from('cast-private-media').createSignedUrl(path,3600);if(error||!data?.signedUrl)throw Error(error?.message||'非公開画像のURLを取得できません');return data.signedUrl})();
+      entry={time:now,promise};imageSignedCache.set(path,entry);
+      promise.catch(()=>{if(imageSignedCache.get(path)===entry)imageSignedCache.delete(path)});
+    }
+    return entry.promise;
+  }
+  async function resolveImagePreview(d){
+    const fields=imageFields(d).filter(([obj,key])=>isPrivateImage(obj[key]));
+    for(let i=0;i<fields.length;i+=8)await Promise.all(fields.slice(i,i+8).map(async ([obj,key])=>{obj[key]=await imagePreviewURL(obj[key])}));
+  }
+  function imageDataURI(blob){return new Promise((resolve,reject)=>{
+    const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(Error('画像のバックアップ変換に失敗'));reader.readAsDataURL(blob);
+  })}
+  async function importImageReferences(d){
+    const converted=new Map();
+    for(const [obj,key] of imageFields(d)){
+      const value=obj[key];
+      if(!/^data:image\/(?:webp|png|jpeg|gif);base64,/i.test(value))continue;
+      if(!converted.has(value))converted.set(value,await storePrivateImage(await (await fetch(value)).blob()));
+      obj[key]=converted.get(value);
+    }
+  }
   async function previewDraft(){
     const result=clone(draft);
     await Promise.all(audioModels(result).map(async m=>{if(isPrivateAudio(m.src))m.src=await audioPreviewURL(m.src)}));
+    await resolveImagePreview(result);
     return result;
   }
   function audioDataURI(blob){return new Promise((resolve,reject)=>{
@@ -152,9 +212,15 @@
     reader.onerror=()=>reject(Error('音源のバックアップ変換に失敗'));reader.readAsDataURL(blob);
   })}
   // Keep the existing JSON/ZIP export portable for unpublished audio.
-  async function exportDraft({charIds=null}={}){
+  async function exportDraft({charIds=null,worldIds=null}={}){
     const result=clone(draft),converted=new Map();
     if(Array.isArray(charIds))result.characters=result.characters.filter(c=>charIds.includes(c.id));
+    if(Array.isArray(worldIds))result.worlds=result.worlds.filter(w=>worldIds.includes(w.id));
+    for(const [obj,key] of imageFields(result)){
+      const value=obj[key];if(!isPrivateImage(value))continue;
+      if(!converted.has(value))converted.set(value,await imageDataURI(await readPrivateImage(value)));
+      obj[key]=converted.get(value);
+    }
     for(const m of audioModels(result)){
       if(!isPrivateAudio(m.src))continue;
       const value=m.src;
@@ -177,13 +243,13 @@
   async function publishImages(publicDoc, nextDraft){
     const converted=new Map();
     async function transform(value,label){
-      if(!isImageData(value))return value||'';
+      if(!isImageData(value)&&!isPrivateImage(value))return value||'';
       if(converted.has(value))return converted.get(value);
-      if(!/^data:image\/(?:webp|png|jpeg|gif);base64,/i.test(value))
+      if(!isPrivateImage(value)&&!/^data:image\/(?:webp|png|jpeg|gif);base64,/i.test(value))
         throw new Error(label+' の画像形式は公開できません');
-      const blob=await (await fetch(value)).blob();
+      const blob=isPrivateImage(value)?await readPrivateImage(value):await (await fetch(value)).blob();
       const ext={'image/webp':'webp','image/png':'png','image/jpeg':'jpg','image/gif':'gif'}[blob.type];
-      if(!ext||blob.size>5*1024*1024)throw new Error(label+' は5MB以下のWebP/PNG/JPEG/GIFにしてください');
+      if(!ext||blob.size<=0||blob.size>IMAGE_LIMIT)throw new Error(label+' は5MB以下のWebP/PNG/JPEG/GIFにしてください');
       const filename=`published/${Date.now()}-${crypto.randomUUID()}.${ext}`;
       const {error}=await client.storage.from('cast-public-media').upload(filename,blob,{contentType:blob.type,cacheControl:'31536000',upsert:false});
       if(error)throw new Error(label+' の画像アップロード失敗: '+error.message);
@@ -303,7 +369,7 @@
     if(!validDoc(value))return false;
     if((await flushDraft())===false)return false;
     const next=defaults(value);
-    try{await importAudioReferences(next);await putRow('draft',next);draft=next;lastError='';return true}
+    try{await importImageReferences(next);await importAudioReferences(next);await putRow('draft',next);draft=next;lastError='';return true}
     catch(e){lastError=e.message||String(e);return false}
   }
   // Inventory is deliberately limited to the managed published/ directory in each bucket.
@@ -323,6 +389,7 @@
     function visit(v,label){
       if(typeof v==='string'){
         if(isPrivateAudio(v)){try{add('cast-private-media',privateAudioPath(v),label)}catch{}}
+        if(isPrivateImage(v)){try{add('cast-private-media',privateImagePath(v),label)}catch{}}
         if(v.includes(origin+'/storage/v1/')){
           for(const m of v.match(/https:\/\/[^\s<>"'\x60]+/g)||[]){
             try{const u=new URL(m);if(u.origin!==origin)continue;for(const b of resourceBuckets){const prefix='/storage/v1/object/public/'+b+'/';if(u.pathname.startsWith(prefix))add(b,decodeURIComponent(u.pathname.slice(prefix.length)),label)}}catch{}
@@ -428,7 +495,7 @@
       getDraft:()=>draft,getPublished:()=>published,
       getLastError:()=>lastError,
       getSignalReport:async()=>{const {data,error}=await client.rpc('cast_signal_report');if(error)throw Error(error.message);if(!Array.isArray(data))throw Error('集計データの形式が不正です');return data},
-      saveDraft,publish,replaceDraft,scanResources,resourcePreview,downloadResource,deleteResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,
+      saveDraft,publish,replaceDraft,scanResources,resourcePreview,downloadResource,deleteResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,storePrivateImage,isPrivateImage,imagePreviewURL,
       reset:async()=>replaceDraft(published),
       signOut,
       createId:(prefix)=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`
