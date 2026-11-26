@@ -6,6 +6,47 @@ const validUrl=x=>/^https?:\/\/[^\s]+$/i.test(x||'')?x:'';
 const api=window.CAST_DATA;
 const state={people:[],doc:null,index:0,panel:null,tab:'profile',filter:'all',world:'',mode:'published',animations:!matchMedia('(prefers-reduced-motion: reduce)').matches,timer:null,enterTimer:null,enterNonce:0,directoryView:'gallery',returnWorldId:'',returnWorldScroll:0};
 const stage=$('hero'), cur=()=>state.people[state.index];
+// Keep speculative transfers bounded. Never preload a full cast.
+const artWarm=new Map(),artVisited=new Set();let artIdleTimer=0,artHoverTimer=0,artEpoch=0,idleBudget=2,hoverBudget=3;
+function canWarm(idle=false){
+ if(state.mode!=='published'||document.hidden||document.body.classList.contains('admin-open'))return false;
+ const net=navigator.connection;
+ if(net?.saveData||/^(slow-2g|2g|3g)$/.test(net?.effectiveType||''))return false;
+ if(idle&&matchMedia('(max-width:800px)').matches&&net?.effectiveType!=='4g')return false;
+ return true;
+}
+function warmArt(c,idle=false){
+ const src=c?.artwork;if(!src||!canWarm(idle)||artVisited.has(src)||artWarm.has(src)||!(idle?idleBudget:hoverBudget))return;
+ if(idle)idleBudget--;else hoverBudget--;
+ const im=new Image();im.fetchPriority='low';im.decoding='async';artWarm.set(src,im);
+ im.onerror=()=>artWarm.delete(src);im.src=src;
+}
+function scheduleNeighbor(c){
+ clearTimeout(artIdleTimer);if(!canWarm(true)||!idleBudget||state.people.length<2)return;
+ artIdleTimer=setTimeout(()=>{if(cur()?.id!==c.id||state.panel||!canWarm(true))return;warmArt(state.people[(state.index+1)%state.people.length],true)},1100);
+}
+function setHeroImage(c){
+ const img=$('heroArt'),src=c.artwork||'',previous=img.getAttribute('src')||'';
+ img.fetchPriority='high';img.alt=c.name+'の立ち絵';
+ if(src===previous){if(src&&img.complete&&img.naturalWidth)scheduleNeighbor(c);return}
+ clearTimeout(artIdleTimer);const epoch=++artEpoch;
+ if(!src){img.removeAttribute('src');img.style.visibility='hidden';return}
+ img.style.visibility='hidden';artVisited.add(src);
+ const reveal=()=>{if(epoch!==artEpoch)return;img.style.visibility='';if(img.naturalWidth)scheduleNeighbor(cur()||c)};
+ img.src=src;
+ // Decode the selected image before revealing it, preventing an old character
+ // from remaining visible under the new name while the network request runs.
+ if(typeof img.decode==='function')img.decode().then(reveal,()=>{if(epoch!==artEpoch)return;if(img.complete)reveal();else{img.addEventListener('load',reveal,{once:true});img.addEventListener('error',reveal,{once:true})}});
+ else if(img.complete)reveal();else{img.addEventListener('load',reveal,{once:true});img.addEventListener('error',reveal,{once:true})}
+}
+function intentArt(e){
+ const b=e.target.closest?.('[data-v5-target],[data-mobile-person],[data-pick],[data-related-id],[data-world-character]');
+ if(!b||!canWarm()||e.pointerType==='touch')return;
+ const id=b.dataset.v5Target||b.dataset.mobilePerson||b.dataset.pick||b.dataset.relatedId||b.dataset.worldCharacter;
+ const c=state.people.find(x=>x.id===id);if(!c||c.id===cur()?.id)return;
+ clearTimeout(artHoverTimer);artHoverTimer=setTimeout(()=>{if(b.isConnected&&b.matches(':hover'))warmArt(c)},140);
+}
+document.addEventListener('pointerover',intentArt,{passive:true});
 // Snapshot of the approved ORPHE desktop badge location (2026-11-22).
 // The personal fileBadgePosition always takes precedence over this default.
 const BADGE_DESKTOP_DEFAULT=Object.freeze({right:9.051756007393713,top:14.186685998241362});
@@ -70,7 +111,7 @@ function updateMobileIntroProgress(){
 function renderMobileSelection(){
  const c=cur(),track=$('mobilePortraitTrack'), viewport=$('mobilePortraitViewport');
  if(!c||!track)return;
- track.innerHTML=state.people.map(p=>`<button type="button" class="mobile-portrait" role="tab" data-mobile-person="${esc(p.id)}" aria-selected="${p.id===c.id}" style="--portrait-accent:${esc(p.colors.accent)}" aria-label="${esc(p.name)}を選ぶ" title="${esc(p.name)}"><span><img src="${esc(icon(p))}" alt="" style="${cropStyle(p,'mobile')}" class="cast-icon ${p.icon?'has-face':''}" data-crop-render></span></button>`).join('');
+ track.innerHTML=state.people.map(p=>`<button type="button" class="mobile-portrait" role="tab" data-mobile-person="${esc(p.id)}" aria-selected="${p.id===c.id}" style="--portrait-accent:${esc(p.colors.accent)}" aria-label="${esc(p.name)}を選ぶ" title="${esc(p.name)}"><span><img src="${esc(icon(p))}" alt="" loading="lazy" decoding="async" style="${cropStyle(p,'mobile')}" class="cast-icon ${p.icon?'has-face':''}" data-crop-render></span></button>`).join('');
  setText('mobilePickerCount',String(state.index+1).padStart(2,'0')+' / '+String(state.people.length).padStart(2,'0'));
  requestAnimationFrame(()=>{const chosen=track.querySelector('[aria-selected="true"]');if(!chosen)return;
  const destination=chosen.offsetLeft+chosen.offsetWidth/2-viewport.clientWidth/2;
@@ -79,7 +120,7 @@ function renderMobileSelection(){
 }
 function showEmpty(){stage.style.display='none';$('pickerStrip').innerHTML='<p class="empty">公開中のキャラクターはまだいません。</p>'}
 function load({animate=true}={}){
- if(!state.people.length){showEmpty();return} stage.style.display='';const c=cur();setTheme(c);
+ if(!state.people.length){showEmpty();return} stage.style.display='';const c=cur();setHeroImage(c);setTheme(c);
  setText('heroRoman',c.roman||c.name||'UNKNOWN');setText('heroRoman2',c.surname||'');$('heroRoman2').hidden=!String(c.surname||'').trim();$('heroCopy').classList.toggle('no-surname',!String(c.surname||'').trim());setText('heroJapanese',c.name||'名前未定');
  setText('heroKicker',`CHARACTER FILE ${c.no} / ${String(state.people.length).padStart(3,'0')}`);setText('heroRole',c.roleJa||c.type||'ORIGINAL CHARACTER');
  const species=String(c.species||'').trim(),gender=String(c.gender||'').trim();$('heroCoreData').hidden=!(species||gender);$('heroSpeciesWrap').hidden=!species;$('heroGenderWrap').hidden=!gender;setText('heroSpecies',species);setText('heroGender',gender);
@@ -90,7 +131,7 @@ function load({animate=true}={}){
  setText('mobileIntroText',bio||'紹介文は準備中です。');setText('mobileIntroNumber',c.no+' / CHARACTER FILE');
  cancelIntroWheelAnimation($('mobileIntroText'));$('mobileIntroText').scrollTop=0;requestAnimationFrame(updateMobileIntroProgress);
  setText('heroMeta',`${c.playable?'PLAYABLE / zeta':'SHOWCASE'} / ${c.world}  ●  ${c.no}`);setText('sideDash',c.deco+' / SYSTEM READY');
- $('heroArt').src=c.artwork||'';const pos={x:0,y:0,zoom:1,...(c.artPosition||{})};$('heroArt').style.setProperty('--art-x',`${Number(pos.x)||0}%`);$('heroArt').style.setProperty('--art-y',`${Number(pos.y)||0}%`);$('heroArt').style.setProperty('--art-zoom',Number(pos.zoom)||1);$('heroArt').alt=c.name+'の立ち絵';const badge={...BADGE_DESKTOP_DEFAULT,...(c.fileBadgePosition||{})},mobileBadge={right:8,top:66,...(c.fileBadgePositionMobile||{})};$('artStamp').style.setProperty('--badge-right',Number(badge.right)+'%');$('artStamp').style.setProperty('--badge-top',Number(badge.top)+'%');$('artStamp').style.setProperty('--badge-mobile-right',Number(mobileBadge.right)+'%');$('artStamp').style.setProperty('--badge-mobile-top',Number(mobileBadge.top)+'%');$('artStamp').innerHTML=`<span class="v7-stamp-original">FILE<br><b>${esc(c.no)}</b></span><span class="v7-stamp-detail" aria-hidden="true"><span class="v7-stamp-corner tl"></span><span class="v7-stamp-corner tr"></span><span class="v7-stamp-corner bl"></span><span class="v7-stamp-corner br"></span><svg class="v10-stamp-arc" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><defs><path id="v10-stamp-arc-path" d="M 32 56 A 59 59 0 0 1 128 56"/></defs><text><textPath href="#v10-stamp-arc-path" startOffset="50%" text-anchor="middle">CAST SIGNAL</textPath></text></svg><span class="v7-stamp-inner"><small>FILE</small><strong>${esc(c.no)}</strong><i></i></span></span>`;
+ const pos={x:0,y:0,zoom:1,...(c.artPosition||{})};$('heroArt').style.setProperty('--art-x',`${Number(pos.x)||0}%`);$('heroArt').style.setProperty('--art-y',`${Number(pos.y)||0}%`);$('heroArt').style.setProperty('--art-zoom',Number(pos.zoom)||1);$('heroArt').alt=c.name+'の立ち絵';const badge={...BADGE_DESKTOP_DEFAULT,...(c.fileBadgePosition||{})},mobileBadge={right:8,top:66,...(c.fileBadgePositionMobile||{})};$('artStamp').style.setProperty('--badge-right',Number(badge.right)+'%');$('artStamp').style.setProperty('--badge-top',Number(badge.top)+'%');$('artStamp').style.setProperty('--badge-mobile-right',Number(mobileBadge.right)+'%');$('artStamp').style.setProperty('--badge-mobile-top',Number(mobileBadge.top)+'%');$('artStamp').innerHTML=`<span class="v7-stamp-original">FILE<br><b>${esc(c.no)}</b></span><span class="v7-stamp-detail" aria-hidden="true"><span class="v7-stamp-corner tl"></span><span class="v7-stamp-corner tr"></span><span class="v7-stamp-corner bl"></span><span class="v7-stamp-corner br"></span><svg class="v10-stamp-arc" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><defs><path id="v10-stamp-arc-path" d="M 32 56 A 59 59 0 0 1 128 56"/></defs><text><textPath href="#v10-stamp-arc-path" startOffset="50%" text-anchor="middle">CAST SIGNAL</textPath></text></svg><span class="v7-stamp-inner"><small>FILE</small><strong>${esc(c.no)}</strong><i></i></span></span>`;
  renderPicker();renderMobileSelection();if(state.panel==='dossier')renderDossier();
  clearTimeout(state.enterTimer);const nonce=++state.enterNonce;stage.classList.remove('is-entering');
  if(animate&&state.animations){stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px');void stage.offsetWidth;stage.classList.add('is-entering');state.enterTimer=setTimeout(()=>{if(state.enterNonce===nonce)stage.classList.remove('is-entering')},1220)}
@@ -100,7 +141,7 @@ function label(c){return c.playable?'<b class="zeta-badge">zeta</b>':''}
 function renderPicker(){
  const c=cur();$('pickerCount').textContent=`${String(state.people.length).padStart(2,'0')} SIGNALS DETECTED`;
  $('pickerStrip').innerHTML=state.people.map(p=>`<button type="button" class="person" role="tab" data-person="${esc(p.id)}" aria-selected="${p.id===c.id}" style="--character-accent:${esc(p.colors.accent)}" title="${esc(p.name)}を選ぶ">
- <span class="person-thumb"><img data-crop-render class="cast-icon ${p.icon?'has-face':''}" style="${cropStyle(p,'choose')}" src="${esc(icon(p))}" alt=""></span>
+ <span class="person-thumb"><img data-crop-render class="cast-icon ${p.icon?'has-face':''}" style="${cropStyle(p,'choose')}" src="${esc(icon(p))}" alt="" loading="lazy" decoding="async"></span>
  <span class="person-data"><span class="person-no">NO.${p.no} ${label(p)} ${newBadge(p)}</span><strong>${esc(p.name)}</strong><small>${esc(p.roman)}</small><span class="person-selected">${p.id===c.id?'◀ SELECTED':'SELECT ↗'}</span></span></button>`).join('');
  requestAnimationFrame(()=>{followSelected(true);updatePickerEdges()});
 }
@@ -373,11 +414,11 @@ function returnToOriginWorld(){
 }
 function openWorld(id){if(!worldById(id))return;state.world=id;state.filter='all';$('search').value='';open('worldDetailPanel')}
 function tab(k){hideConnectionTooltip();state.tab=k;renderDossier();$('dossierContent').scrollTop=0;route('char/'+cur().id+'/'+k)}
-function onRoute(){if(document.body.classList.contains('admin-open'))return;const path=decodeURIComponent(location.hash.replace(/^#/,'')),parts=path.split('/');if(parts[0]==='char'){
- const i=state.people.findIndex(c=>c.id===parts[1]);if(i>=0){state.index=i;load({animate:false});if(['profile','story','gallery','links'].includes(parts[2])){state.tab=parts[2];open('dossier',false)}else close(false);return}
+function onRoute(alreadyLoaded=false){if(document.body.classList.contains('admin-open'))return;const path=decodeURIComponent(location.hash.replace(/^#/,'')),parts=path.split('/');if(parts[0]==='char'){
+ const i=state.people.findIndex(c=>c.id===parts[1]);if(i>=0){if(alreadyLoaded!==true||state.index!==i){state.index=i;load({animate:false})}if(['profile','story','gallery','links'].includes(parts[2])){state.tab=parts[2];open('dossier',false)}else close(false);return}
  }if(parts[0]==='world'&&worldById(parts[1])){state.world=parts[1];open('worldDetailPanel',false);return}if(path==='index'){state.world='';state.filter='all';open('directory',false);return}if(path==='worlds'){open('worldsPanel',false);return}if(path==='about'){open('aboutPanel',false);return}close(false)}
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(state.timer);state.timer=setTimeout(()=>el.classList.remove('show'),3600)}
-function refresh(mode='published',previewDoc=null){const id=cur()?.id;state.mode=mode;hydrate(mode==='draft'?(previewDoc||api.getDraft()):api.getPublished(),mode);state.index=Math.max(0,state.people.findIndex(c=>c.id===id));if(!state.people.length)state.index=0;close(false);load({animate:false});renderWorlds();renderAbout();onRoute();$('draftIndicator').hidden=mode!=='draft';window.dispatchEvent(new Event('cast-sound-refresh'));}
+function refresh(mode='published',previewDoc=null){const id=cur()?.id;state.mode=mode;hydrate(mode==='draft'?(previewDoc||api.getDraft()):api.getPublished(),mode);state.index=Math.max(0,state.people.findIndex(c=>c.id===id));const routeId=location.hash.slice(1).split('/');if(routeId[0]==='char'){try{const i=state.people.findIndex(c=>c.id===decodeURIComponent(routeId[1]||''));if(i>=0)state.index=i}catch{}}if(!state.people.length)state.index=0;close(false);load({animate:false});renderAbout();onRoute(true);$('draftIndicator').hidden=mode!=='draft';window.dispatchEvent(new Event('cast-sound-refresh'));}
 window.CAST_PUBLIC={refresh,openCharacter:id=>choose(id,{detail:true}),toast,getSoundContext:()=>({doc:state.doc,mode:state.mode,id:cur()?.id})};
 document.addEventListener('click',e=>{const a=e.target.closest?.('a[href]');if(!a)return;try{const u=new URL(a.href);if(!/(^|\.)zeta-ai\.io$/i.test(u.hostname))return;if(state.panel==='dossier'&&a.closest('#dossier')&&cur())window.CAST_ANALYTICS?.emit('zeta_char',cur().id);else if(state.panel==='worldDetailPanel'&&a.closest('#worldDetailPanel')&&state.world)window.CAST_ANALYTICS?.emit('zeta_world',state.world);else if(a.closest('#aboutLinks,#footerSocial,#mobileSocialLinks'))window.CAST_ANALYTICS?.emit('zeta_site','site');}catch{}},true);
 const connectionTooltip=$('connectionTooltip');
