@@ -246,6 +246,39 @@
     try{await putRow('draft',next);draft=next;lastError='';return true}
     catch(e){lastError=e.message||String(e);return false}
   }
+  // Read-only inventory of our published media folder, not billing usage.
+  async function scanResources(){
+    const bucket='cast-public-media',prefix='published';
+    const latest=await Promise.all([getRow('draft'),getRow('published')]);
+    if(!latest.every(validDoc))throw Error('保存済みの下書き・公開データを確認できません');
+    const origin=new URL(cfg.url).origin,base='/storage/v1/object/public/'+bucket+'/';
+    const refs=new Set();
+    function visit(v){
+      if(typeof v==='string'){
+        if(!v.includes(origin+base))return;
+        for(const m of v.match(/https:\/\/[^\s<>"'\x60]+/g)||[]){
+          try{const u=new URL(m);if(u.origin===origin&&u.pathname.startsWith(base))refs.add(decodeURIComponent(u.pathname.slice(base.length)))}catch{}
+        }
+      }else if(v&&typeof v==='object'){for(const x of Object.values(v))visit(x)}
+    }
+    for(const d of [...latest,draft,published])visit(d);
+    const files=[],storage=client.storage.from(bucket);
+    for(let offset=0;;offset+=100){
+      const {data,error}=await storage.list(prefix,{limit:100,offset,sortBy:{column:'name',order:'asc'}});
+      if(error)throw error;
+      if(!Array.isArray(data))throw Error('一覧を取得できません');
+      for(const f of data){
+        if(!f.id&&!f.metadata)continue;
+        const path=prefix+'/'+f.name,n=f.metadata?.size;
+        files.push({path,size:n!=null&&Number.isFinite(Number(n))&&Number(n)>=0?Number(n):null,type:f.metadata?.mimetype||'',referenced:refs.has(path)});
+      }
+      if(data.length<100)break;
+      if(offset>=9900)throw Error('1万件以上のためスキャンを中止しました');
+    }
+    const paths=new Set(files.map(f=>f.path));
+    return {files,missing:[...refs].filter(x=>x.startsWith(prefix+'/')&&!paths.has(x)),draftBytes:new Blob([JSON.stringify(latest[0])]).size,publishedBytes:new Blob([JSON.stringify(latest[1])]).size,scannedAt:new Date().toISOString()};
+  }
+
   async function signOut(){
     if(waiters.length && !(await flushDraft())){
       if(!confirm('未保存の変更があります。それでもログアウトしますか？'))return;
@@ -287,7 +320,7 @@
       initial:clone(seed),clone,
       getDraft:()=>draft,getPublished:()=>published,
       getLastError:()=>lastError,
-      saveDraft,publish,replaceDraft,
+      saveDraft,publish,replaceDraft,scanResources,
       reset:async()=>replaceDraft(published),
       signOut,
       createId:(prefix)=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`
