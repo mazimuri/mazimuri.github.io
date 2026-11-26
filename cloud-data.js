@@ -344,7 +344,7 @@
           // Conservative secondary check: a raw or URI-encoded path anywhere protects both buckets.
           const matched=refs.has(key)||serialized.some(s=>s.includes(path)||s.includes(encodeURIComponent(path)));
           const type=f.metadata?.mimetype||(/\.mp3$/i.test(path)?'audio/mpeg':/\.webp$/i.test(path)?'image/webp':/\.png$/i.test(path)?'image/png':/\.gif$/i.test(path)?'image/gif':/\.jpe?g$/i.test(path)?'image/jpeg':'');
-          files.push({id:key,bucket,path,size:n!=null&&Number.isFinite(Number(n))&&Number(n)>=0?Number(n):null,type,created:f.created_at||'',referenced:matched,refs:[...(refs.get(key)||[])],manageable:resourcePathOK(path)});
+          files.push({id:key,bucket,path,size:n!=null&&Number.isFinite(Number(n))&&Number(n)>=0?Number(n):null,type,created:f.created_at||'',referenced:matched,refs:[...(refs.get(key)||[])],manageable:resourcePathOK(path)&&Number.isFinite(Date.parse(f.created_at||''))&&Date.now()-Date.parse(f.created_at)>=10*60*1000});
         }
         if(data.length<100)break;
         if(offset>=9900)throw Error('1万件以上のためスキャンを中止しました');
@@ -363,6 +363,7 @@
   }
   // No auto-delete. Re-read both documents and both listings; abort the entire selection if any is unsafe.
   async function deleteResources(ids){
+    if((await flushDraft())===false)throw Error('下書きの保存が完了していないため削除を中止しました');
     if(!Array.isArray(ids)||!ids.length||ids.length>10000)throw Error('削除対象がありません');
     const unique=[...new Set(ids)],fresh=await scanResources();
     if(fresh.missing.length||fresh.warnings.length)throw Error('一覧が不完全なため削除を中止しました');
