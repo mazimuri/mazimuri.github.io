@@ -416,10 +416,12 @@
     if(!window.supabase?.createClient)throw new Error('Supabaseのライブラリを読み込めません。ネット接続をご確認ください。');
     client=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
     await requireLogin();
+    try{localStorage.setItem('cast-signal-analytics-exclude','1')}catch{}
     window.CAST_DATA={
       initial:clone(seed),clone,
       getDraft:()=>draft,getPublished:()=>published,
       getLastError:()=>lastError,
+      getSignalReport:async()=>{const {data,error}=await client.rpc('cast_signal_report');if(error)throw Error(error.message);if(!Array.isArray(data))throw Error('集計データの形式が不正です');return data},
       saveDraft,publish,replaceDraft,scanResources,resourcePreview,deleteResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,
       reset:async()=>replaceDraft(published),
       signOut,
