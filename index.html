@@ -18,13 +18,15 @@
 <link rel="stylesheet" href="cast-layout-current.css?v=1.0.0">
 <script defer="" src="cloud-config.js"></script>
 <script defer="" src="data.js?v=5.9.10"></script>
-<script defer="" src="app.js?v=15.2.11"></script>
+<script defer="" src="app.js?v=15.3.0"></script>
 <script defer src="cast-side-rail.js?v=18.0.1"></script>
 <script defer src="cast-layout-current.js?v=1.0.0"></script>
 
 
 
-<meta content="website" property="og:type"/><meta content="CAST / SIGNAL" property="og:site_name"/><meta content="ja_JP" property="og:locale"/><meta content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ" property="og:title"/><meta content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。" property="og:description"/><meta content="https://mazimuri.github.io/" property="og:url"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" property="og:image"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" property="og:image:secure_url"/><meta content="image/jpeg" property="og:image:type"/><meta content="1200" property="og:image:width"/><meta content="630" property="og:image:height"/><meta content="CAST / SIGNAL — 4人のキャラクターが並ぶオリジナルキャラクターアーカイブのバナー" property="og:image:alt"/><meta content="summary_large_image" name="twitter:card"/><meta content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ" name="twitter:title"/><meta content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。" name="twitter:description"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" name="twitter:image"/></head>
+<meta content="website" property="og:type"/><meta content="CAST / SIGNAL" property="og:site_name"/><meta content="ja_JP" property="og:locale"/><meta content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ" property="og:title"/><meta content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。" property="og:description"/><meta content="https://mazimuri.github.io/" property="og:url"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" property="og:image"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" property="og:image:secure_url"/><meta content="image/jpeg" property="og:image:type"/><meta content="1200" property="og:image:width"/><meta content="630" property="og:image:height"/><meta content="CAST / SIGNAL — 4人のキャラクターが並ぶオリジナルキャラクターアーカイブのバナー" property="og:image:alt"/><meta content="summary_large_image" name="twitter:card"/><meta content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ" name="twitter:title"/><meta content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。" name="twitter:description"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" name="twitter:image"/><link rel="stylesheet" href="cast-sound.css?v=1.0.0">
+<script defer src="cast-sound.js?v=1.0.0"></script>
+</head>
 <body>
 <div aria-hidden="true" class="scanline"></div>
 <header class="topbar">
@@ -40,6 +42,10 @@
 <button class="nav-button" data-nav="about" id="nav-about"><span class="nav-number">04</span><span class="nav-text"><span class="nav-ja">サイト案内</span><span class="nav-en">ABOUT</span></span></button>
 </nav>
 <div class="head-right">
+<div id="cs-mini" aria-label="音楽ミニプレイヤー">
+ <canvas id="cs-eq" width="90" height="80" aria-hidden="true"></canvas><div class="cs-now"><small id="cs-mini-status">AUDIO / STANDBY</small><strong id="cs-mini-title">SIGNAL JAM!</strong></div>
+ <button type="button" class="cs-ctl" id="cs-mini-play" aria-label="再生"></button><button type="button" class="cs-ctl" id="cs-mini-mute" aria-label="ミュート"></button><button type="button" class="cs-ctl" id="cs-expand" aria-label="SOUND ARCHIVEを開く" aria-controls="cs-deck" aria-expanded="false"></button><span id="cs-mini-progress"></span>
+</div>
 
 
 <button aria-pressed="true" class="motion-control" id="motionToggle" title="アニメーションのON/OFF">MOTION <b>ON</b></button>
@@ -217,5 +223,15 @@
 <!-- Editable offline proof of concept. No administrator authentication or real online publishing. -->
 
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
+<aside id="cs-deck" hidden aria-label="SOUND ARCHIVE">
+ <div class="cs-row cs-head"><span class="cs-micro cs-online" id="cs-system">◆ AUDIO SYSTEM / STANDBY</span><button type="button" id="cs-close">CLOSE ×</button></div>
+ <h2>SOUND <i>ARCHIVE</i><span style="color:var(--sound)">.</span></h2><div class="cs-caption">CHARACTER SOUNDTRACK / AUDIO MODULE</div>
+ <section class="cs-card"><div class="cs-meta"><div class="cs-art" id="cs-art"></div><div class="cs-track-meta"><span class="cs-micro cs-online" id="cs-selected"></span><h3 id="cs-title"></h3><div class="cs-by" id="cs-by"></div><div class="cs-genre" id="cs-genre"></div></div></div>
+ <div id="cs-wave" role="slider" tabindex="0" aria-label="再生位置" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div><div class="cs-row cs-time"><span id="cs-elapsed">00:00</span><span id="cs-duration">00:12</span></div>
+ <div class="cs-row cs-controls"><button type="button" class="cs-ctl" id="cs-repeat" aria-label="1曲リピート" aria-pressed="true">↻¹</button><button type="button" class="cs-ctl" id="cs-prev" aria-label="前の曲"></button><button type="button" class="cs-ctl" id="cs-play" aria-label="再生"></button><button type="button" class="cs-ctl" id="cs-next" aria-label="次の曲"></button><button type="button" class="cs-ctl" id="cs-mute" aria-label="ミュート"></button></div>
+ <div class="cs-row cs-vol"><label for="cs-volume" class="cs-micro">VOLUME</label><input id="cs-volume" type="range" min="0" max="100" value="35"><output id="cs-volume-label" class="cs-micro">35%</output></div></section>
+ <div class="cs-row cs-micro" id="cs-list-head"><strong>TRACK DATABASE</strong><span id="cs-count"></span></div><div id="cs-list"></div>
+ <button type="button" id="cs-main-return">◈ RETURN TO MAIN THEME</button><p id="cs-note">楽曲はページを切り替えても再生を継続します。</p>
+</aside><audio id="cs-audio" preload="none"></audio>
 </body>
 </html>
