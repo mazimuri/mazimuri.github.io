@@ -88,3 +88,21 @@
  body.mb-motion-opt-in #hero.hero .mb-motion-fallback-type{animation-duration:.51s!important}
  body.mb-motion-opt-in #hero.hero .mb-motion-fallback-detail{animation-duration:.43s!important}
 }
+
+/* V1.0.2: decoded artwork transition, independent of image positioning.
+   The primed state is painted before the transition; the final style is stable. */
+@media(max-width:800px){
+ #hero.hero .mb-art-motion.mb-art-primed{
+  opacity:0!important;transform:translate3d(110px,24px,0) scale(1.035)!important;
+  transition:none!important;will-change:transform,opacity;
+ }
+ #hero.hero .mb-art-motion.mb-art-playing{
+  opacity:1!important;transform:translate3d(0,0,0) scale(1)!important;
+  transition:transform .86s cubic-bezier(.22,.64,.32,1),opacity .64s ease-out!important;
+ }
+ body.no-motion #hero.hero .mb-art-motion{opacity:1!important;transform:none!important;transition:none!important}
+}
+@media(max-width:800px) and (prefers-reduced-motion:reduce){
+ body:not(.mb-motion-opt-in) #hero.hero .mb-art-motion{opacity:1!important;transform:none!important;transition:none!important}
+ body.mb-motion-opt-in:not(.no-motion) #hero.hero .mb-art-motion.mb-art-playing{transition-duration:.86s,.64s!important}
+}
