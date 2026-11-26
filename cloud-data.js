@@ -19,7 +19,7 @@
     typeof cfg.publishableKey === 'string' &&
     cfg.publishableKey.length > 20 && !cfg.publishableKey.startsWith('YOUR_');
   let client = null, draft = null, published = null, seed = null, lastError = '';
-  let scheduled = null, waiters = [], queue = Promise.resolve();
+  let scheduled = null, waiters = [], queue = Promise.resolve(), draftError = '';
   const validDoc = d => d?.version === 5 && d.site &&
     Array.isArray(d.characters) && Array.isArray(d.worlds) && Array.isArray(d.tags);
 
@@ -77,8 +77,8 @@
     if(!resolvers.length)return queue;
     const snapshot=clone(draft);
     queue=queue.catch(()=>{}).then(async()=>{
-      try{await putRow('draft',snapshot);lastError='';return true}
-      catch(e){lastError=e.message||String(e);console.error('CAST cloud save failed:',e);return false}
+      try{await putRow('draft',snapshot);draftError='';lastError='';return true}
+      catch(e){draftError=e.message||String(e);lastError=draftError;console.error('CAST cloud save failed:',e);return false}
     });
     queue.then(ok=>resolvers.forEach(resolve=>resolve(ok)));
     return queue;
@@ -90,9 +90,13 @@
       scheduled=setTimeout(commitDraft,550);
     });
   }
-  async function flushDraft(){
+  async function flushDraft({retry=false}={}){
     if(waiters.length)commitDraft();
-    return queue;
+    const ok=await queue;
+    if(ok!==false||!retry)return ok;
+    const pending=saveDraft();
+    commitDraft();
+    return pending;
   }
   function draftToPublic(source) {
     const out=clone(source), chars=out.characters.filter(c=>c.published!==false);
@@ -194,9 +198,9 @@
     }finally{clearTimeout(timeout)}
   }
   async function publish(){
-    let committed=false;
+    let committed=false,stage='下書き保存';
     try{
-      if((await flushDraft())===false)throw new Error(lastError||'下書き保存が失敗しています');
+      if((await flushDraft({retry:true}))===false)throw new Error(draftError||'下書き保存が失敗しています');
       const now=new Date().toISOString(),next=clone(draft);
       for(const c of next.characters){if(c.published!==false&&!c.firstPublishedAt)c.firstPublishedAt=now}
       for(const w of next.worlds){if(w.published!==false&&!w.firstPublishedAt)w.firstPublishedAt=now}
@@ -204,14 +208,19 @@
       // Nonsecret revision: a new value per publish, even for identical data.
       nextPublic.publicationId=crypto.randomUUID();
       nextPublic.publishedAt=now;
+      stage='画像・ジャケットの公開';
       await publishImages(nextPublic,next);
+      stage='音源の公開';
       await publishSoundtracks(nextPublic,next);
       // One-row atomic public data commit.
+      stage='公開データ保存';
       await putRow('published',nextPublic);
       committed=true;
       published=defaults(nextPublic);
       draft=defaults(next);
-      if(!(await saveDraft()))console.warn('Published, but normalized draft needs saving again');
+      stage='公開後の下書き保存';
+      const normalized=await saveDraft();
+      stage='匿名閲覧の確認';
       await verifyPublicVisibility(nextPublic.publicationId);
       // Let a public tab on the same origin refresh without a manual reload.
       if('BroadcastChannel' in window){
@@ -221,10 +230,11 @@
           channel.close();
         }catch(e){console.warn('Published, but cross-tab notification was unavailable',e)}
       }
+      if(!normalized){lastError='公開済み・閲覧確認済みですが、下書きの再保存に失敗しました：'+draftError;return false}
       lastError='';return true;
     }catch(e){
       const reason=e.message||String(e);
-      lastError=(committed?'公開用データはクラウドに保存されましたが、公開サイト側の確認に失敗しました：':'公開できませんでした：')+reason;
+      lastError=(committed?'公開データ保存済み／':'')+'['+stage+'] '+reason;
       console.error('CAST publish/visibility check failed',e);
       return false;
     }
