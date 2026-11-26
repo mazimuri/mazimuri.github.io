@@ -152,8 +152,9 @@
     reader.onerror=()=>reject(Error('音源のバックアップ変換に失敗'));reader.readAsDataURL(blob);
   })}
   // Keep the existing JSON/ZIP export portable for unpublished audio.
-  async function exportDraft(){
+  async function exportDraft({charIds=null}={}){
     const result=clone(draft),converted=new Map();
+    if(Array.isArray(charIds))result.characters=result.characters.filter(c=>charIds.includes(c.id));
     for(const m of audioModels(result)){
       if(!isPrivateAudio(m.src))continue;
       const value=m.src;
