@@ -113,6 +113,65 @@
     out.tags=out.tags.filter(t=>visibleTags.has(t.id));
     return out;
   }
+  const PRIVATE_AUDIO='private-audio:',AUDIO_LIMIT=15*1024*1024;
+  const isPrivateAudio=value=>typeof value==='string'&&value.startsWith(PRIVATE_AUDIO);
+  function privateAudioPath(value){
+    const path=String(value).slice(PRIVATE_AUDIO.length);
+    if(!/^published\/audio-[0-9a-f-]{36}\.mp3$/i.test(path))throw Error('非公開音源の参照先が正しくありません');
+    return path;
+  }
+  const audioModels=d=>[d.site?.soundtrack,...d.characters.map(c=>c.soundtrack)].filter(Boolean);
+  function validateAudioBlob(blob){
+    if(!blob||blob.size<=0||blob.size>AUDIO_LIMIT)throw Error('MP3形式・15MB以下の音源を選んでください');
+  }
+  async function storePrivateAudio(blob){
+    validateAudioBlob(blob);
+    const path='published/audio-'+crypto.randomUUID()+'.mp3';
+    const {error}=await client.storage.from('cast-private-media').upload(path,blob,{contentType:'audio/mpeg',cacheControl:'0',upsert:false});
+    if(error)throw Error('非公開音源の保存に失敗：'+error.message);
+    return PRIVATE_AUDIO+path;
+  }
+  async function readPrivateAudio(value){
+    const {data,error}=await client.storage.from('cast-private-media').download(privateAudioPath(value));
+    if(error||!data)throw Error('非公開音源の取得に失敗：'+(error?.message||'ファイルなし'));
+    validateAudioBlob(data);return data;
+  }
+  async function audioPreviewURL(value){
+    if(!isPrivateAudio(value))return value||'';
+    const {data,error}=await client.storage.from('cast-private-media').createSignedUrl(privateAudioPath(value),3600);
+    if(error||!data?.signedUrl)throw Error('非公開音源の試聴URLを取得できません：'+(error?.message||'URLなし'));
+    return data.signedUrl;
+  }
+  async function previewDraft(){
+    const result=clone(draft);
+    await Promise.all(audioModels(result).map(async m=>{if(isPrivateAudio(m.src))m.src=await audioPreviewURL(m.src)}));
+    return result;
+  }
+  function audioDataURI(blob){return new Promise((resolve,reject)=>{
+    const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).replace(/^data:[^;]*;base64,/,'data:audio/mpeg;base64,'));
+    reader.onerror=()=>reject(Error('音源のバックアップ変換に失敗'));reader.readAsDataURL(blob);
+  })}
+  // Keep the existing JSON/ZIP export portable for unpublished audio.
+  async function exportDraft(){
+    const result=clone(draft),converted=new Map();
+    for(const m of audioModels(result)){
+      if(!isPrivateAudio(m.src))continue;
+      const value=m.src;
+      if(!converted.has(value))converted.set(value,await audioDataURI(await readPrivateAudio(value)));
+      m.src=converted.get(value);
+    }
+    return result;
+  }
+  async function importAudioReferences(d){
+    const converted=new Map();
+    for(const m of audioModels(d)){
+      if(!/^data:audio\/mpeg;base64,/i.test(m.src||''))continue;
+      const value=m.src;
+      if(!converted.has(value))converted.set(value,await storePrivateAudio(await (await fetch(value)).blob()));
+      m.src=converted.get(value);
+    }
+  }
+
   const isImageData = value => typeof value==='string' && value.startsWith('data:');
   async function publishImages(publicDoc, nextDraft){
     const converted=new Map();
@@ -160,12 +219,12 @@
   async function publishSoundtracks(publicDoc,nextDraft){
     const converted=new Map();
     async function transform(m,label){
-      if(!m?.src||!String(m.src).startsWith('data:'))return;
+      if(!m?.src||(!String(m.src).startsWith('data:')&&!isPrivateAudio(m.src)))return;
       const value=m.src;
       if(converted.has(value)){m.src=converted.get(value);return}
-      if(!/^data:audio\/mpeg;base64,/i.test(value))throw Error(label+'：MP3形式のみ対応しています');
-      const blob=await (await fetch(value)).blob();
-      if(blob.size>8*1024*1024)throw Error(label+'：8MB以下のMP3にしてください');
+      if(!isPrivateAudio(value)&&!/^data:audio\/mpeg;base64,/i.test(value))throw Error(label+'：MP3形式のみ対応しています');
+      const blob=isPrivateAudio(value)?await readPrivateAudio(value):await (await fetch(value)).blob();
+      validateAudioBlob(blob);
       const filename='published/audio-'+crypto.randomUUID()+'.mp3';
       const {error}=await client.storage.from('cast-public-media').upload(filename,blob,{contentType:'audio/mpeg',cacheControl:'31536000',upsert:false});
       if(error)throw Error(label+'：音源のアップロードに失敗しました。Supabaseのcast-public-mediaバケットがaudio/mpegを許可しているか確認してください。 '+error.message);
@@ -243,7 +302,7 @@
     if(!validDoc(value))return false;
     if((await flushDraft())===false)return false;
     const next=defaults(value);
-    try{await putRow('draft',next);draft=next;lastError='';return true}
+    try{await importAudioReferences(next);await putRow('draft',next);draft=next;lastError='';return true}
     catch(e){lastError=e.message||String(e);return false}
   }
   // Read-only inventory of our published media folder, not billing usage.
@@ -320,7 +379,7 @@
       initial:clone(seed),clone,
       getDraft:()=>draft,getPublished:()=>published,
       getLastError:()=>lastError,
-      saveDraft,publish,replaceDraft,scanResources,
+      saveDraft,publish,replaceDraft,scanResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,
       reset:async()=>replaceDraft(published),
       signOut,
       createId:(prefix)=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`
