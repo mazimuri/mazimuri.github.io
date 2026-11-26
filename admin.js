@@ -21,6 +21,7 @@ async function publish(){
  const yes=confirm('公開するキャラクターとWORLDを確認しましたか？\n\n公開用データをSupabaseに保存し、公開サイトから実際に読み取れることまで確認します。HTML/CSSの変更やGitHubへの自動アップロードは行いません。');
  if(!yes)return;
  const button=$('adminPublish');button.disabled=true;
+ const panel=$('adminContent');panel.inert=true;
  let verified=false;
  $('adminStatus').textContent='● PUBLISHING…';
  try{
@@ -34,7 +35,7 @@ async function publish(){
   $('saveStatus').style.color='#ff9b82';
   notify('公開の確認が必要：'+message);
  }
- finally{button.disabled=false;$('adminStatus').textContent=verified?'● PUBLIC VERIFIED':'● PUBLISH CHECK FAILED'}
+ finally{button.disabled=false;panel.inert=false;$('adminStatus').textContent=verified?'● PUBLIC VERIFIED':'● PUBLISH CHECK FAILED'}
 }
 function setSection(s){state.section=s;state.charId=null;state.worldId=null;render()}
 function headline(kicker,title,desc,right=''){return `<div class="admin-headline"><div><div class="admin-kicker">${esc(kicker)}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p></div>${right}</div>`}
@@ -396,9 +397,27 @@ window.addEventListener('resize',()=>{
  if(document.querySelector('#admin .v15-icon-studio'))syncRailCropAspect();
 },{passive:true});
 
+let resourceReport=null,resourceBusy=false,resourceError='';
+const resourceMB=n=>(n/1000000).toFixed(2)+' MB';
+function renderResources(){
+ const r=resourceReport,files=r?.files||[],known=files.filter(f=>f.size!==null),total=known.reduce((sum,f)=>sum+f.size,0),unused=files.filter(f=>!f.referenced),unknown=files.length-known.length;
+ const stats=[['PUBLIC MEDIA / 確認できた容量',resourceMB(total)],['FILES / ファイル数',String(files.length)],['UNREFERENCED / 未参照候補',String(unused.length)]];
+ return headline('07 / RESOURCE MANAGEMENT','RESOURCE MONITOR','現在の公開ストレージと、下書き・公開データの参照関係を調べます。読み取り専用。')+
+ '<div class="admin-card">'+btn('scan-resources',resourceBusy?'SCANNING…':'↻ SCAN STORAGE','accent',resourceBusy?'disabled':'')+'<p class="hint">対象：cast-public-media / published 直下。Supabaseの請求期間平均・他バケット・通信量とは別の数値です。ファイルは削除しません。</p>'+
+ (resourceError?'<p style="color:#ff9b82" role="alert">'+esc(resourceError)+'</p>':'')+'</div>'+
+ (r?'<div class="admin-metrics">'+stats.map(([label,value])=>'<div class="admin-metric"><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong></div>').join('')+'</div><div class="admin-card"><h3>DOCUMENT SIZE / 保存済みデータ</h3><p>下書き：'+resourceMB(r.draftBytes)+' ／ 公開：'+resourceMB(r.publishedBytes)+'</p><p class="hint">確認時点のJSONサイズ。Postgresの実ディスク使用量ではありません。最終スキャン：'+esc(new Date(r.scannedAt).toLocaleString('ja-JP'))+'</p>'+
+ (unknown?'<p>サイズ不明：'+unknown+'件（容量合計から除外）</p>':'')+
+ (r.missing.length?'<p style="color:#ff9b82">一覧で確認できなかった参照先：'+r.missing.length+'件。権限やファイルの存在を確認してください。</p>':'')+
+ '</div><div class="admin-card"><h3>UNREFERENCED CANDIDATES / 未参照候補</h3><p class="hint">保存済み・編集中の下書きと公開データとの照合結果。古いバックアップ、外部直リンク、取得漏れを除外できないため、削除可能とは断定しません。</p><p>候補容量：'+resourceMB(unused.reduce((sum,f)=>sum+(f.size||0),0))+'</p>'+
+ (unused.length?unused.map(f=>'<div class="multi-row"><strong style="overflow-wrap:anywhere">'+esc(f.path)+'</strong><p>'+esc(f.type||'形式不明')+' / '+(f.size===null?'容量不明':resourceMB(f.size))+'</p></div>').join(''):'<p>未参照候補はありません（取得できた範囲）。</p>')+'</div>':'<div class="admin-card"><p>SCAN STORAGEを押すと、実際のファイル一覧を取得します。</p></div>');
+}
+async function scanResourcesUI(){
+ if(resourceBusy)return;resourceBusy=true;resourceError='';resourceReport=null;render();
+ try{resourceReport=await api.scanResources()}catch(e){resourceError='スキャン失敗：'+(e.message||String(e))+'。Storageの一覧取得権限を確認してください。'}finally{resourceBusy=false;if(state.section==='resources')render()}
+}
 function render(){const panel=$('adminContent');const section=state.section;
  $$('[data-admin-section]').forEach(b=>b.classList.toggle('active',b.dataset.adminSection===section));$('adminPath').textContent=`/ CONTROL / ${section.toUpperCase()}${state.charId?' / CHARACTER FILE':''}${state.worldId?' / WORLD FILE':''}`;
- let html='';if(section==='dashboard')html=renderDashboard();if(section==='characters')html=state.charId&&selected()?charForm(selected()):renderCharacters();if(section==='worlds')html=state.worldId&&world()?worldForm(world()):renderWorlds();if(section==='tags')html=renderTags();if(section==='about')html=renderAboutEditor();if(section==='backup')html=renderBackup();if(section==='publish')html=renderPublish();panel.innerHTML=html;
+ let html='';if(section==='dashboard')html=renderDashboard();if(section==='characters')html=state.charId&&selected()?charForm(selected()):renderCharacters();if(section==='worlds')html=state.worldId&&world()?worldForm(world()):renderWorlds();if(section==='tags')html=renderTags();if(section==='about')html=renderAboutEditor();if(section==='backup')html=renderBackup();if(section==='publish')html=renderPublish();if(section==='resources')html=renderResources();panel.innerHTML=html;
  if(panel.querySelector('.v15-icon-studio'))requestAnimationFrame(syncRailCropAspect);
 }
 function openChar(id){state.section='characters';state.charId=id;state.tab='basic';render();$('adminContent').scrollIntoView({block:'start'})}
@@ -460,7 +479,7 @@ function updateRelation(action,index){const c=selected();if(!c)return;const list
 async function exportPublish(){if(!window.CAST_PUBLISH){notify('書き出しツールが読み込めませんでした');return}const chars=[...document.querySelectorAll('[data-pub-char]:checked')].map(x=>x.dataset.pubChar),worlds=[...document.querySelectorAll('[data-pub-world]:checked')].map(x=>x.dataset.pubWorld);const status=$('publishStatus');const button=document.querySelector('[data-action="export-publish"]');if(button)button.disabled=true;if(status)status.textContent='ZIPを作成中…';try{await new Promise(r=>setTimeout(r,35));const result=window.CAST_PUBLISH.pack(doc(),{charIds:chars,worldIds:worlds});const url=URL.createObjectURL(result.blob),a=document.createElement('a');a.href=url;a.download='cast-signal-github-publish.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);if(status)status.textContent=`完成！ キャラ${result.characters}人 / WORLD${result.worlds}件 / 画像${result.images}枚（${Math.round(result.size/1024)}KB）`;notify('公開用ZIPを書き出したよ！')}catch(e){if(status)status.textContent='書き出し失敗：'+e.message;notify('ZIPの作成に失敗しました')}finally{if(button)button.disabled=false}}
 function exportData(){const payload=JSON.stringify(doc(),null,2),file=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download='cast-signal-v57-backup.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);notify('JSONバックアップを書き出したよ')}
 async function importData(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.version!==5||!Array.isArray(data.characters)||!Array.isArray(data.worlds)||!Array.isArray(data.tags))throw Error('format');if(!confirm('このバックアップで現在の下書きを上書きする？'))return;if(!(await api.replaceDraft(data)))throw Error('storage');state.charId=null;state.worldId=null;state.section='dashboard';render();notify('バックアップを読み込んだよ')}catch(e){notify('読み込みに失敗。CAST / SIGNAL v5のJSONか容量を確認してね')}}
-function handleAction(el){const a=el.dataset.action,id=el.dataset.id,index=Number(el.dataset.index);if(a==='clear-sound-jacket'){const target=soundTarget(el.dataset.soundScope);if(target?.soundtrack&&confirm('専用ジャケットを外しますか？')){target.soundtrack={...target.soundtrack,jacket:''};persist();render()}return}if(a==='clear-sound'){const target=soundTarget(el.dataset.soundScope);if(target&&confirm('この楽曲の登録を外しますか？')){target.soundtrack={...(target.soundtrack||{}),src:'',filename:''};persist();render()}return}if(a==='preview-about'){preview();window.location.hash='about';return}if(a==='show-chars'){state.section='characters';state.charId=null;render()}
+function handleAction(el){const a=el.dataset.action,id=el.dataset.id,index=Number(el.dataset.index);if(a==='scan-resources'){scanResourcesUI();return}if(a==='clear-sound-jacket'){const target=soundTarget(el.dataset.soundScope);if(target?.soundtrack&&confirm('専用ジャケットを外しますか？')){target.soundtrack={...target.soundtrack,jacket:''};persist();render()}return}if(a==='clear-sound'){const target=soundTarget(el.dataset.soundScope);if(target&&confirm('この楽曲の登録を外しますか？')){target.soundtrack={...(target.soundtrack||{}),src:'',filename:''};persist();render()}return}if(a==='preview-about'){preview();window.location.hash='about';return}if(a==='show-chars'){state.section='characters';state.charId=null;render()}
  else if(a==='crop-mode'){state.cropMode=['choose','mobile','all'].includes(el.dataset.view)?el.dataset.view:'choose';render();}else if(a==='crop-enable-y'){const c=selected();setCrop(c,{...cropVals(c,cropMode()),zoom:Math.max(1.3,cropVals(c,cropMode()).zoom)});showCrop();persist('上下方向の調整幅を増やしたよ')}else if(a==='crop-reset')resetCrop();else if(a==='badge-reset'){selected()[badgeField()]=badgeIsMobile()?{right:8,top:66}:{...BADGE_DESKTOP_DEFAULT};refreshArtEditor();persist()}else if(a==='art-reset'){selected().artPosition={x:0,y:0,zoom:1};persist();render()}else if(a.startsWith('relation-'))updateRelation(a,index);else if(a.startsWith('tag-')){const c=selected();if(!c)return;if(a==='tag-apply'){const input=$('tagQuickInput');if(commitTags(c,input?.value))render();return}const ids=c.tagIds||[];if(a==='tag-left'&&index>0)[ids[index-1],ids[index]]=[ids[index],ids[index-1]];if(a==='tag-right'&&index<ids.length-1)[ids[index+1],ids[index]]=[ids[index],ids[index+1]];if(a==='tag-remove')ids.splice(index,1);persist();render()}else if(a==='show-publish')setSection('publish');else if(a==='export-publish')exportPublish();else if(a==='new-char')newChar();else if(a==='edit-char')openChar(id);else if(a==='edit-prev'||a==='edit-next'){if(id&&doc().characters.some(c=>c.id===id)){state.charId=id;render();document.querySelector('.admin-workspace')?.scrollTo({top:0,behavior:'instant'})}}else if(a==='move-up')moveChar(id,-1);else if(a==='move-down')moveChar(id,1);else if(a==='delete-char')deleteChar(id);
  else if(a==='world-image-view'){if(!world()||!['select','detail','mobile'].includes(el.dataset.view))return;state.worldImageView=el.dataset.view;const studio=document.getElementById('worldImageStudio');if(studio)studio.outerHTML=worldImageStudio(world());}
  else if(a==='world-image-expand'){worldImageToggleExpand();}
