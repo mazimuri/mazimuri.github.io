@@ -146,6 +146,31 @@
       if(publicDoc.worlds.some(x=>x.id===w.id))w.image=replaceStoredImage(w.image);
     }
   }
+
+  // Draft audio is private in the authenticated draft row. Publish only tracks
+  // in the filtered public document, using the existing media storage bucket.
+  async function publishSoundtracks(publicDoc,nextDraft){
+    const converted=new Map();
+    async function transform(m,label){
+      if(!m?.src||!String(m.src).startsWith('data:'))return;
+      const value=m.src;
+      if(converted.has(value)){m.src=converted.get(value);return}
+      if(!/^data:audio\/mpeg;base64,/i.test(value))throw Error(label+'：MP3形式のみ対応しています');
+      const blob=await (await fetch(value)).blob();
+      if(blob.size>5*1024*1024)throw Error(label+'：5MB以下のMP3にしてください');
+      const filename='published/audio-'+crypto.randomUUID()+'.mp3';
+      const {error}=await client.storage.from('cast-public-media').upload(filename,blob,{contentType:'audio/mpeg',cacheControl:'31536000',upsert:false});
+      if(error)throw Error(label+'：音源のアップロードに失敗しました。Supabaseのcast-public-mediaバケットがaudio/mpegを許可しているか確認してください。 '+error.message);
+      const {data}=client.storage.from('cast-public-media').getPublicUrl(filename);
+      converted.set(value,data.publicUrl);m.src=data.publicUrl;
+    }
+    await transform(publicDoc.site?.soundtrack,'MAIN THEME');
+    for(const c of publicDoc.characters)await transform(c.soundtrack,c.name+' SOUNDTRACK');
+    const replace=m=>{if(m&&converted.has(m.src))m.src=converted.get(m.src)};
+    replace(nextDraft.site?.soundtrack);
+    for(const c of nextDraft.characters)if(publicDoc.characters.some(x=>x.id===c.id))replace(c.soundtrack);
+  }
+
   // Verify that a logged-out visitor can read this exact published revision.
   // An authenticated upsert can succeed even when public SELECT is blocked.
   async function verifyPublicVisibility(revision){
@@ -176,6 +201,7 @@
       nextPublic.publicationId=crypto.randomUUID();
       nextPublic.publishedAt=now;
       await publishImages(nextPublic,next);
+      await publishSoundtracks(nextPublic,next);
       // One-row atomic public data commit.
       await putRow('published',nextPublic);
       committed=true;
