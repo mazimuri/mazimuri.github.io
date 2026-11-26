@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html data-cast-version="5.9.9" lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#141517" name="theme-color"/>
+<meta content="CAST / SIGNAL — 創作キャラクターを巡る、ゲームUI風アーカイブ。" name="description"/>
+<title>CAST / SIGNAL — AUDIO UI PREVIEW</title>
+<link href="style.css?v=5.9.13" rel="stylesheet"/>
+<link href="mobile.css?v=15.4.0" rel="stylesheet"/>
+<link rel="stylesheet" href="cast-side-rail.css?v=16.1.2">
+<link rel="stylesheet" href="cast-view-adjustments.css?v=15.6.2">
+<link rel="stylesheet" href="cast-rail-current.css?v=18.0.1">
+<link rel="stylesheet" href="cast-allcast-current.css?v=2.0.3">
+<link rel="stylesheet" href="cast-worlds-current.css?v=1.0.14">
+<link rel="stylesheet" href="cast-navigation-current.css?v=18.0.1">
+<link rel="stylesheet" href="cast-layout-current.css?v=1.0.0">
+<script defer="" src="cloud-config.js"></script>
+<script defer="" src="data.js?v=5.9.10"></script>
+<script defer="" src="app.js?v=15.2.11"></script>
+<script defer src="cast-side-rail.js?v=18.0.1"></script>
+<script defer src="cast-layout-current.js?v=1.0.0"></script>
+
+
+
+<meta content="website" property="og:type"/><meta content="CAST / SIGNAL" property="og:site_name"/><meta content="ja_JP" property="og:locale"/><meta content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ" property="og:title"/><meta content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。" property="og:description"/><meta content="https://mazimuri.github.io/" property="og:url"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" property="og:image"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" property="og:image:secure_url"/><meta content="image/jpeg" property="og:image:type"/><meta content="1200" property="og:image:width"/><meta content="630" property="og:image:height"/><meta content="CAST / SIGNAL — 4人のキャラクターが並ぶオリジナルキャラクターアーカイブのバナー" property="og:image:alt"/><meta content="summary_large_image" name="twitter:card"/><meta content="CAST / SIGNAL｜オリジナルキャラクターアーカイブ" name="twitter:title"/><meta content="mazimuriのオリジナルキャラクターと、彼らが生きる世界を収録。プロフィール、ギャラリー、出演作品を巡るゲーム風アーカイブ。" name="twitter:description"/><meta content="https://mazimuri.github.io/assets/ogp-main.jpg" name="twitter:image"/><meta name="robots" content="noindex,nofollow"><style>
+/* Isolated audio UI study; only loaded by this preview page. */
+#cs-mini,#cs-deck{--sound:#eaff55;box-sizing:border-box;font-family:var(--sans,Arial,sans-serif);color:#f1efe8}
+#cs-mini *,#cs-deck *{box-sizing:border-box}
+#cs-mini button,#cs-deck button,.cs-char-sound{cursor:pointer;font:inherit;color:inherit;background:none;border:0;padding:0;clip-path:none;transform:none}
+#cs-mini button:focus-visible,#cs-deck button:focus-visible,.cs-char-sound:focus-visible{outline:2px solid var(--sound,#eaff55);outline-offset:3px}
+#cs-mini{width:clamp(210px,17vw,345px);height:46px;flex:none;display:flex;align-items:center;gap:8px;position:relative;padding:5px 7px 5px 10px;background:#20282a;border:1px solid #506061;box-shadow:3px 3px #080b0c;min-width:0}
+#cs-mini::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--sound)}
+#cs-mini canvas{width:30px;height:30px;flex:none}
+#cs-mini .cs-now{flex:1;min-width:0}
+#cs-mini .cs-now small{display:block;color:var(--sound);font:800 8px/1.2 var(--mono,monospace);white-space:nowrap;letter-spacing:.04em}
+#cs-mini .cs-now strong{display:block;font:900 clamp(10px,.83vw,15px)/1.25 var(--sans,sans-serif);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px}
+#cs-mini .cs-ctl,#cs-deck .cs-ctl{display:grid;place-items:center;width:30px;height:30px;flex:none;color:#c7d0cf}
+#cs-mini .cs-ctl:hover,#cs-deck .cs-ctl:hover{color:var(--sound);background:#ffffff09}
+#cs-mini .cs-ctl svg,#cs-deck .cs-ctl svg,.cs-char-sound svg{width:17px;height:17px;fill:currentColor;display:block}
+#cs-mini #cs-mini-play{color:var(--sound)}
+#cs-mini #cs-expand{border-left:1px solid #4a5557;width:27px}
+#cs-mini #cs-expand[aria-expanded=true]{color:var(--sound)}
+#cs-mini-progress{position:absolute;bottom:0;left:0;height:2px;background:var(--sound);width:0;pointer-events:none}
+#cs-deck[hidden]{display:none!important}
+#cs-deck{position:fixed;z-index:210;top:var(--cs-top,76px);right:12px;width:min(434px,calc(100vw - 24px));max-height:calc(100dvh - var(--cs-top,76px) - 12px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--sound) #222c2f;padding:20px;background:linear-gradient(140deg,#212a2d,#141b1e 48%);border:1px solid #657575;border-top:3px solid var(--sound);box-shadow:8px 9px 0 #060a0c,0 12px 40px #0009;clip-path:polygon(0 0,100% 0,100% calc(100% - 13px),calc(100% - 13px) 100%,0 100%)}
+#cs-deck .cs-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#cs-deck .cs-micro{font:800 10px/1.3 var(--mono,monospace);letter-spacing:.06em;color:#aebbb9}
+#cs-deck .cs-online{color:var(--sound)}
+#cs-deck .cs-head{border-bottom:1px solid #485759;padding-bottom:10px}
+#cs-deck #cs-close{border:1px solid #687777;font:900 10px var(--mono,monospace);padding:7px 9px}
+#cs-deck h2{font:1000 clamp(32px,3.2vw,43px)/.96 var(--sans,Arial);letter-spacing:-.075em;margin:17px 0 7px;white-space:nowrap}
+#cs-deck h2 i{font-style:normal;color:transparent;-webkit-text-stroke:1px #f1efe8}
+#cs-deck .cs-caption{font-size:11px;color:#b3bfbb;margin-bottom:16px}
+#cs-deck .cs-card{position:relative;border:1px solid #64716f;padding:13px;background:linear-gradient(130deg,#293333,#171f22);box-shadow:4px 4px 0 #090d0e}
+#cs-deck .cs-card::before{content:"";position:absolute;top:-1px;left:0;width:35%;height:3px;background:var(--sound)}
+#cs-deck .cs-meta{display:flex;align-items:center;gap:14px}
+#cs-deck .cs-art{position:relative;flex:none;width:100px;height:100px;border:1px solid #657370;background:#111719;overflow:hidden;display:grid;place-items:center}
+#cs-deck .cs-art img,#cs-deck .cs-thumb img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+#cs-deck .cs-disc{width:76%;aspect-ratio:1;border:1px solid var(--sound);border-radius:50%;background:repeating-radial-gradient(circle,#1b2426 0 4px,#384342 5px,#1b2426 6px);display:grid;place-items:center}
+#cs-deck .cs-disc::after{content:"";width:28%;aspect-ratio:1;background:var(--sound);border:5px solid #141b1e;border-radius:50%}
+#cs-deck .cs-art b{position:absolute;bottom:0;left:0;background:var(--sound);color:#14191b;padding:4px 7px;font:900 10px var(--mono,monospace)}
+#cs-deck .cs-track-meta{flex:1;min-width:0}
+#cs-deck h3{font:1000 clamp(21px,2vw,29px)/1.03 var(--sans,Arial);letter-spacing:-.04em;margin:5px 0;color:#f1efe8;overflow-wrap:anywhere}
+#cs-deck .cs-by{font:900 11px var(--mono,monospace);color:var(--sound)}
+#cs-deck .cs-genre{font:10px/1.4 var(--mono,monospace);color:#b5c0bd;margin-top:6px}
+#cs-deck #cs-wave{display:flex;position:relative;align-items:center;gap:2px;height:46px;margin-top:13px;cursor:pointer;touch-action:pan-y}
+#cs-deck #cs-wave i{height:var(--h);background:#52615f;flex:1;min-width:1px;pointer-events:none}
+#cs-deck #cs-wave i.done{background:var(--sound)}
+#cs-deck #cs-cursor{position:absolute;top:0;height:100%;width:2px;background:#e8ede4;pointer-events:none}
+#cs-deck .cs-time{font:10px var(--mono,monospace);color:#b6c3bf;margin-top:4px}
+#cs-deck .cs-controls{margin:11px 0}
+#cs-deck .cs-controls .cs-ctl{border:1px solid #4b5859;width:39px;height:35px}
+#cs-deck .cs-controls #cs-play{width:64px;height:43px;background:var(--sound);color:#111719;border:0;clip-path:polygon(0 0,100% 0,100% 75%,84% 100%,0 100%)}
+#cs-deck #cs-repeat[aria-pressed=true]{color:var(--sound);border-color:var(--sound)}
+#cs-deck .cs-vol{border-top:1px solid #43514f;padding-top:10px}
+#cs-deck input{accent-color:var(--sound);min-width:0;flex:1;height:5px}
+#cs-deck #cs-list-head{margin:19px 0 8px}
+#cs-deck #cs-list{display:grid;gap:5px}
+#cs-deck .cs-track{display:grid;grid-template-columns:25px 36px minmax(0,1fr) 18px;align-items:center;gap:9px;text-align:left;min-height:51px;background:#20292b;border:1px solid #465354;padding:6px 9px}
+#cs-deck .cs-track[aria-current=true]{border-color:var(--c);box-shadow:inset 3px 0 var(--c);background:#2b3534}
+#cs-deck .cs-track:hover{border-color:var(--c)}
+#cs-deck .cs-num,#cs-deck .cs-status{font:900 12px var(--mono,monospace);color:var(--c)}
+#cs-deck .cs-thumb{width:36px;height:36px;overflow:hidden;background:#111719;border:1px solid #65736f;display:grid;place-items:center;color:var(--c)}
+#cs-deck .cs-track strong,#cs-deck .cs-track small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cs-deck .cs-track strong{font:900 13px/1.2 var(--sans,Arial)}
+#cs-deck .cs-track small{font:9px/1.3 var(--mono,monospace);color:#aebbb9;margin-top:3px}
+#cs-deck #cs-main-return{width:100%;border:1px solid #687673;color:#eaff55;font:900 11px var(--mono,monospace);padding:12px;margin-top:12px;background:#1c2728;letter-spacing:.05em}
+#cs-deck #cs-note{font:11px/1.6 var(--jpn,sans-serif);color:#a8b4b2;margin:10px 0 0}
+button.cs-char-sound{display:inline-grid;place-items:center;vertical-align:middle;position:relative;z-index:2;flex:none;width:1.42em;height:1.42em;min-width:28px;min-height:28px;max-width:44px;max-height:44px;margin-left:.48em;border:1.5px solid currentColor;border-radius:50%;background:transparent;color:inherit;line-height:1;box-shadow:none}
+button.cs-char-sound svg{width:57%;height:57%}
+button.cs-char-sound[data-state=missing]{opacity:.43;border-style:dashed;cursor:default}
+button.cs-char-sound[data-state=playing]{background:var(--cs-char,#eaff55);border-color:var(--cs-char,#eaff55);color:var(--cs-ink,#131719)}
+button.cs-char-sound[data-state=paused]{border-color:var(--cs-char,#eaff55);box-shadow:inset 0 0 0 1px var(--cs-char,#eaff55)}
+button.cs-char-sound:not(:disabled):hover{outline:2px solid currentColor;outline-offset:2px}
+.cs-char-eq{display:flex;align-items:center;justify-content:center;gap:2px;height:60%;width:60%}
+.cs-char-eq i{width:2px;min-height:3px;background:currentColor;display:block}
+#hero #mobileQuoteName .cs-char-sound{margin-left:2px;width:27px;height:27px;min-width:27px;min-height:27px}
+#dossier #dossierName .cs-char-sound{min-width:30px;min-height:30px}
+@media(min-width:801px) and (max-width:1250px){.topbar .head-right{gap:8px;padding-inline:10px}#cs-mini{width:190px;gap:5px}#cs-mini-mute{display:none!important}}
+@media(min-width:801px) and (max-width:960px){.topbar .brand{min-width:205px!important;padding-inline:10px!important}.topbar .brand-main{font-size:17px}.topbar .brand-mini{display:none}.topbar .topnav .nav-button{padding-inline:6px}#cs-mini{width:106px}#cs-mini .cs-now{display:none}}
+@media(max-width:800px){.topbar .brand{flex:1!important;min-width:0!important;max-width:none!important;padding-right:4px!important}.topbar .head-right{display:flex!important;order:1;padding:0 7px 0 0!important;gap:0!important;border:0!important;min-width:0}.topbar .head-right .motion-control{display:none!important}#cs-mini{width:110px;height:37px;gap:3px;padding:3px 4px 3px 7px}#cs-mini .cs-now,#cs-mini-mute{display:none!important}#cs-mini canvas{width:25px;height:26px}#cs-mini .cs-ctl{width:29px;height:29px}#cs-mini #cs-expand{width:24px}#cs-deck{top:auto;bottom:0;right:0;width:100%;max-height:calc(100dvh - 56px);padding:16px 17px max(16px,env(safe-area-inset-bottom));clip-path:none;box-shadow:0 -10px 40px #0008}#cs-deck h2{font-size:36px}#cs-deck .cs-art{width:88px;height:88px}}
+@media(max-width:365px){#cs-mini{width:83px}#cs-mini canvas{width:17px}#cs-mini .cs-ctl{width:25px}.topbar .brand-main{font-size:15px!important}.topbar .brand{gap:5px!important;padding-left:8px!important}}
+</style></head>
+<body>
+<div aria-hidden="true" class="scanline"></div>
+<header class="topbar">
+<a aria-label="キャラクター選択画面に戻る" class="brand" href="#char/orphe" id="brandHome">
+<span class="brand-symbol"><span></span><span></span><span></span><span></span></span>
+<span class="brand-main">CAST<span class="brand-slash">//</span>SIGNAL</span>
+<span class="brand-mini">YOUR ORIGINAL UNIVERSE</span>
+</a>
+<nav aria-label="ページナビゲーション" class="topnav">
+<button class="nav-button active" data-nav="select" id="nav-select"><span class="nav-number">01</span><span class="nav-text"><span class="nav-ja">キャラ選択</span><span class="nav-en">SELECT</span></span></button>
+<button class="nav-button" data-nav="index" id="nav-index"><span class="nav-number">02</span><span class="nav-text"><span class="nav-ja">キャラ一覧</span><span class="nav-en">ALL CAST</span></span></button>
+<button class="nav-button" data-nav="worlds" id="nav-worlds"><span class="nav-number">03</span><span class="nav-text"><span class="nav-ja">世界観</span><span class="nav-en">WORLDS</span></span></button>
+<button class="nav-button" data-nav="about" id="nav-about"><span class="nav-number">04</span><span class="nav-text"><span class="nav-ja">サイト案内</span><span class="nav-en">ABOUT</span></span></button>
+</nav>
+<div class="head-right">
+<div id="cs-mini" aria-label="音楽ミニプレイヤー">
+ <canvas id="cs-eq" width="90" height="80" aria-hidden="true"></canvas><div class="cs-now"><small id="cs-mini-status">AUDIO / STANDBY</small><strong id="cs-mini-title">SIGNAL JAM!</strong></div>
+ <button type="button" class="cs-ctl" id="cs-mini-play" aria-label="再生"></button><button type="button" class="cs-ctl" id="cs-mini-mute" aria-label="ミュート"></button><button type="button" class="cs-ctl" id="cs-expand" aria-label="SOUND ARCHIVEを開く" aria-controls="cs-deck" aria-expanded="false"></button><span id="cs-mini-progress"></span>
+</div>
+
+
+<button aria-pressed="true" class="motion-control" id="motionToggle" title="アニメーションのON/OFF">MOTION <b>ON</b></button>
+</div>
+</header>
+<button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-label="メニューを開く" aria-controls="mobileNav" aria-expanded="false"><span></span><span></span><span></span></button>
+<div id="mobileNavBackdrop" class="mobile-nav-backdrop" hidden></div>
+<nav id="mobileNav" class="mobile-nav-drawer" aria-label="スマホ用ナビゲーション" aria-hidden="true" inert>
+  <div class="mobile-nav-head"><span>CAST // SIGNAL <small>MENU / NAVIGATION</small></span><button type="button" id="mobileMenuClose" aria-label="メニューを閉じる">×</button></div>
+  <button type="button" class="mobile-nav-link" data-nav="select"><small>01 / SELECT</small><strong>キャラ選択</strong><b>↗</b></button>
+  <button type="button" class="mobile-nav-link" data-nav="index"><small>02 / ALL CAST</small><strong>キャラ一覧</strong><b>↗</b></button>
+  <button type="button" class="mobile-nav-link" data-nav="worlds"><small>03 / WORLDS</small><strong>世界観</strong><b>↗</b></button>
+  <button type="button" class="mobile-nav-link" data-nav="about"><small>04 / ABOUT</small><strong>サイト案内</strong><b>↗</b></button>
+  <button type="button" class="mobile-motion" id="mobileMotionToggle">MOTION <b>ON</b></button>
+  <div class="mobile-social" aria-label="作者のSNSリンク"><small>CREATOR / CONNECT</small><div class="mobile-social-links" id="mobileSocialLinks"></div></div>
+</nav>
+<main id="main">
+<section aria-label="キャラクター選択画面" class="hero theme-orphe is-entering" id="hero">
+<div aria-hidden="true" class="hero-surface"></div>
+<div aria-hidden="true" class="hero-dark-panel"></div>
+<div aria-hidden="true" class="hero-accent-slab"></div>
+<div aria-hidden="true" class="hero-pattern"></div>
+<div aria-hidden="true" class="hero-outline">S</div>
+<div aria-hidden="true" class="hero-angle"></div>
+<div aria-hidden="true" class="hero-circles"><span></span><span></span><span></span></div>
+<div class="v4-deep-insignia" aria-hidden="true"><span class="v4-engraved-title">S / SIGNAL</span><div class="v4-engraved-meta"><span>◀ 001 / CHARACTER DATABASE</span><span>VISUAL SYSTEM — PERSONAL ARCHIVE</span></div><b>///</b></div>
+<div class="v4-paper-insignia" aria-hidden="true"><span>ORIGINAL CAST INDEX</span><i></i><strong>CS / 01</strong><small>EST. 2026 —— INDEXED FILES</small></div>
+<div class="v4-color-ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><span>CHROMA SYSTEM / 04</span></div>
+<div class="v6-graphics" aria-hidden="true">
+<div class="v6-hatch"><span></span><span></span><span></span></div>
+<div class="v8-hatch v8-hatch-lower"><span></span><span></span><span></span></div>
+<div class="v8-hatch v8-hatch-accent"><span></span><span></span><span></span></div>
+<div class="v8-hatch v8-hatch-paper"><span></span><span></span><span></span></div>
+<div class="v6-trace v6-trace-one"></div><div class="v6-trace v6-trace-two"></div>
+<div class="v6-bracket"><span>01 / VISUAL SYSTEM</span><b>CAST SIGNAL — ARCHIVE</b></div>
+<div class="v6-brand-stamp"><span>SELECT / FILES</span><strong>CS—<em id="v6Total">04</em></strong><small>CHARACTER CHROMA INDEX</small></div>
+<div class="v6-paper-number" id="v6PaperNumber">04</div>
+<div class="v6-pictograms"><i></i><i></i><i></i><i></i><b>PERSONAL ARCHIVE</b></div>
+<div class="v6-side-index">CAST SELECTION SYSTEM · ORIGINAL FILES</div>
+<div class="v6-signal-mark">/// ACCESS / READY &nbsp; ◇ &nbsp; SIGNAL 06</div>
+</div>
+
+<div aria-hidden="true" class="hero-crosshair">＋</div>
+<div aria-hidden="true" class="hero-accent-rail"></div><div aria-hidden="true" class="hero-palette-stripe"><i></i><i></i><i></i><i></i></div>
+<div aria-hidden="true" class="hero-topline mono"><span>/// CAST DATABASE — SELECTION SYSTEM</span><span>VOL. 05.9   /   CAST NAVIGATION</span></div>
+<div aria-hidden="true" class="hero-ghostname" id="ghostName">ORPHE</div>
+<div aria-hidden="true" class="hero-no" id="heroNumber">01</div>
+<div aria-live="polite" class="hero-copy" id="heroCopy">
+<div class="intro-kicker"><span class="kicker-stroke"></span><span id="heroKicker">CHARACTER FILE   001 / 003</span><b class="hero-new" hidden="" id="heroNew">NEW</b><span class="kicker-tick">◆</span></div>
+<div class="title-stack"><h1 id="heroRoman">ORPHE</h1><div class="title-outline" id="heroRoman2">ROSIER</div></div>
+<p class="hero-jp" id="heroJapanese">オルフェ・ロジエ</p>
+<div class="hero-role" hidden=""><span class="role-index">TYPE /</span><span id="heroRole">世界的ファッションデザイナー</span></div>
+<div class="hero-core-data" hidden="" id="heroCoreData"><span hidden="" id="heroSpeciesWrap"><small>SPECIES</small><b id="heroSpecies"></b></span><span hidden="" id="heroGenderWrap"><small>GENDER</small><b id="heroGender"></b></span></div>
+<p class="hero-hook" hidden="" id="heroHook">その才能は、たった一人を美しく飾るために。</p>
+<section aria-label="キャラクター紹介" class="hero-intel" hidden="" id="heroIntel">
+<div class="hero-voice" hidden="" id="heroVoiceBlock"><p id="heroVoice"></p></div>
+<div class="hero-bio" hidden="" id="heroBioBlock"><p id="heroBio"></p><span class="intro-scroll-rail" id="introScrollRail" aria-hidden="true" hidden><i></i></span></div>
+</section>
+<button class="hero-cta" id="openDetail" type="button" aria-label="キャラクタープロフィールを開く"><span><small>ACCESS FILE</small><strong>CHARACTER PROFILE</strong></span><span aria-hidden="true" class="cta-arrow">↗</span></button>
+<div class="mini-meta mono" id="heroMeta">ZETA / ロジエ邸 <span>●</span> 001</div>
+</div>
+<div class="hero-art-wrap" id="artWrap"><img alt="オルフェ・ロジエのイラスト" class="hero-art" draggable="false" id="heroArt" src="assets/orphe.png"/></div>
+<section class="mobile-quote" id="mobileQuote" aria-label="キャラクターの名前と台詞">
+  <div class="mobile-quote-name" id="mobileQuoteName">オルフェ・ロジエ</div>
+  <p id="mobileQuoteText"></p>
+</section>
+<button type="button" class="mobile-profile" id="mobileOpenDetail" aria-label="キャラクタープロフィールを開く">
+  <span class="mobile-profile-label"><small>FILE / ACCESS</small><strong>PROFILE</strong></span><span class="mobile-profile-arrow" aria-hidden="true">↗</span>
+</button>
+<section class="mobile-intro" id="mobileIntroduction" aria-label="キャラクター人物紹介">
+  <div class="mobile-intro-head"><strong>INTRODUCTION</strong><small id="mobileIntroNumber">001 / CHARACTER FILE</small></div>
+  <div class="mobile-intro-reading"><p class="mobile-intro-text" id="mobileIntroText"></p><span class="mobile-intro-track" id="mobileIntroTrack" aria-hidden="true"><i id="mobileIntroThumb"></i></span></div>
+</section>
+<div aria-hidden="true" class="hero-art-stamp" id="artStamp"><span>FILE<br/><b>001</b></span></div>
+<div aria-hidden="true" class="side-dash mono" id="sideDash">IDENTITY VERIFIED / SIGNAL ACTIVE</div>
+<div aria-hidden="true" class="hero-bottomline mono"><span><i></i><i></i><i></i> SELECT YOUR CHARACTER</span><span>← / → KEY TO SWITCH</span></div>
+</section>
+<section class="mobile-picker" aria-label="スマホ用キャラクター切り替え">
+  <div class="mobile-picker-row">
+    <button type="button" id="mobilePrev" class="mobile-picker-arrow" aria-label="前のキャラクター">←</button>
+    <div class="mobile-portrait-viewport" id="mobilePortraitViewport" role="tablist" aria-label="登場キャラクター"><div class="mobile-portrait-track" id="mobilePortraitTrack"></div></div>
+    <button type="button" id="mobileNext" class="mobile-picker-arrow" aria-label="次のキャラクター">→</button>
+  </div>
+  <div class="mobile-picker-foot"><span id="mobilePickerCount">01 / 04</span><button type="button" id="mobileAllCast">▦ <span>ALL CAST</span> ↗</button></div>
+</section>
+
+<aside class="v5-rail" id="v5Rail" aria-label="キャラクター選択。奥から手前へ大きくなるセレクター">
+<div class="v5-control-head" role="group" aria-label="キャラクターのグループ移動"><div class="v5-batch-pair"><button type="button" class="v5-batch" id="v5BatchPrev" aria-label="4人前へ" title="4人前へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 17 L16 4 L28 17" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button><button type="button" class="v5-batch" id="v5BatchNext" aria-label="4人先へ" title="4人先へ"><svg viewBox="0 0 32 21" width="28" height="19" aria-hidden="true"><path d="M4 4 L16 17 L28 4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/></svg></button></div><span class="v5-batch-label">STEP ±01</span></div>
+<div class="v5-stack" id="v5Stack" role="tablist" aria-label="キャラクター切り替え。選択中のキャラクターは最下段に表示されます"></div>
+<div class="v5-readout" aria-live="polite"><span id="v5Count">01 / 04</span><span>WHEEL / ↑↓ · SHIFT ×04</span></div>
+</aside>
+<section aria-label="キャラクター切り替え" class="picker">
+<div class="picker-title"><span class="picker-label mono"><i></i> NOW BROWSING</span><strong>CHOOSE<br/><em>YOUR</em> CAST<span class="period">.</span></strong><span class="picker-count mono" id="pickerCount">03 SIGNALS DETECTED</span></div>
+<div class="picker-carousel" id="pickerCarousel">
+<button aria-label="前のキャラクターに切り替える" class="picker-edge picker-edge-left" hidden="" id="pickerEdgePrev" type="button"><span>‹</span></button>
+<div aria-label="登場キャラクター" class="picker-strip" id="pickerStrip" role="tablist"></div>
+<button aria-label="次のキャラクターに切り替える" class="picker-edge picker-edge-right" hidden="" id="pickerEdgeNext" type="button"><span>›</span></button>
+</div>
+<div class="picker-nav"><button aria-label="前のキャラ" id="prev" type="button">← <small>PREV</small></button><button aria-label="次のキャラ" id="next" type="button"><small>NEXT</small> →</button><button aria-label="キャラ一覧を開く" class="picker-index" id="openIndex" type="button">☷ <small>キャラ一覧</small></button></div>
+</section>
+<div class="preview-banner" hidden="" id="draftIndicator"><span>◉ DRAFT PREVIEW — このブラウザ内だけの下書き表示</span></div>
+<div class="footer-bar mono"><span>CAST / SIGNAL — ORIGINAL CHARACTER ARCHIVE</span><div class="footer-social" id="footerSocial"></div><span>© PERSONAL PROJECT / CONCEPT BUILD 05.4</span></div>
+</main>
+<div class="overlay-scrim" hidden="" id="scrim"></div>
+<aside aria-hidden="true" aria-label="キャラクター詳細" aria-modal="true" class="dossier" id="dossier" role="dialog">
+<div class="dossier-head"><span class="mono">/ / /   CHARACTER INTELLIGENCE   <b id="dossierNo">#001</b></span><button aria-label="プロフィールを閉じる" class="panel-close" data-close="" type="button">BACK TO SELECT   ×</button></div>
+<div class="dossier-scroll">
+<div class="dossier-feature"><img alt="" aria-hidden="true" class="dossier-mobile-art" id="dossierMobileArt" src="assets/orphe.png"/><span class="mono dossier-eyebrow" id="dossierEyebrow">PERSONNEL RECORD / ZETA</span><div class="dossier-super" id="dossierSuper">ORPHE</div><div class="dossier-name" id="dossierName">オルフェ・ロジエ</div><p class="dossier-lead" id="dossierLead">その才能は、たった一人を美しく飾るために。</p></div>
+<div aria-label="プロフィール項目" class="dossier-tabs" role="tablist">
+<button aria-selected="true" data-tab="profile" role="tab">01 <span>PROFILE</span></button>
+<button aria-selected="false" data-tab="story" role="tab">02 <span>STORY</span></button>
+<button aria-selected="false" data-tab="gallery" role="tab">03 <span>GALLERY</span></button>
+<button aria-selected="false" data-tab="links" role="tab">04 <span>LINKS</span></button>
+</div>
+<div aria-live="polite" class="dossier-tab-content" id="dossierContent"></div>
+</div>
+<div class="dossier-foot mono"><span id="dossierFooter">ARCHIVE / 001</span><span>© CAST / SIGNAL</span></div>
+</aside>
+<aside aria-hidden="true" aria-label="キャラクター一覧" aria-modal="true" class="directory" id="directory" role="dialog">
+<div class="directory-head"><span class="mono">// COMPLETE DATABASE</span><button class="panel-close" data-close="" type="button">CLOSE INDEX ×</button></div>
+<div class="directory-content cast-directory-content">
+<div class="directory-fixed" id="directoryFixed"><button class="mobile-filter-toggle" type="button" id="mobileFilterToggle" aria-expanded="false" aria-controls="mobileFilters">⌕ SEARCH / FILTER <span>＋</span></button>
+<div class="directory-heading-row"><div><span class="directory-kicker mono">02 / CHARACTER IDENTIFICATION SYSTEM</span><h2>ALL <i>CHARACTERS</i><span>.</span></h2><p class="directory-deck-subtitle">LOOK UP A SIGNAL — FIND A CHARACTER / ACCESS THEIR FILE</p></div><span class="directory-fixed-note mono">SCROLL THE CAST / KEEP YOUR FILTERS</span></div>
+<div class="directory-control" id="mobileFilters"><label class="directory-search-label"><span class="mono">SEARCH /</span><input autocomplete="off" id="search" placeholder="キャラ名・作品・タグで検索" type="search"/></label><div aria-label="キャラクター表示範囲" class="directory-filters" role="group"><button aria-pressed="true" data-filter="all" type="button">すべて</button><button aria-pressed="false" data-filter="playable" type="button">zetaで遊べる</button><button aria-pressed="false" data-filter="showcase" title="zetaで遊ぶリンクがないキャラクター" type="button">紹介のみ</button></div></div>
+<div class="directory-subtools"><div aria-live="polite" class="directory-count mono" id="directoryCount" role="status">03 FILES MATCH</div><div aria-label="一覧の表示切り替え" class="directory-view" role="group"><span class="mono">VIEW MODE /</span><button aria-pressed="true" data-directory-view="gallery" type="button">▦ GALLERY</button><button aria-pressed="false" data-directory-view="detail" type="button">≡ DETAIL</button></div></div>
+</div><div class="allcast-roster-shell is-gallery" id="allcastRosterShell">
+<div class="allcast-deck-top mono" aria-hidden="true"><span><b>////</b> CAST FILE DECK / ACCESS RECORDS</span><span id="allcastDeckTotal">CHARACTER FILES</span><span><i class="deck-led"></i>SYSTEM READY</span></div>
+<div aria-label="検索結果・キャラクター一覧" class="directory-items directory-gallery" id="directoryItems" role="region" tabindex="0"></div>
+<div class="allcast-roster-footer" id="allcastRosterFooter" hidden aria-hidden="true">
+<span>SCROLL FOR MORE FILES ▼</span>
+<span class="allcast-scroll-track"><span class="allcast-scroll-progress" id="allcastScrollProgress"></span></span>
+<span class="allcast-scroll-readout" id="allcastScrollReadout">SCROLL 00%</span>
+</div>
+</div>
+</div>
+</aside>
+<aside aria-hidden="true" aria-label="世界観から探す" aria-modal="true" class="directory worlds-panel" id="worldsPanel" role="dialog">
+<div class="directory-head"><span class="mono">// WORLD DATABASE</span><button class="panel-close" data-close="" type="button">CLOSE ×</button></div>
+<div class="directory-content"><span class="directory-kicker mono">INTERCONNECTED STORIES</span><h2>WORLD <i>SELECT</i><span>.</span></h2><p class="worlds-intro">同じ世界に暮らすキャラクターを、作品から探す。</p><div class="world-cards" id="worldCards"></div></div>
+</aside>
+<aside aria-hidden="true" aria-label="WORLD詳細" aria-modal="true" class="directory world-detail-panel" id="worldDetailPanel" role="dialog">
+<div class="directory-head"><span class="mono">// WORLD INTELLIGENCE / STORY NETWORK</span><button class="panel-close" id="worldDetailBack" type="button">BACK TO WORLDS ×</button></div>
+<div class="world-detail-content" id="worldDetailContent"></div>
+</aside>
+<aside aria-hidden="true" aria-label="このサイトについて" aria-modal="true" class="directory about-panel" id="aboutPanel" role="dialog">
+<div class="directory-head"><span class="mono">// ABOUT THE ARCHIVE</span><button class="panel-close" data-close="" type="button">CLOSE ×</button></div>
+<div class="directory-content about-content">
+<div class="about-topline mono"><span>INFORMATION FILE / 004</span><span>EST. YOUR UNIVERSE</span></div>
+<div class="about-heading"><div><span class="directory-kicker mono">THE WORLD BEHIND THE CHARACTERS</span><h2>ABOUT<span class="about-dot">.</span></h2><p class="about-subtitle">WELCOME TO THE SIGNAL.</p></div><div aria-hidden="true" class="about-deco"><b>CS</b><span>/// ARCHIVE INFORMATION</span></div></div>
+<div class="about-introduction"><span class="about-index mono">01 / THE ARCHIVE</span><h3 id="aboutTitle">キャラクターと、物語の保管庫。</h3><p id="aboutIntro"></p></div>
+<section class="about-signal" aria-label="作品の投稿共有用ハッシュタグ">
+  <div class="about-signal-copy">
+    <div class="about-signal-label mono"><span class="about-signal-live" aria-hidden="true"></span>OPEN CHANNEL / SHARE YOUR SIGNAL</div>
+    <div class="about-signal-main"><strong id="aboutSignalTag">#まじむり受信中</strong><p>ファンアート、zetaのトークスクショ、感想など、mazimuriの作品にまつわる投稿を受信中！</p></div>
+  </div>
+  <div class="about-signal-actions"><button type="button" id="copySignalTag" aria-label="共通投稿タグをコピー">⊞ COPY</button><a id="aboutSignalSearch" href="https://x.com/search?q=%23%E3%81%BE%E3%81%98%E3%82%80%E3%82%8A%E5%8F%97%E4%BF%A1%E4%B8%AD&amp;f=live" target="_blank" rel="noopener noreferrer" aria-label="Xで共通投稿タグを検索">VIEW ON X ↗</a></div>
+</section>
+<div class="about-guides"><article class="about-guide"><span class="mono">02 / IMAGE POLICY</span><h3>画像について<span> ↗</span></h3><p id="aboutImages"></p></article><article class="about-guide"><span class="mono">03 / FAN WORKS</span><h3>二次創作・ファンアート<span> ↗</span></h3><p id="aboutFans"></p></article><article class="about-guide"><span class="mono">04 / TALK SCREENSHOTS</span><h3>zetaのトークスクショ<span> ↗</span></h3><p id="aboutScreens"></p><a class="about-terms" href="https://zeta-ai.io/ja/policy/terms" rel="noopener noreferrer" target="_blank">zetaの利用規約を確認する ↗</a></article></div>
+<div class="about-connect"><div><span class="mono">05 / CREATOR CONNECTION</span><h3>FIND ME <i>ONLINE.</i></h3><p>作品の感想やファンアートも大歓迎。気軽に見せてね！</p></div><div class="about-connect-links" id="aboutLinks"></div></div>
+<div class="about-end mono">THANK YOU FOR VISITING / CAST SIGNAL <span>◆ ◆ ◆</span></div>
+</div>
+</aside>
+<div aria-hidden="true" class="connection-tooltip" hidden="" id="connectionTooltip" role="tooltip">
+<span class="connection-tooltip-kicker">CHARACTER CONNECTION ↗</span>
+<strong id="connectionTooltipName"></strong>
+<span id="connectionTooltipRelation"></span>
+<small hidden="" id="connectionTooltipDetail"></small>
+</div>
+<!-- Fullscreen image viewer. Keeps original image proportions, supports arrows and Esc. -->
+<div aria-hidden="true" aria-label="ギャラリー画像を拡大表示" aria-modal="true" class="gallery-lightbox" hidden="" id="galleryLightbox" role="dialog">
+<div class="lightbox-top"><div class="lightbox-brand mono"><span>◉</span> VISUAL ARCHIVE <small>/ IMAGE VIEWER</small></div><button aria-label="画像ビューアを閉じる" class="lightbox-close" id="lightboxClose" type="button">CLOSE <span>×</span></button></div>
+<div class="lightbox-stage"><button aria-label="前の画像" class="lightbox-prev" id="lightboxPrev" type="button">‹</button><img alt="" draggable="false" id="lightboxImage" src=""/><button aria-label="次の画像" class="lightbox-next" id="lightboxNext" type="button">›</button></div>
+<div class="lightbox-foot mono"><span id="lightboxCaption">ARTWORK</span><span id="lightboxCount">01 / 01</span></div>
+</div>
+<!-- Editable offline proof of concept. No administrator authentication or real online publishing. -->
+
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+
+<aside id="cs-deck" hidden aria-label="SOUND ARCHIVE">
+ <div class="cs-row cs-head"><span class="cs-micro cs-online" id="cs-system">◆ AUDIO SYSTEM / STANDBY</span><button type="button" id="cs-close">CLOSE ×</button></div>
+ <h2>SOUND <i>ARCHIVE</i><span style="color:var(--sound)">.</span></h2><div class="cs-caption">CHARACTER SOUNDTRACK / AUDIO MODULE — UI STUDY</div>
+ <section class="cs-card"><div class="cs-meta"><div class="cs-art" id="cs-art"></div><div class="cs-track-meta"><span class="cs-micro cs-online" id="cs-selected"></span><h3 id="cs-title"></h3><div class="cs-by" id="cs-by"></div><div class="cs-genre" id="cs-genre"></div></div></div>
+ <div id="cs-wave" role="slider" tabindex="0" aria-label="再生位置" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div><div class="cs-row cs-time"><span id="cs-elapsed">00:00</span><span id="cs-duration">00:12</span></div>
+ <div class="cs-row cs-controls"><button type="button" class="cs-ctl" id="cs-repeat" aria-label="1曲リピート" aria-pressed="true">↻¹</button><button type="button" class="cs-ctl" id="cs-prev" aria-label="前の曲"></button><button type="button" class="cs-ctl" id="cs-play" aria-label="再生"></button><button type="button" class="cs-ctl" id="cs-next" aria-label="次の曲"></button><button type="button" class="cs-ctl" id="cs-mute" aria-label="ミュート"></button></div>
+ <div class="cs-row cs-vol"><label for="cs-volume" class="cs-micro">VOLUME</label><input id="cs-volume" type="range" min="0" max="100" value="35"><output id="cs-volume-label" class="cs-micro">35%</output></div></section>
+ <div class="cs-row cs-micro" id="cs-list-head"><strong>TRACK DATABASE</strong><span id="cs-count"></span></div><div id="cs-list"></div>
+ <button type="button" id="cs-main-return">◈ RETURN TO MAIN THEME</button><p id="cs-note">PREVIEW ONLY / 仮音源でUIを確認できます。公開サイト本体とキャラクターデータは変更していません。</p>
+</aside><audio id="cs-audio" preload="none" loop></audio><script>
+(() => {
+'use strict';
+const $=id=>document.getElementById(id), audio=$('cs-audio'), mini=$('cs-mini'), deck=$('cs-deck');
+const glyph={play:'<path d="M7 3v18l15-9z"/>',pause:'<path d="M5 4h5v16H5zm9 0h5v16h-5z"/>',prev:'<path d="M5 4h3v16H5zm14 0L8 12l11 8z"/>',next:'<path d="M16 4h3v16h-3zM5 4l11 8-11 8z"/>',volume:'<path d="M3 9h4l5-5v16l-5-5H3z M15 7a7 7 0 0 1 0 10l-1-2a4 4 0 0 0 0-6z M18 4a11 11 0 0 1 0 16l-1-2a9 9 0 0 0 0-12z"/>',mute:'<path d="M3 9h4l5-5v16l-5-5H3z M15 8l3 3 3-3 1 1-3 3 3 3-1 1-3-3-3 3-1-1 3-3-3-3z"/>',down:'<path d="M3 8l9 9 9-9-2-2-7 7-7-7z"/>',up:'<path d="M3 16l9-9 9 9-2 2-7-7-7 7z"/>',missing:'<path d="M10 5v10a4 4 0 1 1-2-3.5V4l11-2v11a4 4 0 1 1-2-3.5V6z" opacity=".5"/><path d="M3 3l18 18-1.5 1.5L1.5 4.5z"/>'};
+const svg=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+glyph[k]+'</svg>';
+const tracks=[{roman:'',title:'SIGNAL JAM!',by:'MAIN THEME',genre:'ELECTRO SWING',color:'#eaff55',bpm:132},{roman:'ORPHE',title:'VELVET PARADE',by:'ORPHE',genre:'ORCHESTRAL SWING',color:'#e85170',bpm:126},{roman:'PISTA',title:'PAWS & CHAOS',by:'PISTA',genre:'CARTOON JAZZ',color:'#b5d94e',bpm:150},{roman:'PLAYMATE',title:'DEADLY PLAYDATE',by:'PLAYMATE',genre:'DARK CABARET',color:'#ff793b',bpm:146},{roman:'GEKI',title:'SILK & VENOM',by:'GEKI KYODO',genre:'JAZZ FUNK',color:'#dcaa4c',bpm:112},{roman:'GALAN',title:'BONE BEAT',by:'GALAN',genre:'DARK ELECTRO',color:'#ae82f5',bpm:96}];
+const norm=s=>String(s||'').normalize('NFKC').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const names=['','オルフェ・ロジエ','ピスタ','プレイメイト','経堂 戟','ガラン'];
+const normalizedJP=s=>String(s||'').normalize('NFKC').replace(/[\s・]/g,'');
+let current=0,ctx,analyser,source;const cache=new Map();const freq=new Uint8Array(128);
+function setIcon(id,k){$(id).innerHTML=svg(k)}
+function safeColor(c){return /^#[0-9a-f]{6}$/i.test(c||'')?c:null}
+function contrast(hex){const h=hex.slice(1);return (parseInt(h.slice(0,2),16)*.299+parseInt(h.slice(2,4),16)*.587+parseInt(h.slice(4),16)*.114)>145?'#111719':'#fff'}
+function getPeople(){return window.CAST_DATA?.getPublished?.()?.characters||[]}
+function hydrateTracks(){const p=getPeople();tracks.forEach((t,i)=>{if(!i)return;const c=p.find(c=>norm(c.roman)===t.roman||normalizedJP(c.name)===normalizedJP(names[i])||(i===4&&String(c.name).includes('戟')));if(c){t.art=c.icon||c.artwork||'';t.jp=c.name;t.color=safeColor(c.colors?.accent)||t.color;t.roman=norm(c.roman)||t.roman}})}
+// Original, short synthesized test phrases. No external or commercial music.
+function demo(i){if(cache.has(i))return cache.get(i);const sr=16000,beat=60/tracks[i].bpm,seconds=beat*24,N=Math.round(seconds*sr),b=new ArrayBuffer(44+N*2),v=new DataView(b);function str(o,s){for(let j=0;j<s.length;j++)v.setUint8(o+j,s.charCodeAt(j))}str(0,'RIFF');v.setUint32(4,36+N*2,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,N*2,true);const notes=[0,3,7,10,7,3,5,7],roots=[48,53,55,48,46,53],f=n=>440*Math.pow(2,(n-69)/12),tau=2*Math.PI;for(let k=0;k<N;k++){let t=k/sr,q=t/beat,bi=Math.floor(q),u=(q-bi)*beat,h=Math.floor(q*2),z=(q*2-h)*beat/2,root=roots[Math.floor(bi/4)%roots.length]+i%3,low=f(root-12+(bi%4===2?7:0)),high=f(root+12+notes[(h+i)%notes.length]),env=Math.min(1,z*90)*Math.exp(-z*(i===5?6:12)),bass=Math.sin(tau*low*u)*Math.exp(-u*4)*Math.min(1,u*80),lead=(Math.sin(tau*high*z)+.24*Math.sin(tau*high*2*z))*env;let kick=Math.sin(tau*(65*u+30*(1-Math.exp(-u*32))/32))*Math.exp(-u*28),hat=Math.sin(k*2.397)*Math.sin(k*.937)*Math.exp(-z*65);let a=(bass*.29+lead*.19+kick*.22+hat*.045)*Math.min(1,t*70,(seconds-t)*70);v.setInt16(44+k*2,Math.max(-32767,Math.min(32767,a*28000)),true)}const url=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));cache.set(i,url);return url}
+function ensureAudio(){if(!ctx){try{ctx=new (window.AudioContext||window.webkitAudioContext)();analyser=ctx.createAnalyser();analyser.fftSize=256;analyser.smoothingTimeConstant=.75;source=ctx.createMediaElementSource(audio);source.connect(analyser);analyser.connect(ctx.destination)}catch(e){console.warn('Audio visualizer unavailable',e)}}if(ctx?.state==='suspended')ctx.resume().catch(()=>{})}
+function start(){ensureAudio();if(!audio.getAttribute('src')){audio.src=demo(current);audio.load()}audio.play().catch(()=>{$('cs-note').textContent='再生ボタンをもう一度押してください。 / UI STUDY・仮音源'});}
+function toggle(){if(audio.paused)start();else audio.pause()}
+function select(i){if(i===current){start();return}current=i;audio.pause();audio.src=demo(i);audio.load();render();start()}
+function number(i){return String(i).padStart(2,'0')}
+function format(s){s=Math.max(0,Math.floor(s||0));return number(Math.floor(s/60))+':'+number(s%60)}
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function artFor(t,cls){const a=el('span',cls);if(t.art){const img=el('img');img.src=t.art;img.alt='';a.append(img)}else if(cls==='cs-art-content')a.append(el('span','cs-disc'));else a.textContent='◉';return a}
+function render(){const t=tracks[current];mini.style.setProperty('--sound',t.color);deck.style.setProperty('--sound',t.color);$('cs-mini-title').textContent=t.title;$('cs-title').textContent=t.title;$('cs-by').textContent=t.by;$('cs-genre').textContent=t.genre+' / DEMO';const art=$('cs-art');art.replaceChildren();if(t.art){const im=el('img');im.src=t.art;im.alt='';art.append(im)}else art.append(el('span','cs-disc'));art.append(el('b','','CS / '+number(current)));$('cs-count').textContent=number(tracks.length)+' TRACKS';const list=$('cs-list');list.replaceChildren();tracks.forEach((x,i)=>{const b=el('button','cs-track');b.type='button';b.style.setProperty('--c',x.color);b.setAttribute('aria-current',String(i===current));const info=el('span');info.append(el('strong','',x.title),el('small','',x.by+' / '+x.genre));b.append(el('span','cs-num',number(i)),artFor(x,'cs-thumb'),info,el('span','cs-status',i===current?'▮▮▮':'▶'));b.onclick=()=>select(i);list.append(b)});const w=$('cs-wave');w.replaceChildren();for(let j=0;j<82;j++){const bar=el('i');bar.style.setProperty('--h',(12+Math.abs(Math.sin(j*2.17+current)*Math.cos(j*.16))*85)+'%');w.append(bar)}const cursor=el('span');cursor.id='cs-cursor';w.append(cursor);update();state()}
+function trackFor(n){const jp=normalizedJP([...n.childNodes].filter(x=>x.nodeType===3).map(x=>x.textContent).join(''));const index=tracks.findIndex((t,i)=>i>0&&(jp===normalizedJP(t.jp||names[i])||(i===4&&jp.includes('戟'))));return index<1?null:index}
+function renderButtons(){for(const id of ['heroJapanese','mobileQuoteName','dossierName']){const n=$(id);if(!n)continue;let b=n.querySelector('.cs-char-sound');if(!b){b=el('button','cs-char-sound');b.type='button';b.addEventListener('click',e=>{e.stopPropagation();const i=trackFor(n);if(i==null)return;if(i===current){if(audio.muted||audio.volume===0){audio.muted=false;if(audio.volume===0){audio.volume=.35;$('cs-volume').value=35}start()}else toggle()}else select(i)});b.addEventListener('dblclick',e=>e.stopPropagation());n.append(b)}const i=trackFor(n),selected=i===current,playing=selected&&!audio.paused,audible=playing&&!audio.muted&&audio.volume>0,st=i==null?'missing':audible?'playing':selected?'paused':'ready';const label=i==null?'SOUNDTRACK / NOT SET':audible?'SOUNDTRACK / PLAYING':playing?'SOUNDTRACK / MUTED':selected?'SOUNDTRACK / PAUSED':'SOUNDTRACK / READY';b.disabled=i==null;b.title=label;b.setAttribute('aria-label',label);b.setAttribute('aria-pressed',String(audible));if(i!=null){b.style.setProperty('--cs-char',tracks[i].color);b.style.setProperty('--cs-ink',contrast(tracks[i].color))}const icon=st==='missing'?'missing':audible?'eq':playing?'mute':'play';if(b.dataset.icon!==icon){b.dataset.icon=icon;b.innerHTML=icon==='eq'?'<span class="cs-char-eq"><i></i><i></i><i></i><i></i><i></i></span>':svg(icon)}b.dataset.state=st;}}
+function state(){const playing=!audio.paused,muted=audio.muted||audio.volume===0;for(const id of ['cs-play','cs-mini-play']){setIcon(id,playing?'pause':'play');$(id).setAttribute('aria-label',playing?'一時停止':'再生')}for(const id of ['cs-mute','cs-mini-mute']){setIcon(id,muted?'mute':'volume');$(id).setAttribute('aria-pressed',String(muted))}$('cs-system').textContent='◆ AUDIO SYSTEM / '+(playing?'ONLINE':'STANDBY');$('cs-mini-status').textContent=(playing?(muted?'AUDIO / MUTED':'NOW PLAYING'):'AUDIO / STANDBY')+' / '+number(current);$('cs-selected').textContent=(playing?'NOW PLAYING':'SELECTED TRACK')+' / '+number(current);$('cs-volume-label').textContent=Math.round(audio.volume*100)+'%';$('cs-volume').value=Math.round(audio.volume*100);renderButtons()}
+function update(){const d=Number.isFinite(audio.duration)?audio.duration:60/tracks[current].bpm*24,p=Math.min(1,audio.currentTime/d||0);$('cs-elapsed').textContent=format(audio.currentTime);$('cs-duration').textContent=format(d);$('cs-mini-progress').style.width=p*100+'%';$('cs-wave').setAttribute('aria-valuenow',Math.round(p*100));$('cs-wave').querySelectorAll('i').forEach((b,j)=>b.classList.toggle('done',j/82<p));if($('cs-cursor'))$('cs-cursor').style.left=p*100+'%'}
+function place(){const r=mini.getBoundingClientRect(),header=document.querySelector('.topbar').getBoundingClientRect();deck.style.setProperty('--cs-top',Math.max(0,header.bottom)+'px');if(innerWidth>800)deck.style.right=Math.max(10,innerWidth-r.right)+'px';else deck.style.right='0'}
+function open(v){deck.hidden=!v;$('cs-expand').setAttribute('aria-expanded',String(v));setIcon('cs-expand',v?'up':'down');if(v)place()}
+function mute(){audio.muted=!audio.muted;if(!audio.muted&&audio.volume===0)audio.volume=.35;state()}
+$('cs-expand').onclick=()=>open(deck.hidden);$('cs-close').onclick=()=>{open(false);$('cs-expand').focus()};$('cs-play').onclick=$('cs-mini-play').onclick=toggle;$('cs-mute').onclick=$('cs-mini-mute').onclick=mute;$('cs-main-return').onclick=()=>select(0);$('cs-prev').onclick=()=>select((current+tracks.length-1)%tracks.length);$('cs-next').onclick=()=>select((current+1)%tracks.length);setIcon('cs-prev','prev');setIcon('cs-next','next');$('cs-repeat').onclick=()=>{audio.loop=!audio.loop;$('cs-repeat').setAttribute('aria-pressed',String(audio.loop))};$('cs-volume').oninput=e=>{audio.volume=Number(e.target.value)/100;audio.muted=false;try{localStorage.setItem('cs-audio-study-volume',e.target.value)}catch{}state()};try{const n=localStorage.getItem('cs-audio-study-volume');audio.volume=n==null?.35:Math.max(0,Math.min(1,Number(n)/100))}catch{audio.volume=.35}
+$('cs-wave').onclick=e=>{if(Number.isFinite(audio.duration)){const r=e.currentTarget.getBoundingClientRect();audio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*audio.duration;update()}};$('cs-wave').onkeydown=e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();e.stopPropagation();if(Number.isFinite(audio.duration))audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+(e.key==='ArrowLeft'?-2:2)))}};['play','pause','volumechange','ended'].forEach(n=>audio.addEventListener(n,state));['timeupdate','loadedmetadata','seeked'].forEach(n=>audio.addEventListener(n,update));window.addEventListener('resize',place);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!deck.hidden){e.stopImmediatePropagation();open(false);$('cs-expand').focus()}},true);document.addEventListener('pointerdown',e=>{if(!deck.hidden&&!deck.contains(e.target)&&!mini.contains(e.target))open(false)},true);
+const g=$('cs-eq').getContext('2d');function frame(){const playing=!audio.paused&&!audio.muted&&audio.volume>0;if(playing&&analyser)analyser.getByteFrequencyData(freq);g.clearRect(0,0,90,80);g.fillStyle=tracks[current].color;g.globalAlpha=playing?1:.45;for(let i=0;i<9;i++){const h=6+(playing&&analyser?freq[Math.floor(2+i*i*.65)]/255*67:0);g.fillRect(i*10+2,(80-h)/2,6,h)}document.querySelectorAll('.cs-char-eq i').forEach((b,i)=>b.style.height=(4+(playing&&analyser?freq[3+i*i*2]/255*14:0))+'px');requestAnimationFrame(frame)}
+function setup(){hydrateTracks();render();open(false);frame();for(const id of ['heroJapanese','mobileQuoteName','dossierName']){const n=$(id);if(n)new MutationObserver(()=>{if(!n.querySelector('.cs-char-sound'))renderButtons()}).observe(n,{childList:true})}window.CAST_DATA_READY?.then(()=>{hydrateTracks();render()})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
+})();
+</script></body>
+</html>
