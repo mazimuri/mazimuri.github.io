@@ -361,6 +361,12 @@
     if(error||!data?.signedUrl)throw Error(error?.message||'プレビューURLを取得できません');
     return data.signedUrl;
   }
+  async function downloadResource(bucket,path){
+    if(!resourceBuckets.includes(bucket)||typeof path!=='string'||!path.startsWith(resourcePrefix)||path.includes('..'))throw Error('対象外のファイルです');
+    const {data,error}=await client.storage.from(bucket).download(path);
+    if(error||!(data instanceof Blob))throw Error(error?.message||'ファイルを取得できません');
+    return data;
+  }
   // No auto-delete. Re-read both documents and both listings; abort the entire selection if any is unsafe.
   async function deleteResources(ids){
     if((await flushDraft())===false)throw Error('下書きの保存が完了していないため削除を中止しました');
@@ -422,7 +428,7 @@
       getDraft:()=>draft,getPublished:()=>published,
       getLastError:()=>lastError,
       getSignalReport:async()=>{const {data,error}=await client.rpc('cast_signal_report');if(error)throw Error(error.message);if(!Array.isArray(data))throw Error('集計データの形式が不正です');return data},
-      saveDraft,publish,replaceDraft,scanResources,resourcePreview,deleteResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,
+      saveDraft,publish,replaceDraft,scanResources,resourcePreview,downloadResource,deleteResources,storePrivateAudio,audioPreviewURL,previewDraft,exportDraft,isPrivateAudio,
       reset:async()=>replaceDraft(published),
       signOut,
       createId:(prefix)=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`
