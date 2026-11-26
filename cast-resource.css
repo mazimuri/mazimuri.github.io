@@ -92,3 +92,5 @@
 #rm-root .rm-review-list{max-height:170px;overflow:auto;padding:8px;border:1px solid #49555b;margin:12px 0;font:11px var(--mono)}
 #rm-root .rm-review-list div,#rm-root .rm-path{padding:4px;overflow-wrap:anywhere}
 @media(max-width:740px){#rm-root .rm-head{align-items:start}#rm-root .rm-head button{padding:7px;font-size:11px}#rm-root .rm-overview{padding:13px}#rm-root .rm-num{font-size:29px}#rm-root .rm-buckets{gap:6px}#rm-root .rm-bucket{padding:11px 9px;display:block}#rm-root .rm-label{font-size:11px}#rm-root .rm-bucket strong{font-size:23px}#rm-root :is(.rm-section-head,.rm-filters,.rm-selectline,.rm-grid,.rm-pagination,.rm-bar){padding-left:10px;padding-right:10px}#rm-root .rm-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}#rm-root .rm-search{max-width:none;width:100%}#rm-root .list .rm-body{display:block}#rm-root .rm-bar,#rm-root .rm-meta{flex-wrap:wrap}}
+
+#rm-root .rm-dialogactions{flex-wrap:wrap}#rm-root #rm-download{margin-right:auto;border-color:#71817e;color:#eaff55}#rm-root #rm-download:disabled{opacity:.5;cursor:wait}
