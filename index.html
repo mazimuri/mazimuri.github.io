@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="cast-layout-current.css?v=1.0.0">
 <script defer="" src="cloud-config.js"></script>
 <script defer="" src="data.js?v=5.9.11"></script>
-<script defer="" src="app.js?v=15.3.2"></script>
+<script defer="" src="app.js?v=15.3.3"></script>
 <script defer src="cast-analytics.js?v=1.0.0"></script>
 <script defer src="cast-side-rail.js?v=18.0.1"></script>
 <script defer src="cast-layout-current.js?v=1.0.0"></script>
@@ -108,7 +108,7 @@
 <button class="hero-cta" id="openDetail" type="button" aria-label="キャラクタープロフィールを開く"><span><small>ACCESS FILE</small><strong>CHARACTER PROFILE</strong></span><span aria-hidden="true" class="cta-arrow">↗</span></button>
 <div class="mini-meta mono" id="heroMeta">ZETA / ロジエ邸 <span>●</span> 001</div>
 </div>
-<div class="hero-art-wrap" id="artWrap"><img alt="オルフェ・ロジエのイラスト" class="hero-art" draggable="false" id="heroArt" src="assets/orphe.png"/></div>
+<div class="hero-art-wrap" id="artWrap"><img alt="オルフェ・ロジエのイラスト" class="hero-art" draggable="false" id="heroArt" fetchpriority="high"/></div>
 <section class="mobile-quote" id="mobileQuote" aria-label="キャラクターの名前と台詞">
   <div class="mobile-quote-name" id="mobileQuoteName">オルフェ・ロジエ</div>
   <p id="mobileQuoteText"></p>
@@ -154,7 +154,7 @@
 <aside aria-hidden="true" aria-label="キャラクター詳細" aria-modal="true" class="dossier" id="dossier" role="dialog">
 <div class="dossier-head"><span class="mono">/ / /   CHARACTER INTELLIGENCE   <b id="dossierNo">#001</b></span><button aria-label="プロフィールを閉じる" class="panel-close" data-close="" type="button">BACK TO SELECT   ×</button></div>
 <div class="dossier-scroll">
-<div class="dossier-feature"><img alt="" aria-hidden="true" class="dossier-mobile-art" id="dossierMobileArt" src="assets/orphe.png"/><span class="mono dossier-eyebrow" id="dossierEyebrow">PERSONNEL RECORD / ZETA</span><div class="dossier-super" id="dossierSuper">ORPHE</div><div class="dossier-name" id="dossierName">オルフェ・ロジエ</div><p class="dossier-lead" id="dossierLead">その才能は、たった一人を美しく飾るために。</p></div>
+<div class="dossier-feature"><img alt="" aria-hidden="true" class="dossier-mobile-art" id="dossierMobileArt" loading="lazy"/><span class="mono dossier-eyebrow" id="dossierEyebrow">PERSONNEL RECORD / ZETA</span><div class="dossier-super" id="dossierSuper">ORPHE</div><div class="dossier-name" id="dossierName">オルフェ・ロジエ</div><p class="dossier-lead" id="dossierLead">その才能は、たった一人を美しく飾るために。</p></div>
 <div aria-label="プロフィール項目" class="dossier-tabs" role="tablist">
 <button aria-selected="true" data-tab="profile" role="tab">01 <span>PROFILE</span></button>
 <button aria-selected="false" data-tab="story" role="tab">02 <span>STORY</span></button>
