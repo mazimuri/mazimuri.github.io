@@ -4,7 +4,10 @@ const $=id=>document.getElementById(id), $$=q=>[...document.querySelectorAll(q)]
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const validUrl=x=>/^https?:\/\/[^\s]+$/i.test(x||'')?x:'';
 const api=window.CAST_DATA;
-const state={people:[],doc:null,index:0,panel:null,tab:'profile',filter:'all',world:'',mode:'published',animations:!matchMedia('(prefers-reduced-motion: reduce)').matches,timer:null,enterTimer:null,enterNonce:0,directoryView:'gallery',returnWorldId:'',returnWorldScroll:0};
+const MOBILE_MOTION_KEY='cast-signal-mobile-motion';
+function readMobileMotion(){try{const v=localStorage.getItem(MOBILE_MOTION_KEY);return v==='on'||v==='off'?v:null}catch{return null}}
+const storedMobileMotion=matchMedia('(max-width:800px)').matches?readMobileMotion():null;
+const state={people:[],doc:null,index:0,panel:null,tab:'profile',filter:'all',world:'',mode:'published',animations:storedMobileMotion?storedMobileMotion==='on':!matchMedia('(prefers-reduced-motion: reduce)').matches,timer:null,enterTimer:null,enterNonce:0,directoryView:'gallery',returnWorldId:'',returnWorldScroll:0};
 const stage=$('hero'), cur=()=>state.people[state.index];
 // Keep speculative transfers bounded. Never preload a full cast.
 const artWarm=new Map(),artVisited=new Set();let artIdleTimer=0,artHoverTimer=0,artEpoch=0,idleBudget=2,hoverBudget=3;
@@ -26,20 +29,42 @@ function scheduleNeighbor(c){
  artIdleTimer=setTimeout(()=>{if(cur()?.id!==c.id||state.panel||!canWarm(true))return;warmArt(state.people[(state.index+1)%state.people.length],true)},1100);
 }
 const mobileFrame=()=>matchMedia('(max-width:800px)').matches;
-let mobileIntroPlayed=false,mobileMotionExplicit=false,mobileMotionQueue=new Map();
+let mobileIntroPlayed=false,mobileMotionExplicit=storedMobileMotion!==null,mobileMotionQueue=new Map(),mobileArtRun=0;
 const mobileMotionAllowed=()=>mobileFrame()&&state.animations&&(mobileMotionExplicit||!matchMedia('(prefers-reduced-motion:reduce)').matches);
 function cancelMobileMotion(el){
  if(!el)return;const running=mobileMotionQueue.get(el);if(running){running.cancel();mobileMotionQueue.delete(el)}
  el.classList.remove('mb-motion-fallback-art','mb-motion-fallback-slab','mb-motion-fallback-type','mb-motion-fallback-detail');
 }
-function stopMobileMotion(){for(const el of [...mobileMotionQueue.keys()])cancelMobileMotion(el);for(const el of stage.querySelectorAll('.mb-motion-fallback-art,.mb-motion-fallback-slab,.mb-motion-fallback-type,.mb-motion-fallback-detail'))cancelMobileMotion(el)}
+function stopMobileMotion(){resetMobileArt();for(const el of [...mobileMotionQueue.keys()])cancelMobileMotion(el);for(const el of stage.querySelectorAll('.mb-motion-fallback-art,.mb-motion-fallback-slab,.mb-motion-fallback-type,.mb-motion-fallback-detail'))cancelMobileMotion(el)}
 function playMobileMotion(el,kind,frames,duration,delay=0){
  if(!el)return;cancelMobileMotion(el);if(!mobileMotionAllowed())return;
  const timing={duration,delay,easing:'cubic-bezier(.16,.82,.22,1)',fill:'backwards'};
  if(typeof el.animate==='function'){try{const a=el.animate(frames,timing);mobileMotionQueue.set(el,a);a.onfinish=()=>{if(mobileMotionQueue.get(el)===a)mobileMotionQueue.delete(el)};return}catch{}}
  void el.offsetWidth;el.classList.add('mb-motion-fallback-'+kind);
 }
-function mobileArtMotion(){playMobileMotion($('mobileArtMotionLayer'),'art',[{transform:'translate3d(72px,18px,0) scale(1.025)',opacity:0},{transform:'translate3d(0,0,0) scale(1)',opacity:1}],740)}
+// The decoded image is already in its own layer. Paint the start state before
+// starting a CSS transition; no animation clock runs while the image is loading.
+function resetMobileArt(){
+ mobileArtRun++;
+ const layer=$('mobileArtMotionLayer');if(layer)layer.classList.remove('mb-art-primed','mb-art-playing');
+}
+function primeMobileArt(){
+ resetMobileArt();
+ if(mobileMotionAllowed())$('mobileArtMotionLayer')?.classList.add('mb-art-primed');
+}
+function mobileArtMotion(){
+ const layer=$('mobileArtMotionLayer');if(!layer)return;
+ if(!mobileMotionAllowed()){resetMobileArt();return}
+ primeMobileArt();
+ const run=mobileArtRun;
+ // Flush the initial style, then allow a rendered frame before switching.
+ void getComputedStyle(layer).opacity;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(run!==mobileArtRun||!mobileMotionAllowed())return;
+  layer.classList.add('mb-art-playing');
+  layer.classList.remove('mb-art-primed');
+ }));
+}
 function mobileSceneMotion(){
  playMobileMotion($('mobileSlabMotionLayer'),'slab',[{transform:'translate3d(95px,0,0)',opacity:.45},{transform:'translate3d(0,0,0)',opacity:1}],620);
  for(const el of stage.querySelectorAll('.title-stack,.intro-kicker'))playMobileMotion(el,'type',[{transform:'translate3d(-38px,0,0)',opacity:0},{transform:'translate3d(0,0,0)',opacity:1}],510,35);
@@ -49,15 +74,21 @@ function setHeroImage(c){
  const img=$('heroArt'),src=c.artwork||'',previous=img.getAttribute('src')||'';
  img.fetchPriority='high';img.alt=c.name+'の立ち絵';
  if(src===previous){if(src&&img.complete&&img.naturalWidth){scheduleNeighbor(c)}return}
- clearTimeout(artIdleTimer);const epoch=++artEpoch;cancelMobileMotion($('mobileArtMotionLayer'));
- if(!src){img.removeAttribute('src');img.style.visibility='hidden';return}
+ clearTimeout(artIdleTimer);const epoch=++artEpoch;primeMobileArt();
+ if(!src){resetMobileArt();img.removeAttribute('src');img.style.visibility='hidden';return}
  img.style.visibility='hidden';artVisited.add(src);
- const reveal=()=>{if(epoch!==artEpoch)return;img.style.visibility='';if(img.naturalWidth){mobileArtMotion();scheduleNeighbor(cur()||c)}};
+ let revealed=false;
+ const reveal=()=>{if(epoch!==artEpoch||revealed)return;revealed=true;
+  if(img.naturalWidth){mobileArtMotion();img.style.visibility='';scheduleNeighbor(cur()||c)}
+  else{resetMobileArt();img.style.visibility=''}
+ };
+ // A load event is a second readiness path for browsers with delayed decode().
+ img.addEventListener('load',reveal,{once:true});img.addEventListener('error',reveal,{once:true});
  img.src=src;
  // Decode the selected image before revealing it, preventing an old character
  // from remaining visible under the new name while the network request runs.
- if(typeof img.decode==='function')img.decode().then(reveal,()=>{if(epoch!==artEpoch)return;if(img.complete)reveal();else{img.addEventListener('load',reveal,{once:true});img.addEventListener('error',reveal,{once:true})}});
- else if(img.complete)reveal();else{img.addEventListener('load',reveal,{once:true});img.addEventListener('error',reveal,{once:true})}
+ if(typeof img.decode==='function')img.decode().then(reveal,()=>{if(img.complete)reveal()});
+ else if(img.complete)reveal();
 }
 function intentArt(e){
  const b=e.target.closest?.('[data-v5-target],[data-mobile-person],[data-pick],[data-related-id],[data-world-character]');
@@ -82,6 +113,7 @@ const worldHasZeta=w=>[w?.link,...(w?.stories||[]).map(s=>s.url)].some(u=>/^http
 const isNewWorld=w=>{const p=Date.parse(w?.firstPublishedAt||'');const days=Number(website().newDays);return Number.isFinite(p)&&Number.isFinite(days)&&days>0&&Date.now()>=p&&Date.now()-p<days*86400000};
 const worldBadges=w=>`<span class="world-badges">${worldHasZeta(w)?'<b class="zeta-badge">zeta</b>':''}${isNewWorld(w)?'<b class="cast-new">NEW</b>':''}</span>`;
 if(!state.animations)document.body.classList.add('no-motion');
+if(mobileMotionExplicit&&state.animations)document.body.classList.add('mb-motion-opt-in');
 function hydrate(doc,mode){
  state.doc=doc;
  state.people=doc.characters.filter(c=>mode==='draft'||c.published!==false).map((c,i)=>({
@@ -562,8 +594,8 @@ $('worldDetailContent').addEventListener('click',e=>{
  if(b){state.returnWorldScroll=$('worldDetailContent').scrollTop;choose(b.dataset.worldCharacter,{detail:true,fromWorldId:state.world})}
 });
 $('dossierContent').addEventListener('click',e=>{const mode=e.target.closest('[data-gallery-mode]'),pick=e.target.closest('[data-gallery-select]');if(mode){galleryState.view=mode.dataset.galleryMode;renderDossier()}else if(pick){galleryState.focus=Number(pick.dataset.gallerySelect);renderDossier()}});
-$('motionToggle').onclick=()=>{state.animations=!state.animations;if(mobileFrame())mobileMotionExplicit=true;document.body.classList.toggle('no-motion',!state.animations);document.body.classList.toggle('mb-motion-opt-in',mobileMotionExplicit&&state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
-$('motionToggle').setAttribute('aria-pressed',String(state.animations));if(!state.animations)stopMobileMotion();else if(mobileFrame()&&mobileMotionAllowed()&&!state.panel){mobileSceneMotion();if($('heroArt').complete&&$('heroArt').naturalWidth)mobileArtMotion()}};
+$('motionToggle').onclick=()=>{state.animations=!state.animations;if(mobileFrame()){mobileMotionExplicit=true;try{localStorage.setItem(MOBILE_MOTION_KEY,state.animations?'on':'off')}catch{}}document.body.classList.toggle('no-motion',!state.animations);document.body.classList.toggle('mb-motion-opt-in',mobileMotionExplicit&&state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
+$('motionToggle').setAttribute('aria-pressed',String(state.animations));if(!state.animations)stopMobileMotion();else if(mobileFrame()&&mobileMotionAllowed()&&!state.panel){if(document.body.classList.contains('mobile-menu-open'))setMobileMenu(false);mobileSceneMotion();if($('heroArt').complete&&$('heroArt').naturalWidth)mobileArtMotion()}};
 $('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
 // V5.9.8: compact mobile navigation, no impact on desktop navigation.
 $('mobileIntroText').addEventListener('scroll',updateMobileIntroProgress,{passive:true});
