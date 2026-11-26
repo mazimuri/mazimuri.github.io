@@ -135,3 +135,28 @@ button.cs-char-sound[data-state=ready] .cs-speaker::before{border-color:var(--cs
 button.cs-char-sound[data-state=ready] .cs-speaker svg{color:var(--cs-char,#eaff55)}
 button.cs-char-sound[data-state=paused] .cs-speaker-off{border-color:#b4c0bf}
 button.cs-char-sound[data-state=paused] .cs-speaker-off::after{width:38%;height:48%;left:31%;top:26%;transform:none;background:none;border-inline:1.5px solid #d9e1de}
+
+/* Lyrics study 01 — opt-in reading mode, existing transport preserved */
+#cs-deck [hidden]{display:none!important}
+#cs-deck .cs-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:16px}
+#cs-deck .cs-tabs button,#cs-deck .cs-lang button{min-width:0;border:1px solid #52615f;background:#20292b;color:#cbd5d1;font:800 10px/1.3 var(--mono,monospace);padding:10px 4px}
+#cs-deck .cs-tabs button[aria-pressed=true]{background:var(--sound);border-color:var(--sound);color:#111719}
+#cs-deck .cs-lang{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:10px 0 8px}
+#cs-deck .cs-lang button{padding:8px 2px}
+#cs-deck .cs-lang button[aria-pressed=true]{border-color:var(--sound);color:var(--sound);background:#2c3535}
+#cs-deck #cs-lyric-scroll{min-height:190px;max-height:clamp(190px,calc(100dvh - 570px),420px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--sound) #222c2f;border:1px solid #43514f;background:#151d20;padding:15px 13px;overflow-wrap:anywhere;touch-action:pan-y}
+#cs-deck .cs-lyric-block{margin-bottom:19px}
+#cs-deck .cs-lyric-block:last-child{margin-bottom:0}
+#cs-deck .cs-lyric-original,#cs-deck .cs-lyric-translation{white-space:pre-wrap;font:500 14px/1.7 var(--sans,Arial,sans-serif);margin:0;color:#f1efe8}
+#cs-deck .cs-lyric-translation{font:400 12px/1.8 var(--jpn,sans-serif);color:#aebbb9;margin:7px 0 12px}
+#cs-deck .cs-lyric-label{font:800 10px/1.4 var(--mono,monospace);color:var(--sound);margin:12px 0 8px}
+#cs-deck .cs-lyric-note{font:10px/1.4 var(--mono,monospace);color:#a8b4b2;margin:7px 0 0}
+#cs-deck.cs-reading .cs-art{width:76px;height:76px}
+#cs-deck.cs-reading .cs-caption{margin-bottom:10px}
+#cs-deck.cs-reading #cs-wave{height:34px;margin-top:9px}
+#cs-deck.cs-reading .cs-controls{margin:7px 0}
+#cs-deck.cs-reading .cs-tabs{margin-top:12px}
+#cs-deck.cs-reading #cs-main-return{margin-top:8px;padding:9px}
+#cs-deck.cs-reading #cs-note{margin-top:6px}
+@media(max-width:800px){#cs-deck #cs-lyric-scroll{max-height:clamp(190px,calc(100dvh - 520px),320px)}}
+.cs-editor-jacket{width:150px;max-width:100%;aspect-ratio:1;object-fit:cover;border:1px solid #52615f}
