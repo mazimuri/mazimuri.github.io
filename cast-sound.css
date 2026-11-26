@@ -85,7 +85,7 @@ button.cs-char-sound .cs-speaker::before{content:"";position:absolute;border-rad
 button.cs-char-sound .cs-speaker svg{position:relative;z-index:1;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 button.cs-char-sound .cs-speaker-off{position:absolute;right:-1px;bottom:-1px;z-index:2;border-radius:50%;display:none;pointer-events:none}
 button.cs-char-sound .cs-speaker-off::after{content:"";position:absolute;width:100%;height:1.5px;left:0;top:calc(50% - .75px);transform:rotate(-48deg)}
-button.cs-char-sound:is([data-state=ready],[data-state=paused]) .cs-speaker-off{display:block}
+button.cs-char-sound:is([data-state=muted],[data-state=paused]) .cs-speaker-off{display:block}
 button.cs-char-sound:focus-visible{outline:2px solid var(--cs-char,#eaff55);outline-offset:3px}
 #cs-deck{opacity:0;visibility:hidden;pointer-events:none}
 #cs-deck.cs-open{opacity:1;visibility:visible;pointer-events:auto}
@@ -115,3 +115,23 @@ button.cs-char-sound:not(:disabled):active .cs-speaker{transform:scale(.9)}
 
 /* Edit mode soundtrack fields */
 .cs-editor-audio{display:grid;gap:10px;padding:13px;border:1px solid #52615f;background:#20292b}.cs-editor-audio audio{width:100%;max-width:100%}.cs-editor-audio .cs-editor-file{font:11px/1.5 var(--mono,monospace);overflow-wrap:anywhere;color:#c0cdc8}.cs-editor-audio input[type=file]{max-width:100%;color:#d9e1dc}.cs-editor-audio .cs-editor-status{font:800 10px var(--mono,monospace);color:#eaff55}.cs-editor-audio .cs-editor-status[data-empty=true]{color:#abb6b1}
+
+/* Sound UI polish: contained track indicator and distinct soundtrack states */
+#cs-deck .cs-status{width:18px;height:18px;display:flex;align-items:center;justify-content:center;justify-self:center;overflow:hidden}
+#cs-deck .cs-status svg{display:block;width:11px;height:11px;fill:currentColor}
+#cs-deck .cs-track[aria-current=true] .cs-status{gap:2px;align-items:flex-end;padding:2px 0}
+#cs-deck .cs-status i{display:block;width:3px;height:var(--bar,8px);flex:none;background:currentColor;transform-origin:bottom}
+#cs-deck .cs-status i:nth-child(2){--bar:13px}
+#cs-deck .cs-status i:nth-child(3){--bar:10px}
+#cs-deck .cs-track[data-playback=playing] .cs-status i{animation:cs-track-eq .82s ease-in-out infinite alternate}
+#cs-deck .cs-track[data-playback=playing] .cs-status i:nth-child(2){animation-delay:-.35s;animation-duration:.68s}
+#cs-deck .cs-track[data-playback=playing] .cs-status i:nth-child(3){animation-delay:-.57s;animation-duration:.94s}
+#cs-deck .cs-track:is([data-playback=paused],[data-playback=muted]) .cs-status{opacity:.65}
+@keyframes cs-track-eq{0%{transform:scaleY(.45)}100%{transform:scaleY(1)}}
+body.no-motion #cs-deck .cs-status i{animation:none!important}
+@media(prefers-reduced-motion:reduce){#cs-deck .cs-status i{animation:none!important}}
+button.cs-char-sound[data-state=ready] .cs-speaker{border-color:var(--cs-char,#eaff55)}
+button.cs-char-sound[data-state=ready] .cs-speaker::before{border-color:var(--cs-char,#eaff55);opacity:.55}
+button.cs-char-sound[data-state=ready] .cs-speaker svg{color:var(--cs-char,#eaff55)}
+button.cs-char-sound[data-state=paused] .cs-speaker-off{border-color:#b4c0bf}
+button.cs-char-sound[data-state=paused] .cs-speaker-off::after{width:38%;height:48%;left:31%;top:26%;transform:none;background:none;border-inline:1.5px solid #d9e1de}
