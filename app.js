@@ -119,8 +119,9 @@ function updatePickerEdges(){
  $('pickerEdgePrev').hidden=!canCycle;
  $('pickerEdgeNext').hidden=!canCycle;
 }
-function route(path){const h='#'+path;if(location.hash!==h)history.pushState(null,'',h)}
+function route(path){const h='#'+path;if(location.hash!==h)history.pushState(null,'',h);window.CAST_ANALYTICS?.page()}
 function choose(id,{routing=true,detail=false,fromWorldId=''}={}){const i=state.people.findIndex(p=>p.id===id);if(i<0)return;
+ if(routing)window.CAST_ANALYTICS?.emit('select',id);
  // A return-to-WORLD control belongs to journeys that actually began in a WORLD.
  state.returnWorldId=fromWorldId&&worldById(fromWorldId)?fromWorldId:'';
  state.index=i;close(false);load();if(detail){state.tab='profile';open('dossier',false)}if(routing)route('char/'+id+(detail?'/profile':''));
@@ -378,6 +379,7 @@ function onRoute(){if(document.body.classList.contains('admin-open'))return;cons
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(state.timer);state.timer=setTimeout(()=>el.classList.remove('show'),3600)}
 function refresh(mode='published',previewDoc=null){const id=cur()?.id;state.mode=mode;hydrate(mode==='draft'?(previewDoc||api.getDraft()):api.getPublished(),mode);state.index=Math.max(0,state.people.findIndex(c=>c.id===id));if(!state.people.length)state.index=0;close(false);load({animate:false});renderWorlds();renderAbout();onRoute();$('draftIndicator').hidden=mode!=='draft';window.dispatchEvent(new Event('cast-sound-refresh'));}
 window.CAST_PUBLIC={refresh,openCharacter:id=>choose(id,{detail:true}),toast,getSoundContext:()=>({doc:state.doc,mode:state.mode,id:cur()?.id})};
+document.addEventListener('click',e=>{const a=e.target.closest?.('a[href]');if(!a)return;try{const u=new URL(a.href);if(!/(^|\.)zeta-ai\.io$/i.test(u.hostname))return;if(state.panel==='dossier'&&a.closest('#dossier')&&cur())window.CAST_ANALYTICS?.emit('zeta_char',cur().id);else if(state.panel==='worldDetailPanel'&&a.closest('#worldDetailPanel')&&state.world)window.CAST_ANALYTICS?.emit('zeta_world',state.world);else if(a.closest('#aboutLinks,#footerSocial,#mobileSocialLinks'))window.CAST_ANALYTICS?.emit('zeta_site','site');}catch{}},true);
 const connectionTooltip=$('connectionTooltip');
 let activeConnection=null;
 function hideConnectionTooltip(){activeConnection=null;connectionTooltip.hidden=true;connectionTooltip.setAttribute('aria-hidden','true')}
