@@ -150,7 +150,7 @@ function soundEditor(target,scope){
 const soundTarget=scope=>scope==='site'?doc().site:selected();
 let soundBusy=false;
 async function previewPrivateAudio(el){const src=soundTarget(el.dataset.soundScope)?.soundtrack?.src,node=$('cs-private-preview');if(!node||!api.isPrivateAudio(src)||el.disabled)return;el.disabled=true;try{const url=await api.audioPreviewURL(src);if(node.isConnected){node.src=url;node.hidden=false;el.textContent='↻ 試聴URLを更新';notify('試聴の準備ができました。プレイヤーの再生ボタンを押してください')}}catch(e){notify(e.message||String(e))}finally{el.disabled=false}}
-async function uploadSoundJacket(el){const file=el.files?.[0],target=soundTarget(el.dataset.soundJacket);if(!file||!target||soundBusy)return;if(file.size>20*1024*1024){notify('20MB以下の画像を選んでね');return}const button=$('adminPublish');soundBusy=true;el.disabled=true;if(button)button.disabled=true;try{const data=await storeCompressedImage(file,1000),old=target.soundtrack;target.soundtrack={...(old||{}),jacket:data};if(!(await api.saveDraft())){target.soundtrack=old;throw Error(api.getLastError?.()||'下書き保存に失敗しました')}render();notify('ジャケットを下書きに保存しました')}catch(e){notify('ジャケットの登録に失敗：'+(e.message||'画像を確認してください'))}finally{soundBusy=false;el.disabled=false;if(button)button.disabled=false}}
+async function uploadSoundJacket(el){const file=el.files?.[0],target=soundTarget(el.dataset.soundJacket);if(!file||!target||soundBusy||previewBusy)return;if(file.size>20*1024*1024){notify('20MB以下の画像を選んでね');return}const button=$('adminPublish'),panel=$('adminContent');soundBusy=true;el.disabled=true;panel.inert=true;if(button)button.disabled=true;try{const data=await storeCompressedImage(file,1000),old=target.soundtrack;target.soundtrack={...(old||{}),jacket:data};if(!(await api.saveDraft())){target.soundtrack=old;throw Error(api.getLastError?.()||'下書き保存に失敗しました')}render();notify('ジャケットを下書きに保存しました')}catch(e){notify('ジャケットの登録に失敗：'+(e.message||'画像を確認してください'))}finally{soundBusy=false;el.disabled=false;panel.inert=false;if(button)button.disabled=false}}
 async function uploadSound(el){
  const file=el.files?.[0],scope=el.dataset.soundUpload,target=soundTarget(scope);if(!file||!target||soundBusy)return;
  if(!/\.mp3$/i.test(file.name)||file.size===0||file.size>15*1024*1024){notify('MP3形式・15MB以下の音源を選んでね');el.value='';return}
@@ -298,7 +298,7 @@ function worldImageFrameReady(frame){
  const doc=frame.contentDocument;
  if(doc.fonts?.ready)doc.fonts.ready.then(()=>{if(frame.isConnected)worldImageFit(frame)}).catch(()=>{});
  const img=doc.querySelector('[data-world-preview-img]');
- if(img&&!img.complete)img.addEventListener('load',()=>{if(frame.isConnected)worldImageFit(frame)},{once:true});
+ if(img&&(!img.complete||img.hasAttribute('data-private-image')))img.addEventListener('load',()=>{if(frame.isConnected)worldImageFit(frame)},{once:true});
 }
 function worldImageToggleExpand(){
  const studio=document.getElementById('worldImageStudio');
