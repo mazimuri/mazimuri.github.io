@@ -16,14 +16,14 @@
 <link rel="stylesheet" href="cast-worlds-current.css?v=1.0.14">
 <link rel="stylesheet" href="cast-navigation-current.css?v=18.0.1">
 <link rel="stylesheet" href="cast-layout-current.css?v=1.0.0">
-<link rel="stylesheet" href="cast-mobile-brand.css?v=1.0.0">
+<link rel="stylesheet" href="cast-mobile-brand.css?v=1.0.1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
   <script src="cloud-config.js" defer></script>
   <script src="cloud-data.js?v=5.14.0" defer></script>
   <link rel="stylesheet" href="cloud-admin.css">
   <link rel="stylesheet" href="cast-resource.css?v=1.0.1">
   <link rel="stylesheet" href="admin-v15-studio.css?v=16.2.0">
-  <script src="app.js?v=15.4.0" defer></script>
+  <script src="app.js?v=15.4.1" defer></script>
 <script defer src="cast-side-rail.js?v=18.0.1"></script>
 <script defer src="cast-layout-current.js?v=1.0.0"></script>
   <script src="publisher.js?v=5.9.0" defer></script>
@@ -90,7 +90,7 @@
     <section class="hero theme-orphe is-entering" id="hero" aria-label="キャラクター選択画面">
       <div class="hero-surface" aria-hidden="true"></div>
       <div class="hero-dark-panel" aria-hidden="true"></div>
-      <div class="hero-accent-slab" aria-hidden="true"></div>
+      <div class="mb-slab-motion" id="mobileSlabMotionLayer" aria-hidden="true"><div class="hero-accent-slab" aria-hidden="true"></div></div>
       <div class="hero-pattern" aria-hidden="true"></div>
       <div class="hero-outline" aria-hidden="true">S</div>
       <div class="hero-angle" aria-hidden="true"></div>
@@ -131,7 +131,7 @@
         <button class="hero-cta" type="button" id="openDetail"><span><small>ACCESS FILE</small><strong>CHARACTER PROFILE</strong></span><span class="cta-arrow" aria-hidden="true">↗</span></button>
         <div class="mini-meta mono" id="heroMeta">ZETA / ロジエ邸 <span>●</span> 001</div>
       </div>
-      <div class="hero-art-wrap" id="artWrap"><img class="hero-art" fetchpriority="high" id="heroArt" alt="オルフェ・ロジエのイラスト" draggable="false"></div>
+      <div class="hero-art-wrap" id="artWrap"><div class="mb-art-motion" id="mobileArtMotionLayer"><img class="hero-art" fetchpriority="high" id="heroArt" alt="オルフェ・ロジエのイラスト" draggable="false"></div></div>
 <div class="mobile-brand-layer" aria-hidden="true"><div class="mb-top"><span>/// CAST DATABASE — SELECTION SYSTEM</span><span>VOL. 05.9</span></div><div class="mb-hatches"><i></i><i></i><i></i></div><div class="mb-stamp">FILE<strong id="mobileFileStamp">001</strong><span>//////</span></div><div class="mb-micro">CAST SELECTION SYSTEM · ORIGINAL FILES</div><div class="mb-edge"></div><div class="mb-railmark">01 / VISUAL SYSTEM<br>CAST SIGNAL — ARCHIVE</div><div class="mb-engrave">S / SIGNAL<small>◀ CHARACTER DATABASE<br>VISUAL SYSTEM — PERSONAL ARCHIVE</small></div><div class="mb-palette"><i></i><i></i><i></i><i></i></div><div class="mb-watermark" id="mobileCastTotal">00</div></div>
 <section class="mobile-quote" id="mobileQuote" aria-label="キャラクターの名前と台詞">
   <div class="mobile-quote-name" id="mobileQuoteName">オルフェ・ロジエ</div>
