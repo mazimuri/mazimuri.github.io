@@ -376,8 +376,8 @@ function onRoute(){if(document.body.classList.contains('admin-open'))return;cons
  const i=state.people.findIndex(c=>c.id===parts[1]);if(i>=0){state.index=i;load({animate:false});if(['profile','story','gallery','links'].includes(parts[2])){state.tab=parts[2];open('dossier',false)}else close(false);return}
  }if(parts[0]==='world'&&worldById(parts[1])){state.world=parts[1];open('worldDetailPanel',false);return}if(path==='index'){state.world='';state.filter='all';open('directory',false);return}if(path==='worlds'){open('worldsPanel',false);return}if(path==='about'){open('aboutPanel',false);return}close(false)}
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(state.timer);state.timer=setTimeout(()=>el.classList.remove('show'),3600)}
-function refresh(mode='published'){const id=cur()?.id;state.mode=mode;hydrate(mode==='draft'?api.getDraft():api.getPublished(),mode);state.index=Math.max(0,state.people.findIndex(c=>c.id===id));if(!state.people.length)state.index=0;close(false);load({animate:false});renderWorlds();renderAbout();onRoute();$('draftIndicator').hidden=mode!=='draft';}
-window.CAST_PUBLIC={refresh,openCharacter:id=>choose(id,{detail:true}),toast};
+function refresh(mode='published'){const id=cur()?.id;state.mode=mode;hydrate(mode==='draft'?api.getDraft():api.getPublished(),mode);state.index=Math.max(0,state.people.findIndex(c=>c.id===id));if(!state.people.length)state.index=0;close(false);load({animate:false});renderWorlds();renderAbout();onRoute();$('draftIndicator').hidden=mode!=='draft';window.dispatchEvent(new Event('cast-sound-refresh'));}
+window.CAST_PUBLIC={refresh,openCharacter:id=>choose(id,{detail:true}),toast,getSoundContext:()=>({doc:state.doc,mode:state.mode,id:cur()?.id})};
 const connectionTooltip=$('connectionTooltip');
 let activeConnection=null;
 function hideConnectionTooltip(){activeConnection=null;connectionTooltip.hidden=true;connectionTooltip.setAttribute('aria-hidden','true')}
