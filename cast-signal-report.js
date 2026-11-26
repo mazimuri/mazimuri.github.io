@@ -16,10 +16,11 @@ const art=(id,type)=>{const d=window.CAST_DATA?.getPublished?.();const c=d?.char
 const button=(id,text,active=false)=>'<button type="button" data-sr="'+id+'" class="'+(active?'active':'')+'">'+esc(text)+'</button>';
 function chart(keys,previous){
  const map=ks=>ks.map(day=>({day,v:sum(values(metric,[day])),known:!!first()&&day>=first()}));
- const a=map(keys),b=map(previous),max=Math.max(1,...a.map(x=>x.v),...b.map(x=>x.v));const w=800,h=204,left=46,right=785,top=15,bottom=169;
+ const a=map(keys),b=map(previous),peak=Math.max(0,...a.map(x=>x.v),...b.map(x=>x.v));
+ const raw=peak/4,unit=10**Math.floor(Math.log10(Math.max(1,raw))),step=([1,2,5,10].find(n=>n*unit>=raw)||10)*unit,ticks=Math.max(1,Math.ceil(peak/step)),max=ticks*step;const w=800,h=204,left=46,right=785,top=15,bottom=169;
  const x=i=>left+(right-left)*i/Math.max(1,a.length-1),y=v=>bottom-(bottom-top)*v/max;
  const line=data=>{let started=false;return data.map((d,i)=>{if(!d.known){started=false;return ''}const s=(started?'L':'M')+x(i).toFixed(1)+' '+y(d.v).toFixed(1);started=true;return s}).join(' ')};
- let grid='';for(let i=0;i<=4;i++){const v=max*i/4;grid+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+right+'" y2="'+y(v)+'" stroke="#394247"/><text x="38" y="'+(y(v)+4)+'" text-anchor="end" fill="#9caaae" font-size="10">'+fmt(Math.round(v))+'</text>'}
+ let grid='';for(let i=0;i<=ticks;i++){const v=i*step;grid+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+right+'" y2="'+y(v)+'" stroke="#394247"/><text x="38" y="'+(y(v)+4)+'" text-anchor="end" fill="#9caaae" font-size="10">'+fmt(Math.round(v))+'</text>'}
  const labelsAt=[0,Math.floor((a.length-1)/2),a.length-1];
  return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="選択期間と前期間の日別集計グラフ">'+grid+'<path d="'+line(b)+'" stroke="#8ea9c9" stroke-width="2" stroke-dasharray="5 5" fill="none"/><path d="'+line(a)+'" stroke="#eaff55" stroke-width="3" fill="none"/>'+a.map((d,i)=>d.known?'<circle cx="'+x(i)+'" cy="'+y(d.v)+'" r="3" fill="#eaff55"><title>'+esc(d.day)+'：'+fmt(d.v)+'</title></circle>':'').join('')+labelsAt.map(i=>'<text x="'+x(i)+'" y="192" text-anchor="'+(i===0?'start':i===a.length-1?'end':'middle')+'" fill="#9caaae" font-size="11">'+a[i].day.slice(5).replace('-','/')+'</text>').join('')+'</svg>';
 }
