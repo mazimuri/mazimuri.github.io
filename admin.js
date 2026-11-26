@@ -399,7 +399,7 @@ window.addEventListener('resize',()=>{
  if(document.querySelector('#admin .v15-icon-studio'))syncRailCropAspect();
 },{passive:true});
 
-let resourceReport=null,resourceBusy=false,resourceError='',resourceBucket='cast-public-media',resourceStatus='unused',resourceType='all',resourceMode='grid',resourceSort='recent',resourceQuery='',resourcePage=0,resourceSelection=new Set(),resourceURLs=new Map();
+let resourceReport=null,resourceBusy=false,resourceError='',resourceBucket='cast-public-media',resourceStatus='unused',resourceType='all',resourceMode='grid',resourceSort='recent',resourceQuery='',resourcePage=0,resourceSelection=new Set(),resourceURLs=new Map(),resourceObserver=null;
 const resourceMB=n=>n==null?'容量不明':(n/1000000).toFixed(2)+' MB';
 const resourceSum=files=>files.reduce((sum,f)=>sum+(f.size||0),0);
 const resourceKind=f=>f.type.startsWith('image/')?'image':f.type.startsWith('audio/')?'audio':'other';
@@ -430,16 +430,17 @@ function renderResources(){
  '<div class="rm-pagination">'+rButton('prev','← PREV',false,!resourcePage)+'<span>'+(count?(resourcePage*18+1)+'–'+Math.min(count,(resourcePage+1)*18)+' / '+count:'0 FILES')+'</span>'+rButton('next','NEXT →',false,(resourcePage+1)*18>=count)+'</div><div class="rm-bar"><div><strong>'+selected.length+'件選択 / '+resourceMB(resourceSum(selected))+'</strong><p>削除は確認後のみ。参照中は選択不可。</p></div>'+rButton('review','REVIEW & DELETE ↗',false,!selected.length||resourceBusy)+'</div></div><p class="rm-footnote">未参照候補は削除可能と断定できません。外部直リンク・古いバックアップは照合できない場合があります。</p><dialog id="rm-dialog"></dialog></section>';
 }
 function refreshResourceView(){const root=$('rm-root');if(!root)return;const focus=document.activeElement?.id==='rm-search',pos=focus?document.activeElement.selectionStart:null;const scroll=root.parentElement?.scrollTop;root.outerHTML=renderResources();if(scroll!=null)$('rm-root').parentElement.scrollTop=scroll;bindResources();if(focus){const q=$('rm-search');q.focus();q.setSelectionRange(pos,pos)}}
-async function resourceURL(f){if(!resourceURLs.has(f.id))resourceURLs.set(f.id,api.resourcePreview(f.bucket,f.path).catch(e=>{resourceURLs.delete(f.id);throw e}));return resourceURLs.get(f.id)}
+async function resourceURL(f){let cached=resourceURLs.get(f.id);if(!cached||Date.now()-cached.time>45*60*1000){cached={time:Date.now(),promise:api.resourcePreview(f.bucket,f.path).catch(e=>{resourceURLs.delete(f.id);throw e})};resourceURLs.set(f.id,cached)}return cached.promise}
 function bindResources(){
  const root=$('rm-root');if(!root)return;
+ resourceObserver?.disconnect();resourceObserver=null;
  const check=$('rm-selectpage'),page=resourcePageFiles().filter(resourceSafe);if(check)check.indeterminate=page.some(f=>resourceSelection.has(f.id))&&!page.every(f=>resourceSelection.has(f.id));
  const load=async img=>{const f=resourceFiles().find(x=>x.id===img.dataset.rThumb);if(!f)return;try{const url=await resourceURL(f);if(img.isConnected)img.src=url}catch{if(img.isConnected)img.alt='画像取得失敗'}};
  const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{for(const x of entries)if(x.isIntersecting){observer.unobserve(x.target);load(x.target)}},{rootMargin:'120px'}):null;
- root.querySelectorAll('[data-r-thumb]').forEach(img=>observer?observer.observe(img):load(img));
+ resourceObserver=observer;root.querySelectorAll('[data-r-thumb]').forEach(img=>observer?observer.observe(img):load(img));
  root.onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.rPreview){openResourcePreview(b.dataset.rPreview);return}if(b.dataset.rBucket){resourceBucket=b.dataset.rBucket;resourceSelection.clear();resourcePage=0;refreshResourceView();return}const action=b.dataset.rAction;if(!action)return;if(action==='scan'){scanResourcesUI();return}if(action==='review'){reviewResources();return}if(action==='clear')resourceSelection.clear();else if(action==='selectall')resourceFiltered().filter(resourceSafe).forEach(f=>resourceSelection.add(f.id));else if(action==='prev')resourcePage--;else if(action==='next')resourcePage++;else if(action.startsWith('status:')){resourceStatus=action.split(':')[1];resourcePage=0}else if(action.startsWith('type:')){resourceType=action.split(':')[1];resourcePage=0}else if(action.startsWith('mode:'))resourceMode=action.split(':')[1];refreshResourceView()};
  root.onchange=e=>{const v=e.target;if(v.id==='rm-sort'){resourceSort=v.value;resourcePage=0}else if(v.id==='rm-selectpage'){page.forEach(f=>v.checked?resourceSelection.add(f.id):resourceSelection.delete(f.id))}else if(v.dataset.rPick){const f=resourceFiles().find(x=>x.id===v.dataset.rPick);if(f&&resourceSafe(f)){v.checked?resourceSelection.add(f.id):resourceSelection.delete(f.id)}}else return;refreshResourceView()};
- $('rm-search').oninput=e=>{resourceQuery=e.target.value;resourcePage=0;refreshResourceView()};
+ const search=$('rm-search');const applySearch=()=>{resourceQuery=search.value;resourcePage=0;refreshResourceView()};search.oninput=e=>{if(!e.isComposing)applySearch()};search.oncompositionend=applySearch;
 }
 async function scanResourcesUI(){
  if(resourceBusy)return;resourceBusy=true;resourceError='';resourceReport=null;resourceSelection.clear();resourceURLs.clear();refreshResourceView();
@@ -464,7 +465,7 @@ function reviewResources(){
 function render(){const panel=$('adminContent');const section=state.section;
  $$('[data-admin-section]').forEach(b=>b.classList.toggle('active',b.dataset.adminSection===section));$('adminPath').textContent=`/ CONTROL / ${section.toUpperCase()}${state.charId?' / CHARACTER FILE':''}${state.worldId?' / WORLD FILE':''}`;
  let html='';if(section==='dashboard')html=renderDashboard();if(section==='characters')html=state.charId&&selected()?charForm(selected()):renderCharacters();if(section==='worlds')html=state.worldId&&world()?worldForm(world()):renderWorlds();if(section==='tags')html=renderTags();if(section==='about')html=renderAboutEditor();if(section==='backup')html=renderBackup();if(section==='publish')html=renderPublish();if(section==='resources')html=renderResources();panel.innerHTML=html;
- if(section==='resources')bindResources();
+ if(section==='resources')bindResources();else{resourceObserver?.disconnect();resourceObserver=null;}
  if(panel.querySelector('.v15-icon-studio'))requestAnimationFrame(syncRailCropAspect);
 }
 function openChar(id){state.section='characters';state.charId=id;state.tab='basic';render();$('adminContent').scrollIntoView({block:'start'})}
