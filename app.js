@@ -26,16 +26,33 @@ function scheduleNeighbor(c){
  artIdleTimer=setTimeout(()=>{if(cur()?.id!==c.id||state.panel||!canWarm(true))return;warmArt(state.people[(state.index+1)%state.people.length],true)},1100);
 }
 const mobileFrame=()=>matchMedia('(max-width:800px)').matches;
-let mobileIntroPlayed=false;
-function mobileArtMotion(img){img.classList.remove('mobile-art-arrive');if(mobileFrame()&&state.animations&&!matchMedia('(prefers-reduced-motion:reduce)').matches){void img.offsetWidth;img.classList.add('mobile-art-arrive')}}
+let mobileIntroPlayed=false,mobileMotionExplicit=false,mobileMotionQueue=new Map();
+const mobileMotionAllowed=()=>mobileFrame()&&state.animations&&(mobileMotionExplicit||!matchMedia('(prefers-reduced-motion:reduce)').matches);
+function cancelMobileMotion(el){
+ if(!el)return;const running=mobileMotionQueue.get(el);if(running){running.cancel();mobileMotionQueue.delete(el)}
+ el.classList.remove('mb-motion-fallback-art','mb-motion-fallback-slab','mb-motion-fallback-type','mb-motion-fallback-detail');
+}
+function stopMobileMotion(){for(const el of [...mobileMotionQueue.keys()])cancelMobileMotion(el);for(const el of stage.querySelectorAll('.mb-motion-fallback-art,.mb-motion-fallback-slab,.mb-motion-fallback-type,.mb-motion-fallback-detail'))cancelMobileMotion(el)}
+function playMobileMotion(el,kind,frames,duration,delay=0){
+ if(!el)return;cancelMobileMotion(el);if(!mobileMotionAllowed())return;
+ const timing={duration,delay,easing:'cubic-bezier(.16,.82,.22,1)',fill:'backwards'};
+ if(typeof el.animate==='function'){try{const a=el.animate(frames,timing);mobileMotionQueue.set(el,a);a.onfinish=()=>{if(mobileMotionQueue.get(el)===a)mobileMotionQueue.delete(el)};return}catch{}}
+ void el.offsetWidth;el.classList.add('mb-motion-fallback-'+kind);
+}
+function mobileArtMotion(){playMobileMotion($('mobileArtMotionLayer'),'art',[{transform:'translate3d(72px,18px,0) scale(1.025)',opacity:0},{transform:'translate3d(0,0,0) scale(1)',opacity:1}],740)}
+function mobileSceneMotion(){
+ playMobileMotion($('mobileSlabMotionLayer'),'slab',[{transform:'translate3d(95px,0,0)',opacity:.45},{transform:'translate3d(0,0,0)',opacity:1}],620);
+ for(const el of stage.querySelectorAll('.title-stack,.intro-kicker'))playMobileMotion(el,'type',[{transform:'translate3d(-38px,0,0)',opacity:0},{transform:'translate3d(0,0,0)',opacity:1}],510,35);
+ for(const el of stage.querySelectorAll('.mobile-brand-layer,.mobile-quote,.mobile-profile,.mobile-intro'))playMobileMotion(el,'detail',[{opacity:0},{opacity:1}],430,100);
+}
 function setHeroImage(c){
  const img=$('heroArt'),src=c.artwork||'',previous=img.getAttribute('src')||'';
  img.fetchPriority='high';img.alt=c.name+'の立ち絵';
- if(src===previous){if(src&&img.complete&&img.naturalWidth)scheduleNeighbor(c);return}
- clearTimeout(artIdleTimer);const epoch=++artEpoch;img.classList.remove('mobile-art-arrive');
+ if(src===previous){if(src&&img.complete&&img.naturalWidth){scheduleNeighbor(c)}return}
+ clearTimeout(artIdleTimer);const epoch=++artEpoch;cancelMobileMotion($('mobileArtMotionLayer'));
  if(!src){img.removeAttribute('src');img.style.visibility='hidden';return}
  img.style.visibility='hidden';artVisited.add(src);
- const reveal=()=>{if(epoch!==artEpoch)return;img.style.visibility='';if(img.naturalWidth){mobileArtMotion(img);scheduleNeighbor(cur()||c)}};
+ const reveal=()=>{if(epoch!==artEpoch)return;img.style.visibility='';if(img.naturalWidth){mobileArtMotion();scheduleNeighbor(cur()||c)}};
  img.src=src;
  // Decode the selected image before revealing it, preventing an old character
  // from remaining visible under the new name while the network request runs.
@@ -150,7 +167,7 @@ function load({animate=true}={}){
  renderPicker();renderMobileSelection();if(state.panel==='dossier')renderDossier();
  clearTimeout(state.enterTimer);const nonce=++state.enterNonce;stage.classList.remove('is-entering');
  const firstMobile=mobileFrame()&&!mobileIntroPlayed&&!state.panel&&!/^#(?:index|worlds?|about)(?:\/|$)/.test(location.hash);if(mobileFrame())mobileIntroPlayed=true;
- if((animate||firstMobile)&&state.animations){stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px');void stage.offsetWidth;stage.classList.add('is-entering');state.enterTimer=setTimeout(()=>{if(state.enterNonce===nonce)stage.classList.remove('is-entering')},1220)}
+ if((animate||firstMobile)&&mobileFrame()){mobileSceneMotion()}else if(animate&&state.animations){stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px');void stage.offsetWidth;stage.classList.add('is-entering');state.enterTimer=setTimeout(()=>{if(state.enterNonce===nonce)stage.classList.remove('is-entering')},1220)}
 }
 function icon(c){return c.icon||c.artwork||''}
 function label(c){return c.playable?'<b class="zeta-badge">zeta</b>':''}
@@ -431,7 +448,7 @@ function returnToOriginWorld(){
 function openWorld(id){if(!worldById(id))return;state.world=id;state.filter='all';$('search').value='';open('worldDetailPanel')}
 function tab(k){hideConnectionTooltip();state.tab=k;renderDossier();$('dossierContent').scrollTop=0;route('char/'+cur().id+'/'+k)}
 function onRoute(alreadyLoaded=false){if(document.body.classList.contains('admin-open'))return;const path=decodeURIComponent(location.hash.replace(/^#/,'')),parts=path.split('/');if(parts[0]==='char'){
- const i=state.people.findIndex(c=>c.id===parts[1]);if(i>=0){if(alreadyLoaded!==true||state.index!==i){state.index=i;load({animate:false})}if(['profile','story','gallery','links'].includes(parts[2])){state.tab=parts[2];open('dossier',false)}else close(false);return}
+ const i=state.people.findIndex(c=>c.id===parts[1]);if(i>=0){if(alreadyLoaded!==true||state.index!==i){const changed=state.index!==i;state.index=i;if(!mobileFrame()||changed)load({animate:mobileFrame()&&changed})}if(['profile','story','gallery','links'].includes(parts[2])){state.tab=parts[2];open('dossier',false)}else close(false);return}
  }if(parts[0]==='world'&&worldById(parts[1])){state.world=parts[1];open('worldDetailPanel',false);return}if(path==='index'){state.world='';state.filter='all';open('directory',false);return}if(path==='worlds'){open('worldsPanel',false);return}if(path==='about'){open('aboutPanel',false);return}close(false)}
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(state.timer);state.timer=setTimeout(()=>el.classList.remove('show'),3600)}
 function refresh(mode='published',previewDoc=null){const id=cur()?.id;state.mode=mode;hydrate(mode==='draft'?(previewDoc||api.getDraft()):api.getPublished(),mode);state.index=Math.max(0,state.people.findIndex(c=>c.id===id));const routeId=location.hash.slice(1).split('/');if(routeId[0]==='char'){try{const i=state.people.findIndex(c=>c.id===decodeURIComponent(routeId[1]||''));if(i>=0)state.index=i}catch{}}if(!state.people.length)state.index=0;close(false);load({animate:false});renderAbout();onRoute(true);$('draftIndicator').hidden=mode!=='draft';window.dispatchEvent(new Event('cast-sound-refresh'));}
@@ -545,8 +562,8 @@ $('worldDetailContent').addEventListener('click',e=>{
  if(b){state.returnWorldScroll=$('worldDetailContent').scrollTop;choose(b.dataset.worldCharacter,{detail:true,fromWorldId:state.world})}
 });
 $('dossierContent').addEventListener('click',e=>{const mode=e.target.closest('[data-gallery-mode]'),pick=e.target.closest('[data-gallery-select]');if(mode){galleryState.view=mode.dataset.galleryMode;renderDossier()}else if(pick){galleryState.focus=Number(pick.dataset.gallerySelect);renderDossier()}});
-$('motionToggle').onclick=()=>{state.animations=!state.animations;document.body.classList.toggle('no-motion',!state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
-$('motionToggle').setAttribute('aria-pressed',String(state.animations))};
+$('motionToggle').onclick=()=>{state.animations=!state.animations;if(mobileFrame())mobileMotionExplicit=true;document.body.classList.toggle('no-motion',!state.animations);document.body.classList.toggle('mb-motion-opt-in',mobileMotionExplicit&&state.animations);$('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
+$('motionToggle').setAttribute('aria-pressed',String(state.animations));if(!state.animations)stopMobileMotion();else if(mobileFrame()&&mobileMotionAllowed()&&!state.panel){mobileSceneMotion();if($('heroArt').complete&&$('heroArt').naturalWidth)mobileArtMotion()}};
 $('motionToggle').innerHTML=`MOTION <b>${state.animations?'ON':'OFF'}</b>`;
 // V5.9.8: compact mobile navigation, no impact on desktop navigation.
 $('mobileIntroText').addEventListener('scroll',updateMobileIntroProgress,{passive:true});
@@ -574,8 +591,9 @@ mobileMenuToggle.addEventListener('click',()=>setMobileMenu(mobileMenuToggle.get
 mobileMenuClose.addEventListener('click',()=>{setMobileMenu(false);mobileMenuToggle.focus({preventScroll:true})});
 mobileBackdrop.addEventListener('click',()=>setMobileMenu(false));
 $$('#mobileNav [data-nav]').forEach(b=>b.addEventListener('click',()=>setMobileMenu(false)));
-mobileMotionToggle.innerHTML=$('motionToggle').innerHTML;
-mobileMotionToggle.addEventListener('click',()=>{$('motionToggle').click(); mobileMotionToggle.innerHTML=$('motionToggle').innerHTML});
+function syncMobileMotionButton(){mobileMotionToggle.innerHTML=$('motionToggle').innerHTML;mobileMotionToggle.setAttribute('aria-pressed',String(state.animations));mobileMotionToggle.title=!state.animations&&matchMedia('(prefers-reduced-motion:reduce)').matches?'端末の動きを減らす設定に従っています。ONにするとSELECT演出を再生します。':'アニメーションのON/OFF'}
+syncMobileMotionButton();
+mobileMotionToggle.addEventListener('click',()=>{$('motionToggle').click();syncMobileMotionButton();if(state.animations)setMobileMenu(false)});
 window.addEventListener('resize',()=>{if(!matchMedia('(max-width:620px)').matches)setMobileMenu(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('mobile-menu-open')){e.stopImmediatePropagation();setMobileMenu(false);mobileMenuToggle.focus({preventScroll:true})}},true);
 
