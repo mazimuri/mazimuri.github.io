@@ -1,0 +1,47 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>CAST // SIGNAL — CDN CUTOVER</title><style>body{background:#15191d;color:#f2f3ed;font:16px system-ui,sans-serif;max-width:860px;margin:48px auto;padding:20px}h1{font-size:clamp(28px,6vw,48px);line-height:1;letter-spacing:-.04em}small{color:#eaff55;letter-spacing:.12em}button{background:#eaff55;color:#15191d;border:0;padding:14px 22px;font-weight:bold;cursor:pointer}button:disabled{opacity:.4;cursor:default}progress{display:block;width:100%;height:18px;accent-color:#eaff55;margin:18px 0}pre{background:#22292d;border:1px solid #465057;min-height:130px;max-height:350px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;font-size:12px}a{color:#eaff55}#status{color:#eaff55;font-weight:bold;overflow-wrap:anywhere}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script><script src="cloud-config.js"></script></head><body><small>CAST // SIGNAL / CONTROL ROOM</small><h1>CDN CUTOVER.</h1><p>コピー済みメディアを再検証し、公開データのメディア参照だけをR2へ切り替えます。下書きは公開しません。</p><p>CONTROL ROOMにログイン後、管理画面のタブを閉じてから実行してください。切替中は編集・公開操作をしないでください。</p><p id="status">認証確認中…</p><button id="go" disabled>全ファイルを検証してCDNへ切り替える</button><progress id="progress" value="0" max="1"></progress><pre id="log"></pre><a href="admin.html">CONTROL ROOMに戻る</a><script>
+(async()=>{
+const cfg=window.CAST_CONFIG||{},CDN='https://cast-signal-cdn.mazimuri.workers.dev/',PREFIX=cfg.url+'/storage/v1/object/public/cast-public-media/';
+const $=id=>document.getElementById(id),say=s=>{$('status').textContent=s},log=s=>{$('log').textContent+=s+'\n';$('log').scrollTop=$('log').scrollHeight};
+const pattern=/^published\/(?:audio-[0-9a-f-]{36}\.mp3|[0-9]+-[0-9a-f-]{36}\.(?:webp|png|jpg|jpeg|gif))$/i;
+const types={mp3:'audio/mpeg',webp:'image/webp',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif'};
+const client=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const fetchSafe=(url,opts={})=>fetch(url,{...opts,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(30000)});
+async function requireAdmin(){const {data,error}=await client.auth.getUser();if(error||!data?.user)throw Error('CONTROL ROOMにログインしてください');const r=await client.from('cast_documents').select('kind').eq('kind','draft').maybeSingle();if(r.error||r.data?.kind!=='draft')throw Error('管理者権限がありません')}
+async function current(){const r=await client.from('cast_documents').select('payload,updated_at').eq('kind','published').single();if(r.error||!r.data?.payload||!r.data.updated_at)throw Error('公開データ取得失敗');return r.data}
+function visit(o,fn){if(!o||typeof o!=='object')return;for(const k of Object.keys(o)){const v=o[k];if(typeof v==='string')o[k]=fn(v);else if(v&&typeof v==='object')visit(v,fn)}}
+function plan(row){const payload=JSON.parse(JSON.stringify(row.payload)),keys=new Set();if(payload.version!==5||!Array.isArray(payload.characters)||!Array.isArray(payload.worlds))throw Error('公開データ形式が不正');visit(payload,v=>{if(v.startsWith(PREFIX)){const key=v.slice(PREFIX.length);if(!pattern.test(key))throw Error('未対応の旧メディアパス');keys.add(key);return CDN+key}if(v.includes(PREFIX))throw Error('埋め込みURLがあり自動切替を中止');return v});return {payload,keys:[...keys].sort()}}
+let committed=false;
+try{await requireAdmin();const p=plan(await current());say(p.keys.length?'管理者認証 OK / 切替対象 '+p.keys.length+' 件':'切替対象なし（すでに切替済みの可能性）');$('go').disabled=!p.keys.length}catch(e){say(e.message);return}
+$('go').onclick=async()=>{
+ if(!confirm('公開済みメディアの配信先だけをR2へ切り替えます。下書きは公開しません。実行しますか？'))return;
+ $('go').disabled=true;$('log').textContent='';
+ try{
+  await requireAdmin();const row=await current(),p=plan(row);if(!p.keys.length)throw Error('切替対象なし');
+  $('progress').max=p.keys.length;$('progress').value=0;let checked=0;
+  for(let i=0;i<p.keys.length;i+=6){
+   await Promise.all(p.keys.slice(i,i+6).map(async k=>{
+    const [old,next]=await Promise.all([fetchSafe(PREFIX+k,{method:'HEAD'}),fetchSafe(CDN+k,{method:'HEAD'})]);
+    const a=old.headers.get('Content-Length'),b=next.headers.get('Content-Length');
+    if(!old.ok||!next.ok||!a||!b||a!==b||Number(a)<=0)throw Error('サイズ・配信検証失敗 '+k+' / '+old.status+' '+next.status);
+    if((next.headers.get('Content-Type')||'').split(';')[0]!==types[k.split('.').pop().toLowerCase()])throw Error('Content-Type不一致 '+k);
+    checked++;$('progress').value=checked;say('配信先検証 '+checked+' / '+p.keys.length);
+   }));
+  }
+  log('全 '+checked+' 件 / HEAD・容量・Content-Type 一致');
+  const mp3=p.keys.find(k=>k.endsWith('.mp3'));
+  if(mp3){const r=await fetchSafe(CDN+mp3,{headers:{Range:'bytes=0-1023'}});if(r.status!==206||!/^bytes 0-1023\/\d+$/.test(r.headers.get('Content-Range')||'')||(await r.arrayBuffer()).byteLength!==1024)throw Error('MP3 Range検証失敗');log('MP3 Range / CORS: OK')}
+  p.payload.publicationId=crypto.randomUUID();
+  const r=await client.from('cast_documents').update({payload:p.payload,updated_at:new Date().toISOString()}).eq('kind','published').eq('updated_at',row.updated_at).select('kind');
+  if(r.error)throw Error('切替保存失敗 '+r.error.message);
+  if(r.data?.length!==1)throw Error('公開データが変更されました。別タブの編集を終了し再読み込みしてください');
+  committed=true;log('公開データ切替完了 / 下書き・旧ファイルは未変更');
+  const res=await fetchSafe(cfg.url+'/rest/v1/cast_documents?kind=eq.published&select=payload',{headers:{apikey:cfg.publishableKey,Accept:'application/json'}});
+  if(!res.ok)throw Error('匿名公開確認失敗 HTTP '+res.status);
+  const seen=(await res.json())?.[0]?.payload;
+  if(seen?.publicationId!==p.payload.publicationId||JSON.stringify(seen).includes(PREFIX))throw Error('匿名公開データの照合失敗');
+  say('CDN CUTOVER VERIFIED / '+checked+' 件');log('匿名閲覧から新CDN参照を確認しました。');
+  try{const ch=new BroadcastChannel('cast-signal-published');ch.postMessage({type:'published',revision:p.payload.publicationId});ch.close()}catch{}
+ }catch(e){say((committed?'切替保存済み・追加確認が必要: ':'停止: ')+e.message);log('下書きと旧ファイルは変更していません。');$('go').disabled=committed}
+};
+})().catch(e=>{document.getElementById('status').textContent=e.message;});
+</script></body></html>
