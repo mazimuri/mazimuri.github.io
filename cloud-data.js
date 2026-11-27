@@ -70,6 +70,7 @@
     }
     published=defaults(loadedPublished);
     draft=defaults(loadedDraft);
+    adoptVerifiedMedia(draft,published);
   }
   function commitDraft() {
     clearTimeout(scheduled);scheduled=null;
@@ -239,6 +240,50 @@
     }
   }
 
+
+  // Public media only. Private drafts remain in the authenticated Supabase bucket.
+  const CDN='https://cast-signal-cdn.mazimuri.workers.dev/';
+  const OLD_MEDIA=cfg.url+'/storage/v1/object/public/cast-public-media/';
+  const MEDIA_PATH=/^published\/(?:audio-[0-9a-f-]{36}\.mp3|[0-9]+-[0-9a-f-]{36}\.(?:webp|png|jpg|jpeg|gif))$/i;
+  const mediaTypes={mp3:'audio/mpeg',webp:'image/webp',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif'};
+  const mediaFetch=(url,opts={})=>fetch(url,{...opts,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(60000)});
+  const mediaHash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(x=>x.toString(16).padStart(2,'0')).join('');
+  function mediaVisit(value,fn){
+    if(!value||typeof value!=='object')return;
+    for(const key of Object.keys(value)){
+      const v=value[key];if(typeof v==='string')value[key]=fn(v);else if(v&&typeof v==='object')mediaVisit(v,fn);
+    }
+  }
+  function adoptVerifiedMedia(d,p){
+    const known=new Set();
+    mediaVisit(p,v=>{if(v.startsWith(CDN)&&MEDIA_PATH.test(v.slice(CDN.length)))known.add(v.slice(CDN.length));return v});
+    mediaVisit(d,v=>v.startsWith(OLD_MEDIA)&&known.has(v.slice(OLD_MEDIA.length))?CDN+v.slice(OLD_MEDIA.length):v);
+  }
+  async function uploadPublicMedia(path,blob,{existingOK=false}={}){
+    if(!MEDIA_PATH.test(path))throw Error('公開メディアパスが不正です');
+    const type=mediaTypes[path.split('.').pop().toLowerCase()],limit=(type==='audio/mpeg'?15:5)*1024*1024;
+    if(!type||blob.type!==type||!blob.size||blob.size>limit)throw Error('公開メディアの形式・容量が不正です');
+    const {data,error}=await client.auth.getSession();
+    if(error||!data?.session?.access_token)throw Error('ログイン期限切れです');
+    const r=await mediaFetch(CDN+path,{method:'PUT',headers:{Authorization:'Bearer '+data.session.access_token,apikey:cfg.publishableKey,'Content-Type':type},body:blob});
+    if(r.status!==201&&!(existingOK&&r.status===409))throw Error('R2アップロード失敗 HTTP '+r.status+' '+(await r.text()).slice(0,100));
+    const check=await mediaFetch(CDN+path);
+    if(!check.ok||(check.headers.get('Content-Type')||'').split(';')[0]!==type)throw Error('R2公開確認失敗 HTTP '+check.status);
+    if(await mediaHash(await check.arrayBuffer())!==await mediaHash(await blob.arrayBuffer()))throw Error('R2ファイル照合失敗');
+    return CDN+path;
+  }
+  async function migrateLegacyMedia(publicDoc,nextDraft){
+    const keys=new Set();
+    mediaVisit(publicDoc,v=>{if(v.startsWith(OLD_MEDIA)){const k=v.slice(OLD_MEDIA.length);if(!MEDIA_PATH.test(k))throw Error('未対応の旧メディアパス');keys.add(k)}return v});
+    const done=new Set();
+    for(const k of keys){
+      const r=await mediaFetch(OLD_MEDIA+k);if(!r.ok)throw Error('旧メディアの取得失敗 HTTP '+r.status);
+      await uploadPublicMedia(k,await r.blob(),{existingOK:true});done.add(k);
+    }
+    const replace=v=>v.startsWith(OLD_MEDIA)&&done.has(v.slice(OLD_MEDIA.length))?CDN+v.slice(OLD_MEDIA.length):v;
+    mediaVisit(publicDoc,replace);mediaVisit(nextDraft,replace);
+  }
+
   const isImageData = value => typeof value==='string' && value.startsWith('data:');
   async function publishImages(publicDoc, nextDraft){
     const converted=new Map();
@@ -251,11 +296,9 @@
       const ext={'image/webp':'webp','image/png':'png','image/jpeg':'jpg','image/gif':'gif'}[blob.type];
       if(!ext||blob.size<=0||blob.size>IMAGE_LIMIT)throw new Error(label+' は5MB以下のWebP/PNG/JPEG/GIFにしてください');
       const filename=`published/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-      const {error}=await client.storage.from('cast-public-media').upload(filename,blob,{contentType:blob.type,cacheControl:'31536000',upsert:false});
-      if(error)throw new Error(label+' の画像アップロード失敗: '+error.message);
-      const {data}=client.storage.from('cast-public-media').getPublicUrl(filename);
-      converted.set(value,data.publicUrl);
-      return data.publicUrl;
+      const publicURL=await uploadPublicMedia(filename,blob);
+      converted.set(value,publicURL);
+      return publicURL;
     }
     if(publicDoc.site?.soundtrack?.jacket)publicDoc.site.soundtrack.jacket=await transform(publicDoc.site.soundtrack.jacket,'MAIN THEME JACKET');
     for(const c of publicDoc.characters){
@@ -293,10 +336,8 @@
       const blob=isPrivateAudio(value)?await readPrivateAudio(value):await (await fetch(value)).blob();
       validateAudioBlob(blob);
       const filename='published/audio-'+crypto.randomUUID()+'.mp3';
-      const {error}=await client.storage.from('cast-public-media').upload(filename,blob,{contentType:'audio/mpeg',cacheControl:'31536000',upsert:false});
-      if(error)throw Error(label+'：音源のアップロードに失敗しました。Supabaseのcast-public-mediaバケットがaudio/mpegを許可しているか確認してください。 '+error.message);
-      const {data}=client.storage.from('cast-public-media').getPublicUrl(filename);
-      converted.set(value,data.publicUrl);m.src=data.publicUrl;
+      const publicURL=await uploadPublicMedia(filename,new Blob([blob],{type:'audio/mpeg'}));
+      converted.set(value,publicURL);m.src=publicURL;
     }
     await transform(publicDoc.site?.soundtrack,'MAIN THEME');
     for(const c of publicDoc.characters)await transform(c.soundtrack,c.name+' SOUNDTRACK');
@@ -334,6 +375,9 @@
       // Nonsecret revision: a new value per publish, even for identical data.
       nextPublic.publicationId=crypto.randomUUID();
       nextPublic.publishedAt=now;
+      stage='旧公開メディアの確認・移行';
+      adoptVerifiedMedia(nextPublic,published);adoptVerifiedMedia(next,published);
+      await migrateLegacyMedia(nextPublic,next);
       stage='画像・ジャケットの公開';
       await publishImages(nextPublic,next);
       stage='音源の公開';
