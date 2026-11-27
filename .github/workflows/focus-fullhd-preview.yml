@@ -1,0 +1,35 @@
+name: FOCUS Full HD vertical balance preview
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - cast-side-rail.css
+      - tests/focus-vertical-compare.mjs
+      - .github/workflows/focus-fullhd-preview.yml
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch origin main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser dependencies
+        run: npm install --no-save --ignore-scripts playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Compare Full HD and 2K (no deployment)
+        run: node tests/focus-vertical-compare.mjs
+      - name: Collect visual comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: focus-fullhd-compare
+          path: fullhd-hero-review/*.png
+          if-no-files-found: ignore

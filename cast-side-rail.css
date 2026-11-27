@@ -1484,3 +1484,13 @@ body.no-motion #hero .v7-stamp-corner{animation:none!important}
     }
   }
 }
+/* FOCUS / SHORT DESKTOP VIEWPORT RHYTHM
+   At 1919×1079 the lower copy feels cramped. The real 2K screenshot is
+   2048×1149; its established composition must remain completely unchanged.
+   Lift ONLY short desktop layouts, smoothly approaching 0px at 1130px tall.
+   All text, intro and PROFILE shift together; art and rail never move. */
+@media (min-width:1850px) and (max-height:1130px){
+  #hero .hero-copy{
+    top:max(38px,calc(clamp(44px,7.4vh,110px) - clamp(0px,calc(904px - 80svh),48px)))!important;
+  }
+}
