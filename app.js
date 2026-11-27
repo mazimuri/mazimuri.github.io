@@ -29,13 +29,14 @@ function scheduleNeighbor(c){
  artIdleTimer=setTimeout(()=>{if(cur()?.id!==c.id||state.panel||!canWarm(true))return;warmArt(state.people[(state.index+1)%state.people.length],true)},1100);
 }
 const mobileFrame=()=>matchMedia('(max-width:800px)').matches;
-let mobileIntroPlayed=false,mobileMotionExplicit=storedMobileMotion!==null,mobileMotionQueue=new Map(),mobileArtRun=0;
+let mobileIntroPlayed=false,mobileLastId=null,mobileMotionExplicit=storedMobileMotion!==null,mobileMotionQueue=new Map(),mobileArtRun=0;
 const mobileMotionAllowed=()=>mobileFrame()&&state.animations&&(mobileMotionExplicit||!matchMedia('(prefers-reduced-motion:reduce)').matches);
 function cancelMobileMotion(el){
  if(!el)return;const running=mobileMotionQueue.get(el);if(running){running.cancel();mobileMotionQueue.delete(el)}
- el.classList.remove('mb-motion-fallback-art','mb-motion-fallback-slab','mb-motion-fallback-type','mb-motion-fallback-detail');
+ el.classList.remove('mb-motion-fallback-art','mb-motion-fallback-slab','mb-motion-fallback-type','mb-motion-fallback-detail','mb-motion-fallback-switch-slab','mb-motion-fallback-switch-type');
 }
-function stopMobileMotion(){resetMobileArt();for(const el of [...mobileMotionQueue.keys()])cancelMobileMotion(el);for(const el of stage.querySelectorAll('.mb-motion-fallback-art,.mb-motion-fallback-slab,.mb-motion-fallback-type,.mb-motion-fallback-detail'))cancelMobileMotion(el)}
+function stopMobileScene(){for(const el of [...mobileMotionQueue.keys()])cancelMobileMotion(el);for(const el of stage.querySelectorAll('[class*="mb-motion-fallback-"]'))cancelMobileMotion(el)}
+function stopMobileMotion(){resetMobileArt();stopMobileScene()}
 function playMobileMotion(el,kind,frames,duration,delay=0){
  if(!el)return;cancelMobileMotion(el);if(!mobileMotionAllowed())return;
  const timing={duration,delay,easing:'cubic-bezier(.16,.82,.22,1)',fill:'backwards'};
@@ -46,16 +47,19 @@ function playMobileMotion(el,kind,frames,duration,delay=0){
 // starting a CSS transition; no animation clock runs while the image is loading.
 function resetMobileArt(){
  mobileArtRun++;
- const layer=$('mobileArtMotionLayer');if(layer)layer.classList.remove('mb-art-primed','mb-art-playing');
+ const layer=$('mobileArtMotionLayer');if(layer)layer.classList.remove('mb-art-primed','mb-art-playing','mb-art-switch');
 }
-function primeMobileArt(){
+function primeMobileArt(kind='full'){
  resetMobileArt();
- if(mobileMotionAllowed())$('mobileArtMotionLayer')?.classList.add('mb-art-primed');
-}
-function mobileArtMotion(){
+ if(kind==='none'||!mobileMotionAllowed())return;
  const layer=$('mobileArtMotionLayer');if(!layer)return;
- if(!mobileMotionAllowed()){resetMobileArt();return}
- primeMobileArt();
+ layer.classList.toggle('mb-art-switch',kind==='switch');
+ layer.classList.add('mb-art-primed');
+}
+function mobileArtMotion(kind='full'){
+ const layer=$('mobileArtMotionLayer');if(!layer)return;
+ if(kind==='none'||!mobileMotionAllowed()){resetMobileArt();return}
+ primeMobileArt(kind);
  const run=mobileArtRun;
  // Flush the initial style, then allow a rendered frame before switching.
  void getComputedStyle(layer).opacity;
@@ -65,21 +69,28 @@ function mobileArtMotion(){
   layer.classList.remove('mb-art-primed');
  }));
 }
-function mobileSceneMotion(){
+function mobileSceneMotion(kind='full'){
+ stopMobileScene();
+ if(kind==='none'||!mobileMotionAllowed())return;
+ if(kind==='switch'){
+  playMobileMotion($('mobileSlabMotionLayer'),'switch-slab',[{transform:'translate3d(48px,0,0)',opacity:.65},{transform:'translate3d(0,0,0)',opacity:1}],350);
+  for(const el of stage.querySelectorAll('.title-stack'))playMobileMotion(el,'switch-type',[{opacity:.25},{opacity:1}],180);
+  return;
+ }
  playMobileMotion($('mobileSlabMotionLayer'),'slab',[{transform:'translate3d(95px,0,0)',opacity:.45},{transform:'translate3d(0,0,0)',opacity:1}],620);
  for(const el of stage.querySelectorAll('.title-stack,.intro-kicker'))playMobileMotion(el,'type',[{transform:'translate3d(-38px,0,0)',opacity:0},{transform:'translate3d(0,0,0)',opacity:1}],510,35);
  for(const el of stage.querySelectorAll('.mobile-brand-layer,.mobile-quote,.mobile-profile,.mobile-intro'))playMobileMotion(el,'detail',[{opacity:0},{opacity:1}],430,100);
 }
-function setHeroImage(c){
+function setHeroImage(c,kind='none'){
  const img=$('heroArt'),src=c.artwork||'',previous=img.getAttribute('src')||'';
  img.fetchPriority='high';img.alt=c.name+'の立ち絵';
  if(src===previous){if(src&&img.complete&&img.naturalWidth){scheduleNeighbor(c)}return}
- clearTimeout(artIdleTimer);const epoch=++artEpoch;primeMobileArt();
+ clearTimeout(artIdleTimer);const epoch=++artEpoch;primeMobileArt(kind);
  if(!src){resetMobileArt();img.removeAttribute('src');img.style.visibility='hidden';return}
  img.style.visibility='hidden';artVisited.add(src);
  let revealed=false;
  const reveal=()=>{if(epoch!==artEpoch||revealed)return;revealed=true;
-  if(img.naturalWidth){mobileArtMotion();img.style.visibility='';scheduleNeighbor(cur()||c)}
+  if(img.naturalWidth){mobileArtMotion(kind);img.style.visibility='';scheduleNeighbor(cur()||c)}
   else{resetMobileArt();img.style.visibility=''}
  };
  // A load event is a second readiness path for browsers with delayed decode().
@@ -183,7 +194,12 @@ function fitMobileTitle(){
 window.addEventListener('resize',()=>requestAnimationFrame(fitMobileTitle),{passive:true});
 document.fonts?.ready.then(fitMobileTitle);
 function load({animate=true}={}){
- if(!state.people.length){showEmpty();return} stage.style.display='';const c=cur();setHeroImage(c);setTheme(c);
+ if(!state.people.length){showEmpty();return} stage.style.display='';const c=cur();
+ const isMobile=mobileFrame();
+ const firstMobile=isMobile&&!mobileIntroPlayed&&!state.panel&&!/^#(?:index|worlds?|about)(?:\/|$)/.test(location.hash);
+ const mobileKind=isMobile?(firstMobile||(!mobileIntroPlayed&&animate)?'full':animate&&mobileLastId!==c.id?'switch':'none'):'none';
+ if(isMobile){if(mobileKind!=='none')mobileIntroPlayed=true;mobileLastId=c.id}
+ setHeroImage(c,mobileKind);setTheme(c);
  setText('heroRoman',c.roman||c.name||'UNKNOWN');setText('heroRoman2',c.surname||'');$('heroRoman2').hidden=!String(c.surname||'').trim();$('heroCopy').classList.toggle('no-surname',!String(c.surname||'').trim());setText('heroJapanese',c.name||'名前未定');
  setText('heroKicker',`CHARACTER FILE ${c.no} / ${String(state.people.length).padStart(3,'0')}`);setText('heroRole',c.roleJa||c.type||'ORIGINAL CHARACTER');
  const species=String(c.species||'').trim(),gender=String(c.gender||'').trim();$('heroCoreData').hidden=!(species||gender);$('heroSpeciesWrap').hidden=!species;$('heroGenderWrap').hidden=!gender;setText('heroSpecies',species);setText('heroGender',gender);
@@ -198,8 +214,7 @@ function load({animate=true}={}){
  const pos={x:0,y:0,zoom:1,...(c.artPosition||{})};$('heroArt').style.setProperty('--art-x',`${Number(pos.x)||0}%`);$('heroArt').style.setProperty('--art-y',`${Number(pos.y)||0}%`);$('heroArt').style.setProperty('--art-zoom',Number(pos.zoom)||1);$('heroArt').alt=c.name+'の立ち絵';const badge={...BADGE_DESKTOP_DEFAULT,...(c.fileBadgePosition||{})},mobileBadge={right:8,top:66,...(c.fileBadgePositionMobile||{})};$('artStamp').style.setProperty('--badge-right',Number(badge.right)+'%');$('artStamp').style.setProperty('--badge-top',Number(badge.top)+'%');$('artStamp').style.setProperty('--badge-mobile-right',Number(mobileBadge.right)+'%');$('artStamp').style.setProperty('--badge-mobile-top',Number(mobileBadge.top)+'%');$('artStamp').innerHTML=`<span class="v7-stamp-original">FILE<br><b>${esc(c.no)}</b></span><span class="v7-stamp-detail" aria-hidden="true"><span class="v7-stamp-corner tl"></span><span class="v7-stamp-corner tr"></span><span class="v7-stamp-corner bl"></span><span class="v7-stamp-corner br"></span><svg class="v10-stamp-arc" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><defs><path id="v10-stamp-arc-path" d="M 32 56 A 59 59 0 0 1 128 56"/></defs><text><textPath href="#v10-stamp-arc-path" startOffset="50%" text-anchor="middle">CAST SIGNAL</textPath></text></svg><span class="v7-stamp-inner"><small>FILE</small><strong>${esc(c.no)}</strong><i></i></span></span>`;
  renderPicker();renderMobileSelection();if(state.panel==='dossier')renderDossier();
  clearTimeout(state.enterTimer);const nonce=++state.enterNonce;stage.classList.remove('is-entering');
- const firstMobile=mobileFrame()&&!mobileIntroPlayed&&!state.panel&&!/^#(?:index|worlds?|about)(?:\/|$)/.test(location.hash);if(mobileFrame())mobileIntroPlayed=true;
- if((animate||firstMobile)&&mobileFrame()){mobileSceneMotion()}else if(animate&&state.animations){stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px');void stage.offsetWidth;stage.classList.add('is-entering');state.enterTimer=setTimeout(()=>{if(state.enterNonce===nonce)stage.classList.remove('is-entering')},1220)}
+ if(isMobile){if(mobileKind!=='none')mobileSceneMotion(mobileKind)}else if(animate&&state.animations){stage.style.setProperty('--par-x','0px');stage.style.setProperty('--par-y','0px');void stage.offsetWidth;stage.classList.add('is-entering');state.enterTimer=setTimeout(()=>{if(state.enterNonce===nonce)stage.classList.remove('is-entering')},1220)}
 }
 function icon(c){return c.icon||c.artwork||''}
 function label(c){return c.playable?'<b class="zeta-badge">zeta</b>':''}
