@@ -106,3 +106,22 @@
  body:not(.mb-motion-opt-in) #hero.hero .mb-art-motion{opacity:1!important;transform:none!important;transition:none!important}
  body.mb-motion-opt-in:not(.no-motion) #hero.hero .mb-art-motion.mb-art-playing{transition-duration:.86s,.64s!important}
 }
+
+/* V1.0.3: keep the full first entrance; make repeated cast browsing lightweight. */
+@media(max-width:800px){
+ #hero.hero .mb-art-motion.mb-art-switch.mb-art-primed{
+  transform:translate3d(40px,9px,0) scale(1.01)!important;
+ }
+ #hero.hero .mb-art-motion.mb-art-switch.mb-art-playing{
+  transition:transform .45s cubic-bezier(.22,.64,.32,1),opacity .30s ease-out!important;
+ }
+ #hero.hero .mb-motion-fallback-switch-slab{animation:mb-switch-slab .35s cubic-bezier(.16,.82,.22,1) both!important}
+ #hero.hero .mb-motion-fallback-switch-type{animation:mb-switch-type .18s ease-out both!important}
+}
+@keyframes mb-switch-slab{from{transform:translate3d(48px,0,0);opacity:.65}to{transform:translate3d(0,0,0);opacity:1}}
+@keyframes mb-switch-type{from{opacity:.25}to{opacity:1}}
+@media(max-width:800px) and (prefers-reduced-motion:reduce){
+ body.mb-motion-opt-in:not(.no-motion) #hero.hero .mb-art-motion.mb-art-switch.mb-art-playing{transition-duration:.45s,.30s!important}
+ body.mb-motion-opt-in:not(.no-motion) #hero.hero .mb-motion-fallback-switch-slab{animation-duration:.35s!important}
+ body.mb-motion-opt-in:not(.no-motion) #hero.hero .mb-motion-fallback-switch-type{animation-duration:.18s!important}
+}
