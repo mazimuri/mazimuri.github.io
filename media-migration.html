@@ -1,0 +1,49 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>CAST // SIGNAL — MEDIA MIGRATION</title><style>body{background:#15191d;color:#f2f3ed;font:16px system-ui,sans-serif;max-width:860px;margin:48px auto;padding:20px}h1{font-size:clamp(28px,6vw,48px);line-height:1;letter-spacing:-.04em}small{color:#eaff55;letter-spacing:.12em}button{background:#eaff55;color:#15191d;border:0;padding:14px 22px;font-weight:bold;cursor:pointer}button:disabled{opacity:.4;cursor:default}progress{display:block;width:100%;height:18px;accent-color:#eaff55;margin:18px 0}pre{background:#22292d;border:1px solid #465057;min-height:130px;max-height:350px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;font-size:12px}a{color:#eaff55}#status{color:#eaff55;font-weight:bold;overflow-wrap:anywhere}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script><script src="cloud-config.js"></script></head><body><small>CAST // SIGNAL / CONTROL ROOM</small><h1>MEDIA MIGRATION.</h1><p>公開済みメディアをR2へコピーし、SHA-256で内容を照合します。元データ・公開URLは変更しません。</p><p>既存の管理者セッションが必要です。移行中は編集・公開操作をしないでください。</p><p id="status">認証確認中…</p><button id="go" disabled>公開メディアをコピー・検証する</button><progress id="progress" value="0" max="1"></progress><pre id="log"></pre><a href="admin.html">CONTROL ROOMに戻る</a><script>
+(async()=>{
+const cfg=window.CAST_CONFIG||{},CDN='https://cast-signal-cdn.mazimuri.workers.dev/',PREFIX=cfg.url+'/storage/v1/object/public/cast-public-media/';
+const $=id=>document.getElementById(id),say=s=>{$('status').textContent=s},log=s=>{$('log').textContent+=s+'\n';$('log').scrollTop=$('log').scrollHeight};
+const path=/^published\/(?:audio-[0-9a-f-]{36}\.mp3|[0-9]+-[0-9a-f-]{36}\.(?:webp|png|jpg|jpeg|gif))$/;
+const types={mp3:'audio/mpeg',webp:'image/webp',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif'};
+const client=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+async function admin(){const {data,error}=await client.auth.getUser();if(error||!data?.user)throw Error('CONTROL ROOMにログインしてから再読み込みしてください。');const r=await client.from('cast_documents').select('kind').eq('kind','draft').maybeSingle();if(r.error||r.data?.kind!=='draft')throw Error('管理者権限が確認できません。');}
+async function refs(){const r=await client.from('cast_documents').select('payload').eq('kind','published').single();if(r.error)throw Error(r.error.message);const set=new Set();function visit(v){if(typeof v==='string'&&v.startsWith(PREFIX)){const key=v.slice(PREFIX.length);if(!path.test(key))throw Error('未対応の公開メディアパス');set.add(key);}else if(v&&typeof v==='object')Object.values(v).forEach(visit);}visit(r.data.payload);return [...set].sort();}
+async function req(url,opts={}){return fetch(url,{...opts,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(60000)});}
+const hash=async b=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',b))).map(x=>x.toString(16).padStart(2,'0')).join('');
+let keys=[];
+try{await admin();keys=await refs();if(!keys.length)throw Error('移行対象なし');say('管理者認証 OK / 公開ファイル '+keys.length+' 件');$('go').disabled=false;}catch(e){say(e.message);return;}
+$('go').onclick=async()=>{
+ $('go').disabled=true;$('log').textContent='';$('progress').max=keys.length;$('progress').value=0;
+ try{
+  await admin();keys=await refs();$('progress').max=keys.length;
+  const probe=await req(CDN+'published/'+keys[0].split('/')[1],{method:'PUT',headers:{'Content-Type':types[keys[0].split('.').pop()]},body:new Uint8Array([0])});
+  if(probe.status!==403)throw Error('未認証の書き込み拒否を確認できません: HTTP '+probe.status);
+  log('未認証アップロード拒否: OK');
+  let copied=0,existing=0;
+  for(const k of keys){
+   say('検証中 '+(copied+existing+1)+' / '+keys.length);
+   const src=await req(PREFIX+k);if(!src.ok)throw Error('元ファイル取得失敗: '+k+' / '+src.status);
+   const bytes=await src.arrayBuffer();const digest=await hash(bytes);
+   const type=types[k.split('.').pop()];const limit=(type==='audio/mpeg'?15:5)*1024*1024;
+   if(!bytes.byteLength||bytes.byteLength>limit)throw Error('容量制限: '+k);
+   const head=await req(CDN+k,{method:'HEAD'});
+   let already=head.ok;
+   if(!already){
+    if(head.status!==404)throw Error('CDN応答異常: '+head.status);
+    const {data,error}=await client.auth.getSession();if(error||!data?.session?.access_token)throw Error('ログイン期限切れ');
+    const put=await req(CDN+k,{method:'PUT',headers:{'Authorization':'Bearer '+data.session.access_token,'apikey':cfg.publishableKey,'Content-Type':type},body:bytes});
+    if(put.status===409){already=true;}else if(put.status!==201)throw Error('アップロード失敗: '+k+' / HTTP '+put.status+' '+(await put.text()).slice(0,100));
+   }
+   const check=await req(CDN+k);if(!check.ok)throw Error('配信確認失敗: '+k+' / '+check.status);
+   if((check.headers.get('Content-Type')||'').split(';')[0]!==type)throw Error('Content-Type不一致: '+k);
+   if(await hash(await check.arrayBuffer())!==digest)throw Error('SHA-256不一致: '+k);
+   if(already)existing++;else copied++;
+   $('progress').value=copied+existing;
+   log((already?'既存確認':'コピー成功')+' '+(copied+existing)+' / '+keys.length+' '+k);
+  }
+  const mp3=keys.find(k=>k.endsWith('.mp3'));
+  if(mp3){const r=await req(CDN+mp3,{headers:{Range:'bytes=0-1023'}});if(r.status!==206||!/^bytes 0-1023\/\d+$/.test(r.headers.get('Content-Range')||'')||(await r.arrayBuffer()).byteLength!==1024)throw Error('MP3 Range配信テスト失敗');log('MP3 Range / CORS: OK');}
+  say('COPY VERIFIED / '+keys.length+' 件（新規 '+copied+' / 既存 '+existing+'）');log('元のSupabase・公開データは変更していません。');
+ }catch(e){say('停止: '+e.message);log('再実行可能です。元データは変更していません。');}
+ finally{$('go').disabled=false;}
+};
+})().catch(e=>{document.getElementById('status').textContent=e.message;});</script></body></html>
