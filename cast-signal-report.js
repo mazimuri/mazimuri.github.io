@@ -15,14 +15,26 @@ const name=(id,type)=>{const d=window.CAST_DATA?.getPublished?.();if(id==='main'
 const art=(id,type)=>{const d=window.CAST_DATA?.getPublished?.();const c=d?.characters?.find(x=>x.id===id);const s=type==='sound'?(id==='main'?d?.site?.soundtrack?.jacket:c?.soundtrack?.jacket||c?.icon):c?.icon||c?.artwork;return typeof s==='string'&&/^(https:\/\/|assets\/)/.test(s)?'<img src="'+esc(s)+'" loading="lazy" decoding="async" alt="">':''};
 const button=(id,text,active=false)=>'<button type="button" data-sr="'+id+'" class="'+(active?'active':'')+'">'+esc(text)+'</button>';
 function chart(keys,previous){
- const map=ks=>ks.map(day=>({day,v:sum(values(metric,[day])),known:!!first()&&day>=first()}));
+ const start=first(),map=ks=>ks.map(day=>({day,v:sum(values(metric,[day])),known:!!start&&day>=start}));
  const a=map(keys),b=map(previous),peak=Math.max(0,...a.map(x=>x.v),...b.map(x=>x.v));
  const raw=peak/4,unit=10**Math.floor(Math.log10(Math.max(1,raw))),step=([1,2,5,10].find(n=>n*unit>=raw)||10)*unit,ticks=Math.max(1,Math.ceil(peak/step)),max=ticks*step;const w=800,h=204,left=46,right=785,top=15,bottom=169;
  const x=i=>left+(right-left)*i/Math.max(1,a.length-1),y=v=>bottom-(bottom-top)*v/max;
  const line=data=>{let started=false;return data.map((d,i)=>{if(!d.known){started=false;return ''}const s=(started?'L':'M')+x(i).toFixed(1)+' '+y(d.v).toFixed(1);started=true;return s}).join(' ')};
  let grid='';for(let i=0;i<=ticks;i++){const v=i*step;grid+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+right+'" y2="'+y(v)+'" stroke="#394247"/><text x="38" y="'+(y(v)+4)+'" text-anchor="end" fill="#9caaae" font-size="10">'+fmt(Math.round(v))+'</text>'}
  const labelsAt=[0,Math.floor((a.length-1)/2),a.length-1];
- return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="選択期間と前期間の日別集計グラフ">'+grid+'<path d="'+line(b)+'" stroke="#8ea9c9" stroke-width="2" stroke-dasharray="5 5" fill="none"/><path d="'+line(a)+'" stroke="#eaff55" stroke-width="3" fill="none"/>'+a.map((d,i)=>d.known?'<circle cx="'+x(i)+'" cy="'+y(d.v)+'" r="3" fill="#eaff55"><title>'+esc(d.day)+'：'+fmt(d.v)+'</title></circle>':'').join('')+labelsAt.map(i=>'<text x="'+x(i)+'" y="192" text-anchor="'+(i===0?'start':i===a.length-1?'end':'middle')+'" fill="#9caaae" font-size="11">'+a[i].day.slice(5).replace('-','/')+'</text>').join('')+'</svg>';
+ const label=labels[metric]||metric;
+ const dots=a.map((d,i)=>d.known?'<circle cx="'+x(i)+'" cy="'+y(d.v)+'" r="3" fill="#eaff55"/>':'').join('');
+ const hits=a.map((d,i)=>{
+  const p=b[i];if(!d.known&&!p.known)return '';
+  const xx=x(i),half=(right-left)/Math.max(1,a.length-1)/2,lo=Math.max(left-5,xx-half),hi=Math.min(right+5,xx+half);
+  const date=d.day+(d.day===dayKey(0)?' / TODAY':'');
+  const current=d.known?label+'  '+fmt(d.v):label+'  —';
+  const previous=p.known?p.day+' / '+fmt(p.v):'';
+  const tw=174,th=p.known?65:48,tx=Math.max(2,Math.min(w-tw-2,xx+9+tw>w?xx-tw-9:xx+9)),anchor=y(d.known?d.v:p.v),ty=Math.max(2,Math.min(h-th-2,anchor-th-9<2?anchor+9:anchor-th-9));
+  const aria=date+'、'+current+(previous?'、前期間 '+previous:'');
+  return '<g class="sr-chart-day" data-sr-chart-day="'+i+'" tabindex="0" role="button" aria-label="'+esc(aria)+'" aria-pressed="false"><rect class="sr-chart-hit" x="'+lo+'" y="'+(top-6)+'" width="'+(hi-lo)+'" height="'+(bottom-top+12)+'" fill="transparent"/><g class="sr-chart-popup" pointer-events="none"><line x1="'+xx+'" y1="'+top+'" x2="'+xx+'" y2="'+bottom+'" stroke="#eaff55" stroke-opacity=".48" stroke-dasharray="3 3"/>'+(d.known?'<circle cx="'+xx+'" cy="'+y(d.v)+'" r="5" fill="#eaff55" stroke="#14191d" stroke-width="1.5"/>':'')+(p.known?'<circle cx="'+xx+'" cy="'+y(p.v)+'" r="4" fill="#8ea9c9" stroke="#14191d" stroke-width="1.5"/>':'')+'<g transform="translate('+tx+' '+ty+')"><rect width="'+tw+'" height="'+th+'" fill="#14191d" stroke="#eaff55" stroke-width=".8"/><text x="10" y="15" font-size="10" fill="#a6b3b6">'+esc(date)+'</text><text x="10" y="34" font-size="13" font-weight="800" fill="#eaff55">'+esc(current)+'</text>'+(p.known?'<text x="10" y="52" font-size="9.5" fill="#8ea9c9">PREV '+esc(previous)+'</text>':'')+'</g></g></g>';
+ }).join('');
+ return '<svg class="sr-traffic-chart" viewBox="0 0 '+w+' '+h+'" role="group" aria-label="選択期間と前期間の日別集計グラフ。日付にカーソルを合わせるか、タップして数値を確認できます。">'+grid+'<path d="'+line(b)+'" stroke="#8ea9c9" stroke-width="2" stroke-dasharray="5 5" fill="none"/><path d="'+line(a)+'" stroke="#eaff55" stroke-width="3" fill="none"/>'+dots+labelsAt.map(i=>'<text x="'+x(i)+'" y="192" text-anchor="'+(i===0?'start':i===a.length-1?'end':'middle')+'" fill="#9caaae" font-size="11">'+a[i].day.slice(5).replace('-','/')+'</text>').join('')+hits+'</svg>';
 }
 function ranking(event,keys,type){
  const items=grouping(event,keys),max=items[0]?.[1]||1;
@@ -54,7 +66,11 @@ async function load(){
 }
 function bind(refresh){
  refreshView=refresh;const root=document.getElementById('sr-root');if(!root)return;
- root.onclick=e=>{const a=e.target.closest('[data-sr]')?.dataset.sr;if(!a)return;if(a==='reload'){load();return}const [k,v]=a.split(':');if(k==='days')days=Number(v);else if(k==='rank')rank=v;else if(k==='metric')metric=v;refreshView?.()};
+ const clearChart=()=>root.querySelectorAll('.sr-chart-day[aria-pressed="true"]').forEach(el=>el.setAttribute('aria-pressed','false'));
+ const toggleChart=el=>{const active=el.getAttribute('aria-pressed')==='true';clearChart();if(!active)el.setAttribute('aria-pressed','true')};
+ root.addEventListener('pointerover',e=>{const el=e.target.closest?.('.sr-chart-day');if(el&&e.pointerType==='mouse')clearChart()});
+ root.addEventListener('keydown',e=>{const el=e.target.closest?.('.sr-chart-day');if(!el)return;if(e.key==='Escape'){clearChart();el.blur();return}if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleChart(el)}});
+ root.onclick=e=>{const point=e.target.closest?.('.sr-chart-day');if(point){if(!matchMedia('(hover: hover) and (pointer: fine)').matches)toggleChart(point);return}clearChart();const a=e.target.closest('[data-sr]')?.dataset.sr;if(!a)return;if(a==='reload'){load();return}const [k,v]=a.split(':');if(k==='days')days=Number(v);else if(k==='rank')rank=v;else if(k==='metric')metric=v;refreshView?.()};
 }
 window.CAST_SIGNAL_REPORT={render,bind,load};
 })();
