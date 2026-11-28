@@ -661,10 +661,16 @@
     grid-template-columns:1fr;gap:16px;
     margin-top:20px;
   }
+  /* Mobile WORLD SELECT: retain the approved wide desktop composition.
+     The image box follows card width, not remaining height after the text.
+     Keep existing art transforms, layers and crop values unchanged. */
   #worldsPanel .world-card.ws5-card{
-    height:clamp(410px,108vw,475px);
+    height:auto;
   }
-  #worldsPanel .ws5-visual{flex:1 1 0%;height:auto;min-height:125px}
+  #worldsPanel .ws5-visual{
+    display:block;flex:0 0 auto;width:100%;height:auto;min-height:0;
+    aspect-ratio:2.35 / 1;
+  }
   #worldsPanel .ws5-huge{font-size:125px}
   #worldsPanel .ws5-name{font-size:clamp(26px,7.1vw,35px)}
   #worldsPanel .ws5-summary{font-size:12px}
